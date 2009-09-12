@@ -1,13 +1,14 @@
 ==================================================================================
-TOX+ - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
+YAQP - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
 http://opentox.ntua.gr:3000/
 ==================================================================================
 
-This is the release 1.2 (alpha) of the web service tox+
+This is the release 1.2 (alpha) of the web service yaqp (yet another qsar project)
 
 This release bring the following features:
 
 - storing arff files on the server
+- Provide various representations of stored data (xml and other)
 - perform attribute selection using the algorithm 
   info Gain Attribute Evaluation
 - Train svm classification and regression models
@@ -15,6 +16,7 @@ This release bring the following features:
 - validate svm classification models and mlr models
 - xml/pmml output for the mlr regression model
 - xml output for all validation results
+- plain text output for svm models
 
 This project (Tox+) is developed under OpenTox (http://opentox.org) 
 to serve as a web service for QSAR model training and validation. 
