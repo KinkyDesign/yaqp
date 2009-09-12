@@ -1,0 +1,57 @@
+==================================================================================
+TOX+ - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
+http://opentox.ntua.gr:3000/
+==================================================================================
+
+This is the release 1.2 (alpha) of the web service tox+
+
+This release bring the following features:
+
+- storing arff files on the server
+- perform attribute selection using the algorithm 
+  info Gain Attribute Evaluation
+- Train svm classification and regression models
+- Train mlr regression models
+- validate svm classification models and mlr models
+- xml/pmml output for the mlr regression model
+- xml output for all validation results
+
+This project (Tox+) is developed under OpenTox (http://opentox.org) 
+to serve as a web service for QSAR model training and validation. 
+The service runs at http://opentox.ntua.gr:3000/ on an Apache Tomcat 
+server, but you can also compile the source code and run it locally. 
+Three external java libraries are needed in order to compile the 
+source code: Restlet, weka & LibSVM. All of these libraries are open-source 
+and distributed for free.
+
+Enjoy Tox+ !
+
+
+==================================================================================
+ONLINE WEB SERVICES
+==================================================================================
+
+A server has been set up that supports the services at http://opentox.ntua.gr:3000/
+You can use the well known program cURL to consume these services. If cURL is not 
+installed on your system, install it typing:
+
+sudo apt-get install curl
+
+Find a complete guide for usign curl at http://opemtox.ntua.gr:3000/guide. Fell free
+to contact us via email at chvng@mail.ntua.gr.
+
+
+==================================================================================
+Summary
+==================================================================================
+Project Name : Tox+ (under OpenTox)
+Programming Lang. : Java
+Project Type : WebServices
+Developed by :	Sopasakis Pantelis
+Home Page : http://opentox.ntua.gr:3000/
+
+
+Copyright 2009 - OpenTox
+This project is licensed under the GNU General Public Licence v.3 
+
+
