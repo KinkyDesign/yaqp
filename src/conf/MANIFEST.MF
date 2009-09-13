@@ -6,5 +6,5 @@ Specification-Title: OpenTox Restful WebServices
 Specification-Version: 1.2.1
 Specification-Vendor: http://www.opentox.org/, OpenTox - An Open Source Predictive Toxicology Framework
 Implementation-Title: org.opentox
-Implementation-Version: build_2140 (Aug 28, 2009)
+Implementation-Version: build_2158 (Sep 4, 2009)
 Implementation-Vendor: National Technical University of Athens, School of Chemical Engineering, Automatic Control Laboratory

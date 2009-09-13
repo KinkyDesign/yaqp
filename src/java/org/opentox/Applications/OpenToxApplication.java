@@ -299,6 +299,9 @@ import org.restlet.data.Request;
 
 
 
+	/**
+	 * This method provides user accounts.
+	 */
     private Map<String, char[]> SetUserIds() {
         Map<String, char[]> secret = new HashMap<String, char[]>();
         secret.put("?", "?".toCharArray());
@@ -309,6 +312,12 @@ import org.restlet.data.Request;
     /**
      * True Random Passwords generated from
      * http://www.goodpassword.com/
+     * This private method provides accounts for
+     * administrators of the web service. Only administrators
+     * are authorized invoke the DELETE method. The source
+     * code of the service is provided to the general public under
+     * the GNU GPL v.3 licence, but the usernames and passwords
+     * are not revealed for seccurity reasons.
      * @return secret
      */
     private Map<String, char[]> SetAdminIds() {

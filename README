@@ -1,11 +1,12 @@
 ==================================================================================
 YAQP - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
+Copyright 2009 - Yet Antother Qsar Project
 http://opentox.ntua.gr:3000/
 ==================================================================================
 
 This is the release 1.2 (alpha) of the web service yaqp (yet another qsar project)
 
-This release bring the following features:
+This release brings the following features:
 
 - storing arff files on the server
 - Provide various representations of stored data (xml and other)
@@ -18,15 +19,15 @@ This release bring the following features:
 - xml output for all validation results
 - plain text output for svm models
 
-This project (Tox+) is developed under OpenTox (http://opentox.org) 
+This project (YAQP) is developed under OpenTox (http://opentox.org) 
 to serve as a web service for QSAR model training and validation. 
 The service runs at http://opentox.ntua.gr:3000/ on an Apache Tomcat 
-server, but you can also compile the source code and run it locally. 
+server (ver 6.0.16), but you can also compile the source code and run it locally. 
 Three external java libraries are needed in order to compile the 
-source code: Restlet, weka & LibSVM. All of these libraries are open-source 
+source code: Restlet, Weka & LibSVM. All of these libraries are open-source 
 and distributed for free.
 
-Enjoy Tox+ !
+Enjoy YAQP !
 
 
 ==================================================================================
@@ -39,21 +40,21 @@ installed on your system, install it typing:
 
 sudo apt-get install curl
 
-Find a complete guide for usign curl at http://opemtox.ntua.gr:3000/guide. Fell free
+Find a complete guide for usign curl at http://opentox.ntua.gr:3000/guide. Feel free
 to contact us via email at chvng@mail.ntua.gr.
 
 
 ==================================================================================
 Summary
 ==================================================================================
-Project Name : Tox+ (under OpenTox)
+Project Name : YAQP (under OpenTox)
 Programming Lang. : Java
 Project Type : WebServices
 Developed by :	Sopasakis Pantelis
 Home Page : http://opentox.ntua.gr:3000/
 
 
-Copyright 2009 - OpenTox
+Copyright 2009 - YAQP (part of OpenTox - http://www.opentox.org)
 This project is licensed under the GNU General Public Licence v.3 
 
 
