@@ -8,7 +8,7 @@ This is the release 1.2 (alpha) of the web service yaqp (yet another qsar projec
 
 This release brings the following features:
 
-- storing arff files on the server
+- storing arff files on the server (Requires a user account)
 - Provide various representations of stored data (xml and other)
 - perform attribute selection using the algorithm 
   info Gain Attribute Evaluation
@@ -19,6 +19,20 @@ This release brings the following features:
 - xml output for all validation results
 - plain text output for svm models
 
+
+==================================================================================
+Summary
+==================================================================================
+Project Name : YAQP (under OpenTox)
+Programming Lang. : Java
+Project Type : Restful WebServices
+Developed by :	Sopasakis Pantelis
+Home Page : http://opentox.ntua.gr:3000/
+
+
+==================================================================================
+About
+==================================================================================
 This project (YAQP) is developed under OpenTox (http://opentox.org) 
 to serve as a web service for QSAR model training and validation. 
 The service runs at http://opentox.ntua.gr:3000/ on an Apache Tomcat 
@@ -43,15 +57,6 @@ sudo apt-get install curl
 Find a complete guide for usign curl at http://opentox.ntua.gr:3000/guide. Feel free
 to contact us via email at chvng@mail.ntua.gr.
 
-
-==================================================================================
-Summary
-==================================================================================
-Project Name : YAQP (under OpenTox)
-Programming Lang. : Java
-Project Type : WebServices
-Developed by :	Sopasakis Pantelis
-Home Page : http://opentox.ntua.gr:3000/
 
 
 Copyright 2009 - YAQP (part of OpenTox - http://www.opentox.org)
