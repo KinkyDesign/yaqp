@@ -121,7 +121,7 @@ import org.restlet.data.Request;
           * Guard sensitive resources!
           * Create a guard - set username and password...
           */
-         final Guard UploalGuard = new Guard(getContext(), ChallengeScheme.HTTP_BASIC,
+         final Guard UploalGuard = new Guard(getContext(), ChallengeScheme.HTTP_DIGEST,
                  "To avoid spamming we ask you to provide your username and password..."){
              @Override
              public int authenticate(Request req)
@@ -299,12 +299,9 @@ import org.restlet.data.Request;
 
 
 
-	/**
-	 * This method provides user accounts.
-	 */
     private Map<String, char[]> SetUserIds() {
         Map<String, char[]> secret = new HashMap<String, char[]>();
-        secret.put("?", "?".toCharArray());
+        secret.put("itsme", "letmein".toCharArray());
         secret.putAll(SetAdminIds());
         return secret;
     }
@@ -312,18 +309,12 @@ import org.restlet.data.Request;
     /**
      * True Random Passwords generated from
      * http://www.goodpassword.com/
-     * This private method provides accounts for
-     * administrators of the web service. Only administrators
-     * are authorized invoke the DELETE method. The source
-     * code of the service is provided to the general public under
-     * the GNU GPL v.3 licence, but the usernames and passwords
-     * are not revealed for seccurity reasons.
      * @return secret
      */
     private Map<String, char[]> SetAdminIds() {
         Map<String, char[]> secret = new HashMap<String, char[]>();
-        secret.put("?","?".toCharArray());
-        secret.put("?","?".toCharArray());
+        secret.put("????","?".toCharArray());
+        secret.put("??","?".toCharArray());
         return secret;
     }
 

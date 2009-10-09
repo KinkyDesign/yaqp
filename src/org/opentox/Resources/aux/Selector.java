@@ -10,14 +10,11 @@ import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 
 /**
- * This class is deprecated. The online interface is now provided
- * at http://opentox.ntua.gr:3000/interface/selector
+ *
  * @author OpenTox, http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @deprecated
  */
-@Deprecated
 public class Selector extends AbstractResource
 {
 

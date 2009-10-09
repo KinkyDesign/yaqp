@@ -202,6 +202,27 @@ public abstract class AbstractResource  extends Resource{
     public static String
                 baseURI="http://opentox.ntua.gr:"+port+"/OpenToxServices";
 
+    private static String
+            ClassificationModelURI = baseURI+"/model/classification";
+
+
+
+    public static String
+            SvcModelURI=ClassificationModelURI+"/svc";
+
+    /**
+     * URI for all learning algorithms! (Private)
+     * 
+     */
+    private static String
+            LearningAlgorithmURI = baseURI + "/algorithm/learning";
+
+    /*
+     * URI for Support vector classifier
+     */
+    public static String
+            SvcAlgorithmURI = LearningAlgorithmURI + "/svc";
+
     /**
      * Server IP.
      */
