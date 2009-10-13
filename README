@@ -4,7 +4,6 @@ Copyright 2009 - Yet Antother Qsar Project
 http://opentox.ntua.gr:3000/
 ==================================================================================
 
--- Tartoufo Forked this Project.
 
 This is the release 1.2 (alpha) of the web service yaqp (yet another qsar project)
 
@@ -20,6 +19,9 @@ This release brings the following features:
 - xml/pmml output for the mlr regression model
 - xml output for all validation results
 - plain text output for svm models
+
+We put effort so that our services be compliant with the OpenTox specification
+(APIs 1.0 and 1.1)
 
 
 ==================================================================================
