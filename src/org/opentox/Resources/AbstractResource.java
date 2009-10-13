@@ -28,7 +28,7 @@ public abstract class AbstractResource  extends Resource{
     /**
      * version unique serial number.
      */
-    private static final long serialVersionUID = 1048422959964500137L;
+    private static final long serialVersionUID = 1048422959964500138L;
 
     /**
      * The first line of every XML file.
@@ -130,6 +130,14 @@ public abstract class AbstractResource  extends Resource{
     private static final String
                   modelsDir=baseDir+"/models";
 
+
+    /**
+     * Repository for xml representations of models
+     *
+     */
+    public static final String
+            modelsXmlDir = modelsDir + "/xml";
+
     /**
      * Repository for classification models.
      */
@@ -202,6 +210,9 @@ public abstract class AbstractResource  extends Resource{
     public static String
                 baseURI="http://opentox.ntua.gr:"+port+"/OpenToxServices";
 
+    public static final String
+            ModelURI = baseURI + "/model";
+
     private static String
             ClassificationModelURI = baseURI+"/model/classification";
 
@@ -209,6 +220,13 @@ public abstract class AbstractResource  extends Resource{
 
     public static String
             SvcModelURI=ClassificationModelURI+"/svc";
+
+
+    private static String
+            RegressionModelURI=baseURI+"/model/regression";
+
+    public static String
+            SvmModelURI=RegressionModelURI+"/svm";
 
     /**
      * URI for all learning algorithms! (Private)
@@ -221,8 +239,13 @@ public abstract class AbstractResource  extends Resource{
      * URI for Support vector classifier
      */
     public static String
-            SvcAlgorithmURI = LearningAlgorithmURI + "/svc";
+            SvcAlgorithmURI = LearningAlgorithmURI + "/classification/svc";
 
+    public static String
+            SvmAlgorithmURI = LearningAlgorithmURI + "/regression/svm";
+
+    public static String
+            MlrAlgorithmURI = LearningAlgorithmURI + "/regression/mlr";
     /**
      * Server IP.
      */

@@ -35,7 +35,7 @@ import org.restlet.resource.Variant;
  */
 public class Model extends AbstractResource{
 
-    private static final long serialVersionUID = 10012190007003004L;
+    private static final long serialVersionUID = 10012190007003005L;
 
     private String model_id, algorithm_id, model_type;
     
@@ -51,8 +51,8 @@ public class Model extends AbstractResource{
         getVariants().add(new Variant(MediaType.TEXT_XML));
         getVariants().add(new Variant(MediaType.TEXT_PLAIN));
         model_id = Reference.decode(request.getAttributes().get("model_id").toString());
-        algorithm_id = Reference.decode(request.getAttributes().get("algorithm_id").toString());
-        model_type = Reference.decode(request.getAttributes().get("model_type").toString());
+        //algorithm_id = Reference.decode(request.getAttributes().get("algorithm_id").toString());
+        //model_type = Reference.decode(request.getAttributes().get("model_type").toString());
     }
 
     /**
@@ -63,14 +63,8 @@ public class Model extends AbstractResource{
     @Override
     public Representation represent(Variant variant)
     {
-        /**
-         * 1. Return XML representations for regression models:
-         */
+        /*
         if (model_type.equalsIgnoreCase("regression")){
-            /**
-             * 1.1. MLR models
-             * xml representation
-             */
             if (algorithm_id.equalsIgnoreCase("mlr")){
                 File MLRmodelFile = new File(REG_MLR_modelsDir+"/"+model_id);
                 if (MLRmodelFile.exists()){
@@ -94,15 +88,13 @@ public class Model extends AbstractResource{
                 }// end of MLR representation
                 
                 
-                /**
-                 * 1.2. Other regression modelsStringRepresentation
-                 */
             }else if (algorithm_id.equalsIgnoreCase("svm")){
-                    File SVMmodelFile = new File(REG_SVM_modelsDir+"/"+model_id);
-                    RepresentationFactory model = new RepresentationFactory(SVMmodelFile.getAbsolutePath());
+                    File SVMmodelFile = new File(REG_SVM_modelsDir+"/xml/"+model_id+".xml");
+                    logger.info("Looking for : "+REG_SVM_modelsDir+"/xml/"+model_id+".xml");
+                    RepresentationFactory model = new RepresentationFactory(REG_SVM_modelsDir+"/xml/"+model_id+".xml");
                     try {
                         getResponse().setStatus(Status.SUCCESS_OK);
-                        return new StringRepresentation(model.getString().toString(), MediaType.TEXT_PLAIN);
+                        return new StringRepresentation(model.getString().toString(), MediaType.TEXT_XML);
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
                         getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
@@ -119,14 +111,7 @@ public class Model extends AbstractResource{
             }
             
         }
-        /**
-         * 2. Return XML representations for classification models:
-         */
         else if (model_type.equalsIgnoreCase("classification")){
-
-            /**
-             * 2.1. SVM Classification Models
-             */
             if (algorithm_id.equalsIgnoreCase("svc")){
                 File SvmClsModel = new File(CLS_SVM_modelsDir+"/"+model_id);
                 if (SvmClsModel.exists()){
@@ -153,16 +138,32 @@ public class Model extends AbstractResource{
 
             return new StringRepresentation("Not implemented yet!");
         }
-        /**
-         * Other than classification or regression
-         */
         else{
             getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             return new StringRepresentation("model_type can be either classification or regression. "+model_type+"" +
                     " is not an acceptable value!");
         }
-        
-            
+        */
+        File modelXmlFile = new File(modelsXmlDir + "/" + model_id + ".xml");
+            if (modelXmlFile.exists()){
+                RepresentationFactory model = new RepresentationFactory(modelXmlFile.getAbsolutePath());
+                try {
+                    getResponse().setStatus(Status.SUCCESS_OK);
+                    return new StringRepresentation(model.getString().toString(), MediaType.TEXT_XML);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+                    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                    return new StringRepresentation("Model not found! Exception Details: "+ex.getMessage());
+                } catch (IOException ex) {
+                    Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+                    getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+                    return new StringRepresentation("IO Exception! Details: "+ex.getMessage());
+                }
+            }
+            else{
+                getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                return new StringRepresentation("Model not found!");
+            }
     }
 
     @Override
