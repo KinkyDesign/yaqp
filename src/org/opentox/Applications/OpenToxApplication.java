@@ -226,8 +226,8 @@ import org.restlet.data.Request;
          router.attach("/validation/test_set_validation/{algorithm_id}",TestSetValidation.class);
          router.attach("/validation_result/{model_type}/{algorithm_id}/{id}", ValidationResult.class);// e.g. /validation_result/classification/svc/validation-36-28-15
          router.attach("/model",ListAllModels.class);
-         router.attach("/model/{model_type}/{algorithm_id}",ListSomeModels.class);
-         router.attach("/model/{model_type}/{algorithm_id}/{model_id}", ModelGuard);// The deletion of models is guarded!!!
+         //router.attach("/model/{model_type}/{algorithm_id}",ListSomeModels.class);
+         router.attach("/model/{model_id}", ModelGuard);// The deletion of models is guarded!!!
          router.attach("/dataset",ListDataSets.class);// {type} stands for the dataset mediatype
          router.attach("/dataset/{id}",DataSetGuard);// The deletion of datasets is guarded!!!
                   
@@ -251,52 +251,7 @@ import org.restlet.data.Request;
      }
 
 
-     /**
-      * The server can run using this main method...
-      * @param args
-      * @throws Exception
-      */
-     public static void main(String[] args) throws Exception {
-
-           // Create a component
-           Component component = new Component();
-
-           component.getServers().add(Protocol.HTTP, 3000);
-
-           component.getClients().add(Protocol.FILE);
-           
-
-           LocalReference javadoc =
-                    LocalReference.createFileReference(
-                  AbstractResource.javadocDir);
-
-           LocalReference home =
-                   LocalReference.createFileReference(
-                  AbstractResource.HTMLDir);
-
-           LocalReference sourceCode =
-                   LocalReference.createFileReference("/home/chung/NetBeansProjects/RESTful/OpenToxServices/src.tar.gz");
-
-           Directory javadocDirectory = new Directory(component.getContext().createChildContext(), javadoc);
-           Directory homeDirectory = new Directory(component.getContext().createChildContext(), home);
-           Directory sourceCodeDirectory = new Directory(component.getContext().createChildContext(), sourceCode);
-                
-           Application application = new OpenToxApplication();
-         
-           VirtualHost host = new VirtualHost();
-
-           host.attach("/OpenToxServices",application);
-           host.attach("",homeDirectory);
-           host.attach("/OpenToxServices/javadoc", javadocDirectory);
-           host.attach("/OpenToxServices/source", sourceCodeDirectory);
-
-
-           component.setDefaultHost(host);
-
-           component.start();
-
-       }
-
+     
 
 
     private Map<String, char[]> SetUserIds() {
