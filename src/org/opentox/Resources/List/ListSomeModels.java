@@ -21,6 +21,7 @@ import org.restlet.resource.Variant;
  * @author Sarimveis Harry
  * @version 1.0 (Last Update: Aug 19, 2009)
  */
+@Deprecated
 public class ListSomeModels extends AbstractResource {
     
     private static final long serialVersionUID = 10012190007001001L;

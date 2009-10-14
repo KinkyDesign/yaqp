@@ -30,12 +30,10 @@ public class Server {
                    LocalReference.createFileReference(
                   AbstractResource.HTMLDir);
 
-           LocalReference sourceCode =
-                   LocalReference.createFileReference("/home/chung/NetBeansProjects/RESTful/OpenToxServices/src.tar.gz");
 
            Directory javadocDirectory = new Directory(component.getContext().createChildContext(), javadoc);
            Directory homeDirectory = new Directory(component.getContext().createChildContext(), home);
-           Directory sourceCodeDirectory = new Directory(component.getContext().createChildContext(), sourceCode);
+
 
            Application application = new OpenToxApplication();
 
@@ -44,7 +42,7 @@ public class Server {
            host.attach("/OpenToxServices",application);
            host.attach("",homeDirectory);
            host.attach("/OpenToxServices/javadoc", javadocDirectory);
-           host.attach("/OpenToxServices/source", sourceCodeDirectory);
+
 
 
            component.setDefaultHost(host);
