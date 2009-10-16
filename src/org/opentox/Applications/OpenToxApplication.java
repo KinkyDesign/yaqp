@@ -1,6 +1,7 @@
  package org.opentox.Applications;
 
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentox.Resources.aux.TrainerMLR;
@@ -40,6 +41,7 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.LocalReference;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
+import org.opentox.database.InHouseDB;
 
 
 /**
@@ -73,6 +75,7 @@ import org.restlet.data.Request;
 
      private static final long serialVersionUID = 749479721274764426L;
 
+     public  InHouseDB dbcon = new InHouseDB();
      
     
 
