@@ -38,7 +38,9 @@ import weka.core.FastVector;
  */
 public class datasetFox {
 
-    private Instances datasetInstances;
+
+
+    private Instances datasetInstances = new Instances("x", new FastVector(), 1);
     private URL serviceBaseUrl;
     private String datasetID;
     private int statusCode = 0;
@@ -73,7 +75,6 @@ public class datasetFox {
      * to that dataset URI, i.e. /dataset/{id}/feature_definitions responded with an error status.</li>
      * <li>4: Dataset URI found (success 20x), feature definitions where also found, but no compounds where
      * detected in this dataset. The URI /dataset/{id}/compound responds with an error code.</li>
-     * <li>5: Status Code 400 (Not Found) while looking for compounds in the dataset</li>
      * </ul>
      * @return
      */
@@ -90,7 +91,7 @@ public class datasetFox {
         /** Chech if the server is alive... **/
         if (isServerAlive(serviceBaseUrl) ){
             
-            Client client = new Client(Protocol.HTTP);
+            final Client client = new Client(Protocol.HTTP);
             URL datasetURL = null;
             try {
                 datasetURL = new URL(serviceBaseUrl.toString() + "/dataset/" + datasetID + "/");
@@ -106,9 +107,8 @@ public class datasetFox {
                     request.getClientInfo().getAcceptedMediaTypes().add(new
                             Preference<MediaType>(MediaType.TEXT_URI_LIST));
                     Response response = client.handle(request);
-                    System.out.println("Feature Definitions : "+response.getStatus());
-
-                    if ((Status.SUCCESS_OK).equals(response.getStatus())){
+                    
+                    
                         BufferedReader br = null;
                         FastVector attributes = new FastVector();
                         try {
@@ -135,37 +135,47 @@ public class datasetFox {
                              if (IsServiceAvailable(compoundsListURL, "text/uri-list", false)){
                                  request.setResourceRef(compoundsListURL.toString());
                                  response = client.handle(request);
-                                 System.out.println("Compounds : "+response.getStatus());
+                                 
 
                                  br = new BufferedReader(
                                      new InputStreamReader(
                                      response.getEntity().getStream()));
                                  String compoundLine=null, feature=null;
 
+                                 
+                                 final int numberOfAttributes=datasetInstances.numAttributes();
+                                 double[] values = new double[numberOfAttributes];
+
                                  /** For all compounds... **/
-                                 int numberOfAttributes=datasetInstances.numAttributes();
+                                 long currentTime=System.currentTimeMillis();
                                  while ((compoundLine=br.readLine())!=null){
 
-                                     for (int i=0;i<numberOfAttributes;i++){
+                                         /** For all feature definitions **/
+                                      for (int i=0;i<numberOfAttributes;i++){
 
-                                         feature=serviceBaseUrl+"/feature/compound/"+
-                                                 new Reference(compoundLine).getLastSegment()+
-                                                 "/feature_definition/"+
-                                                 new Reference(datasetInstances.attribute(i).name()).getLastSegment();
-                                         request = new Request();
-                                         request.setResourceRef(feature);
-                                         request.setMethod(Method.GET);
-                                         request.getClientInfo().getAcceptedMediaTypes().add(new
-                                            Preference<MediaType>(MediaType.TEXT_PLAIN));
-                                         response=client.handle(request);
+                                             feature=serviceBaseUrl+"/feature/compound/"+
+                                                     new Reference(compoundLine).getLastSegment()+
+                                                     "/feature_definition/"+
+                                                     new Reference(datasetInstances.attribute(i).name()).getLastSegment();
+                                             request = new Request();
+                                             request.setResourceRef(feature);
+                                             request.setMethod(Method.GET);
+                                             request.getClientInfo().getAcceptedMediaTypes().add(new
+                                                Preference<MediaType>(MediaType.TEXT_PLAIN));
+                                             response=client.handle(request);
+                                             try{
+                                                 values[i]=Double.parseDouble(response.getEntity().getText());
+                                             }catch (NumberFormatException nex){
+                                                 values[i]=-101.1;
+                                             }
+                                             datasetInstances.add(new Instance(1.0,values));
+                                             response.release();                                                                                       
+                                         }
+                                 
 
-                                       //  System.out.println(response.getEntity().getText());
-                                     
-                                     }
-
+                                    //     System.out.print("|");
                                   }
-
-
+                                  //System.out.println((System.currentTimeMillis()-currentTime)/1000.0+"s");
                                  
                              }else{
                                  statusCode=4;
@@ -188,11 +198,7 @@ public class datasetFox {
                             }
                         }
 
-                    }else{
-                        statusCode=3;
-                        System.err.println("Status Code 400 (Not Found) while looking for feature definitions in" +
-                                "the dataset with id: "+datasetID);
-                    }
+                    
 
                 }else{
                     statusCode=2;
@@ -203,7 +209,7 @@ public class datasetFox {
             }finally{
                 /** Stop the HTTP client! **/
                 try {
-                    client.stop();
+                    //client.stop();
                 } catch (Exception ex) {
                     Logger.getLogger(datasetFox.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -281,9 +287,9 @@ private boolean IsServiceAvailable(URL serviceUri, String mime, boolean followRe
 
 
      public static void main(String[] args) throws MalformedURLException{
-         URL url = new URL("http://ambit.uni-plovdiv.bg:8080/ambit2");
-         datasetFox fox = new datasetFox(url, "8");
-         fox.getInstances();
+         URL url = new URL("http://ambit.uni-plovdiv.bg:8081/ambit2");
+         datasetFox fox = new datasetFox(url, "35");
+         System.out.println(fox.getInstances().numInstances());
          //System.out.println(fox.IsServiceAvailable(new URL("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/999"),"text/xml",false));
      }
 
