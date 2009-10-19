@@ -62,6 +62,8 @@ public class Regression extends AbstractResource {
     private String dataid, kernel, degree, cacheSize,
             cost, epsilon, gamma, coeff0, tolerance;
 
+    private int model_id;
+
     public Regression(Context context, Request request, Response response) {
         super(context, request, response);
         getVariants().add(new Variant(MediaType.TEXT_HTML));
@@ -200,6 +202,7 @@ public class Regression extends AbstractResource {
          * Once the representation is accepted, the status
          * is set to 202
          */
+        model_id = org.opentox.Applications.OpenToxApplication.dbcon.getModelsStack()+1;
         getResponse().setStatus(Status.SUCCESS_ACCEPTED);
 
         /**
@@ -210,7 +213,7 @@ public class Regression extends AbstractResource {
             dataid = form.getFirstValue("dataId");
 
             try {
-                i = Integer.parseInt(dataid);
+//                i = Integer.parseInt(dataid);
                 File dataFile = new File(REG_MLR_FilePath(dataid));
                 boolean exists = dataFile.exists();
                 if (!exists) {
@@ -258,12 +261,13 @@ public class Regression extends AbstractResource {
                     double[] coeffs = linreg.coefficients();
 
 
-                    // Now, construct the PMML:
+                    // Now, construct the XML:
+                    int model_id = org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI+"/algorithm/learning/regression/mlr");
                     StringBuilder builder = new StringBuilder();
-                    File mlrModelFolder = new File(REG_MLR_modelsDir);
-                    String[] listOfFiles = mlrModelFolder.list();
-                    int NMLR = listOfFiles.length;
-                    String model_id = new String(modelPrefix + dataid + "-" + NMLR);
+                  //  File mlrModelFolder = new File(REG_MLR_modelsDir);
+                  //  String[] listOfFiles = mlrModelFolder.list();
+                  //  int NMLR = listOfFiles.length;
+                    
                     builder.append(xmlIntro);
                     builder.append("<ot:Model xmlns:ot=\"http://opentox.org/1.0/\" " +
                                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
@@ -327,7 +331,8 @@ public class Regression extends AbstractResource {
                     output.flush();
                     output.close();
 
-                    getResponse().setEntity(baseURI + "/model/" + modelPrefix + dataid+"\n", MediaType.TEXT_PLAIN);
+                    //getResponse().setEntity(baseURI + "/model/" + modelPrefix + dataid+"\n", MediaType.TEXT_PLAIN);
+                    getResponse().setEntity(baseURI + "/model/" + model_id+"\n", MediaType.TEXT_PLAIN);
                     if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)) {
                         getResponse().setStatus(Status.SUCCESS_OK);
                     }
@@ -636,6 +641,8 @@ public class Regression extends AbstractResource {
             }
 
             String[] options = {""};
+            String scaledPath = scaledDir+"/"+dataSetPrefix+dataid;
+            String modelPath = REG_SVM_modelsDir + "/" + model_id;
 
             if (ker.equalsIgnoreCase("0")) {
                 String[] ops = {
@@ -643,8 +650,9 @@ public class Regression extends AbstractResource {
                     "-t", "0",
                     "-c", cost,
                     "-e", tolerance,
-                    scaledDir + "/" + dataSetPrefix + dataid,
-                    REG_SVM_modelsDir + "/" + modelPrefix + dataid + "-" + NSVM
+                    "-q",
+                    scaledPath,
+                    modelPath
                 };
                 options = ops;
             } else if (ker.equalsIgnoreCase("1")) {
@@ -656,8 +664,9 @@ public class Regression extends AbstractResource {
                     "-d", degree,
                     "-r", coeff0,
                     "-e", tolerance,
-                    scaledDir + "/" + dataSetPrefix + dataid,
-                    REG_SVM_modelsDir + "/" + modelPrefix + dataid + "-" + NSVM
+                    "-q",
+                    scaledPath,
+                    modelPath
                 };
                 options = ops;
             } else if (ker.equalsIgnoreCase("2")) {
@@ -667,8 +676,9 @@ public class Regression extends AbstractResource {
                     "-c", cost,
                     "-g", gamma,
                     "-e", tolerance,
-                    scaledDir + "/" + dataSetPrefix + dataid,
-                    REG_SVM_modelsDir + "/" + modelPrefix + dataid + "-" + NSVM
+                    "-q",
+                    scaledPath,
+                    modelPath
                 };
                 options = ops;
             } else if (ker.equalsIgnoreCase("3")) {
@@ -678,8 +688,9 @@ public class Regression extends AbstractResource {
                     "-c", cost,
                     "-g", gamma,
                     "-e", tolerance,
-                    scaledDir + "/" + dataSetPrefix + dataid,
-                    REG_SVM_modelsDir + "/" + modelPrefix + dataid + "-" + NSVM
+                    "-q",
+                    scaledPath,
+                    modelPath
                 };
                 options = ops;
             }
@@ -692,7 +703,11 @@ public class Regression extends AbstractResource {
                 try {
                     getResponse().setEntity(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
                     long before = System.currentTimeMillis();
-                    logger.info("aaa");
+                    
+                    for(int i=0; i<options.length; i++){
+                        logger.info(options[i]);    
+                    }
+
                     svm_train.main(options);
                     long timeSpent = System.currentTimeMillis() - before;
 
@@ -724,7 +739,9 @@ public class Regression extends AbstractResource {
                      * should be returned
                      */
                     if (getResponse().getStatus().equals(Status.SUCCESS_OK)) {
-                        String model_id = modelPrefix + dataid + "-" + NSVM;
+                        //String model_id = modelPrefix + dataid + "-" + NSVM;
+                        int model_id = org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI+"/algorithm/learning/regression/svm");
+
                         getResponse().setEntity(ModelURI + "/"+ model_id+"\n", MediaType.TEXT_PLAIN);
 
                        StringBuilder xmlstr = new StringBuilder();

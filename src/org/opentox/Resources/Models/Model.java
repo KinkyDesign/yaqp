@@ -145,7 +145,8 @@ public class Model extends AbstractResource{
         }
         */
         File modelXmlFile = new File(modelsXmlDir + "/" + model_id + ".xml");
-            if (modelXmlFile.exists()){
+        System.out.println("HERE: "+model_id);
+        if (modelXmlFile.exists()){
                 RepresentationFactory model = new RepresentationFactory(modelXmlFile.getAbsolutePath());
                 try {
                     getResponse().setStatus(Status.SUCCESS_OK);

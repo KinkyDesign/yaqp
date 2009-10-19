@@ -66,6 +66,8 @@ public class Classification extends AbstractResource{
     private int i;
     private double d;
 
+    private int model_id;
+
     /**
      * Constructor
      * @param context
@@ -234,7 +236,7 @@ public class Classification extends AbstractResource{
          * is set to 202 (Success - Accepted).
          */
         getResponse().setStatus(Status.SUCCESS_ACCEPTED);
-    
+        model_id = org.opentox.Applications.OpenToxApplication.dbcon.getModelsStack()+1;
     
         /**
          * Implementation of the SVM classification algorithm.
@@ -244,6 +246,8 @@ public class Classification extends AbstractResource{
             File svmModelFolder = new File(CLS_SVM_modelsDir);
             String[] listOfFiles = svmModelFolder.list();
             int NSVM = listOfFiles.length;
+            
+            
                 /**
                  * We construct a Form object that handles incoming parameters
                  * If a parameter "x" has been POSTed, we can retrieve it using
@@ -522,7 +526,8 @@ public class Classification extends AbstractResource{
                     ker="3";
 
                 String[] options = {""};
-
+                String scaledPath = scaledDir+"/"+dataSetPrefix+dataid;
+                String modelPath = CLS_SVM_modelsDir + "/" + model_id;
                 if (ker.equalsIgnoreCase("0")){
                     String[] ops={
                         "-s", "0",
@@ -530,8 +535,9 @@ public class Classification extends AbstractResource{
                         "-b","1",
                         "-c", cost,
                         "-e", tolerance,
-                        scaledDir+"/"+dataSetPrefix+dataid,
-                        CLS_SVM_modelsDir+"/"+modelPrefix+dataid+"-"+NSVM
+                        
+                        scaledPath,
+                        modelPath
 
                     };
                     options=ops;
@@ -545,8 +551,9 @@ public class Classification extends AbstractResource{
                         "-d", degree,
                         "-r", coeff0,
                         "-e", tolerance,
-                        scaledDir+"/"+dataSetPrefix+dataid,
-                        CLS_SVM_modelsDir+"/"+modelPrefix+dataid+"-"+NSVM
+                        
+                        scaledPath,
+                        modelPath
 
                     };
                     options=ops;
@@ -558,8 +565,9 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-                        scaledDir+"/"+dataSetPrefix+dataid,
-                        CLS_SVM_modelsDir+"/"+modelPrefix+dataid+"-"+NSVM
+                        
+                        scaledPath,
+                        modelPath
 
                     };
                     options=ops;
@@ -571,10 +579,14 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-                        scaledDir+"/"+dataSetPrefix+dataid,
-                        CLS_SVM_modelsDir+"/"+modelPrefix+dataid+"-"+NSVM
+                        
+                        scaledPath,
+                        modelPath
                     };
                     options=ops;
+                     for(int i=0; i<options.length; i++){
+                        System.out.println(options[i]);
+                    }
                 }
 
                 /**
@@ -583,9 +595,9 @@ public class Classification extends AbstractResource{
                  */
             if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
                 try {
+                    
                     getResponse().setEntity(getResponse().getStatus().toString(),MediaType.TEXT_PLAIN);
                     long before=System.currentTimeMillis();
-                    logger.info("aaa");
                     svm_train.main(options);
                     long timeSpent=System.currentTimeMillis()-before;
 
@@ -594,7 +606,7 @@ public class Classification extends AbstractResource{
                          * If yes, set the status to 200,
                          * otherwise the status is set to 500
                          */
-                    File modelFile = new File(CLS_SVM_modelsDir+"/"+modelPrefix+dataid+"-"+NSVM);
+                    File modelFile = new File(CLS_SVM_modelsDir+"/"+model_id);
                     boolean modelCreated = modelFile.exists();
                     if (!(modelCreated)){
                         getResponse().setEntity(
@@ -605,6 +617,7 @@ public class Classification extends AbstractResource{
                                 MediaType.TEXT_PLAIN);
                         getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
                     }else{
+                        org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI+"/algorithm/learning/regression/mlr");
                         getResponse().setStatus(Status.SUCCESS_OK);
                     }
             
@@ -617,7 +630,7 @@ public class Classification extends AbstractResource{
                      * should be returned
                      */
                     if (getResponse().getStatus().equals(Status.SUCCESS_OK)){
-                    String model_id = modelPrefix+dataid+"-"+NSVM;
+                    
                     getResponse().setEntity(ModelURI + "/" + model_id+"\n\n", MediaType.TEXT_PLAIN);
                     // TODO : create and store xml
                        StringBuilder xmlstr = new StringBuilder();
@@ -645,7 +658,7 @@ public class Classification extends AbstractResource{
                        xmlstr.append("</ot:Model>\n");
                        try{
 
-                           FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id + ".xml" );
+                           FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id);
                            BufferedWriter out = new BufferedWriter(fstream);
                            out.write(xmlstr.toString());
                            out.flush();

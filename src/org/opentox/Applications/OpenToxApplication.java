@@ -75,7 +75,7 @@ import org.opentox.database.InHouseDB;
 
      private static final long serialVersionUID = 749479721274764426L;
 
-     public  InHouseDB dbcon = new InHouseDB();
+     public  static final InHouseDB dbcon = new InHouseDB();
      
     
 
