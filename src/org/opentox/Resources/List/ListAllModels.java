@@ -30,13 +30,12 @@ public class ListAllModels extends AbstractResource {
      * Initialize the resource.
      * @throws ResourceException
      */
-   @Override
-    public void doInit() throws ResourceException{
+    @Override
+    public void doInit() throws ResourceException {
         super.doInit();
         getVariants().put(Method.GET, new Variant(MediaType.TEXT_URI_LIST));
         getVariants().put(Method.GET, new Variant(MediaType.TEXT_HTML));
     }
-
 
     /**
      *
@@ -45,9 +44,17 @@ public class ListAllModels extends AbstractResource {
      */
     @Override
     public Representation get(Variant variant) {
+        Representation rep = null;
         ReferenceList list = new ReferenceList();
-    	return null;
-    }
-    
+        list = org.opentox.Applications.OpenToxApplication.dbcon.getModelsAsReferenceList();
 
+        if (MediaType.TEXT_URI_LIST.equals(variant.getMediaType())) {
+            rep = list.getTextRepresentation();
+            rep.setMediaType(MediaType.TEXT_URI_LIST);
+        } else if (MediaType.TEXT_HTML.equals(variant.getMediaType())) {
+            rep = list.getWebRepresentation();
+            rep.setMediaType(MediaType.TEXT_HTML);
+        }
+        return rep;
+    }
 }

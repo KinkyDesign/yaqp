@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Resources.*;
@@ -72,8 +74,10 @@ public class Regression extends AbstractResource {
     @Override
     public void doInit() throws ResourceException {
         super.doInit();
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_XML));
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_PLAIN));
+        List<Variant> variants = new ArrayList<Variant>();
+        variants.add(new Variant(MediaType.TEXT_PLAIN));
+        variants.add(new Variant(MediaType.TEXT_XML));        
+        getVariants().put(Method.GET, variants);
         this.algorithmId = Reference.decode(getRequest().getAttributes().get("id").toString());
     }
 
@@ -85,22 +89,11 @@ public class Regression extends AbstractResource {
         this.internalStatus = status;
     }
 
-    /**
-     * Implementation of the GET method.
-     * Returns XML representations for the supported regression algorithms
-     * @param variant
-     * @return XML representation of algorithm
-     */
-    @Override
-    public Representation get(Variant variant) {
 
+    private String getSvmXml(){
         StringBuilder builder = new StringBuilder();
         builder.append(xmlIntro);
-
-
-        if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
-            if (algorithmId.equalsIgnoreCase("svm")) {
-                builder.append("<algorithm name=\"Support Vector Machine\" id=\"svm\">\n");
+        builder.append("<algorithm name=\"Support Vector Machine\" id=\"svm\">\n");
                 builder.append("<AlgorithmType>regression</AlgorithmType>\n");
                 builder.append("<Parameters>\n");
                 builder.append("<!-- \n" +
@@ -122,10 +115,58 @@ public class Regression extends AbstractResource {
                 builder.append("<statistic>MSE</statistic>\n");
                 builder.append("</statisticsSupported>\n");
                 builder.append("</algorithm>\n\n");
-                return new StringRepresentation(builder.toString(), variant.getMediaType());
+                return builder.toString();
+    }
 
-            } else if (algorithmId.equalsIgnoreCase("plsr")) {
-                builder.append("<algorithm name=\"Partial Least Squares\" id=\"pls\">\n");
+    private String getSvmHtml(){
+        StringBuilder builder = new StringBuilder();
+        builder.append(htmlHEAD);
+        builder.append("<h1>Support Vector Machine Regression Algorithm</h1>");
+        
+        builder.append("<table><tbody>");
+        builder.append("<tr >");
+        builder.append("<td style=\"width:200\" ><b>Algorithm Name</b></td><td>Support Vector Machine</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td><b>Algorithm Type</b></td><td>Regression</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td><b>Algorithm Parameters</b></td><td>&nbsp;</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>kernel</td><td>{rbf, linear, sigmoid, polynomial}</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>cost</td><td>double, strictly positive</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>epsilon</td><td>double, strictly positive</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>gamma</td><td>double, strictly positive</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>coeff0</td><td>double</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>degree</td><td>integer, strictly positive</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>tolerance</td><td>integer, strictly positive</td>");
+        builder.append("</tr>");
+        builder.append("<tr>");
+        builder.append("<td>cacheSize</td><td>integer, strictly positive</td>");
+        builder.append("</tr>");
+        builder.append("</tbody></table>");
+        
+        builder.append(htmlEND);
+        return builder.toString();
+    }
+
+    private String getPlsrXml(){
+        StringBuilder builder = new StringBuilder();
+        builder.append(xmlIntro);
+        builder.append("<algorithm name=\"Partial Least Squares\" id=\"pls\">\n");
                 builder.append("<AlgorithmType>regression</AlgorithmType>\n");
                 builder.append("<Parameters>\n");
                 builder.append("<!-- \n" +
@@ -139,9 +180,13 @@ public class Regression extends AbstractResource {
                 builder.append("<statistic>x</statistic>\n");
                 builder.append("</statisticsSupported>\n");
                 builder.append("</algorithm>\n\n");
-                return new StringRepresentation(builder.toString(), variant.getMediaType());
-            } else if (algorithmId.equalsIgnoreCase("mlr")) {
-                builder.append("<algorithm name=\"Multiple Linear Regression\" id=\"mlr\">\n");
+                return builder.toString();
+    }
+
+    private String getMlrXml(){
+        StringBuilder builder = new StringBuilder();
+        builder.append(xmlIntro);
+        builder.append("<algorithm name=\"Multiple Linear Regression\" id=\"mlr\">\n");
                 builder.append("<AlgorithmType>regression</AlgorithmType>\n");
                 builder.append("<Parameters>\n");
                 builder.append("<!-- \n" +
@@ -157,24 +202,42 @@ public class Regression extends AbstractResource {
                 builder.append("<statistic>MeanAbsolutError</statistic>\n");
                 builder.append("</statisticsSupported>\n");
                 builder.append("</algorithm>\n\n");
-                return new StringRepresentation(builder.toString(), variant.getMediaType());
+                return builder.toString();
+    }
+
+    /**
+     * Implementation of the GET method.
+     * Returns XML representations for the supported regression algorithms
+     * @param variant
+     * @return XML representation of algorithm
+     */
+    @Override
+    public Representation get(Variant variant) {
+
+        
+
+
+        if (MediaType.TEXT_XML.equals(variant.getMediaType())) {
+            if (algorithmId.equalsIgnoreCase("svm")) {                
+                return new StringRepresentation(getSvmXml(), MediaType.TEXT_XML);
+
+            } else if (algorithmId.equalsIgnoreCase("plsr")) {               
+                return new StringRepresentation(getPlsrXml(), MediaType.TEXT_XML);
+            } else if (algorithmId.equalsIgnoreCase("mlr")) {
+                
+                return new StringRepresentation(getMlrXml(), MediaType.TEXT_XML);
             } else //Not Found!
             {
-                builder.append("<algorithm name=\"unknown\" id=\"" + algorithmId + "\">\n");
-
-                builder.append("<status code=\"404\">The server has not found anything matching the Request-URI or the server does not" +
-                        " wish to reveal exactly why the request has been refused, or no other response is applicable.</status>\n\n");
                 getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                builder.append("</algorithm>\n\n");
-                return new StringRepresentation(builder.toString(), variant.getMediaType());
+                return new StringRepresentation("Not Found", MediaType.TEXT_PLAIN);
             }
         } else if (variant.getMediaType().equals(MediaType.TEXT_URI_LIST)) {
             ReferenceList list = new ReferenceList();
             list.add(getOriginalRef());
             return list.getTextRepresentation();
-        } else {
+        }else {
             getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
-            return new StringRepresentation("Not supported media type!", MediaType.TEXT_PLAIN);
+            return new StringRepresentation(variant.getMediaType()+" is Not supported media type!", MediaType.TEXT_PLAIN);
         }
     }
 
@@ -783,7 +846,7 @@ public class Regression extends AbstractResource {
                         xmlstr.append("</ot:Model>\n");
                         try {
 
-                            FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id + ".xml");
+                            FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id);
                             BufferedWriter out = new BufferedWriter(fstream);
                             out.write(xmlstr.toString());
                             out.flush();

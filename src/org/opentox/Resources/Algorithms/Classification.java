@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.util.svm_train;
@@ -81,8 +83,12 @@ public class Classification extends AbstractResource{
     @Override
     public void doInit() throws ResourceException{
         super.doInit();
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_XML));
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_PLAIN));
+        List<Variant> variants = new ArrayList<Variant>();
+        variants.add(new Variant(MediaType.TEXT_PLAIN));
+        variants.add(new Variant(MediaType.TEXT_XML));
+        /** Sometime we will support HTML representation for models **/
+        //variants.add(new Variant(MediaType.TEXT_HTML));
+        getVariants().put(Method.GET, variants);
         this.algorithmId=Reference.decode(getRequest().getAttributes().get("id").toString());
     }
     
@@ -471,7 +477,7 @@ public class Classification extends AbstractResource{
                         "-b","1",
                         "-c", cost,
                         "-e", tolerance,
-
+                        "-q",
                         scaledPath,
                         modelPath
 
@@ -487,7 +493,7 @@ public class Classification extends AbstractResource{
                         "-d", degree,
                         "-r", coeff0,
                         "-e", tolerance,
-
+                        "-q",
                         scaledPath,
                         modelPath
 
@@ -501,7 +507,7 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-
+                        "-q",
                         scaledPath,
                         modelPath
 
@@ -515,7 +521,7 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-
+                        "-q",
                         scaledPath,
                         modelPath
                     };

@@ -15,10 +15,12 @@ import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.ServerInfo;
-import org.restlet.resource.Representation;
+import org.restlet.data.Status;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+
 
 
 
@@ -36,21 +38,31 @@ public class IndexResource extends AbstractResource
     private static final long serialVersionUID = 10012190003302L;
 
     private static int views=0;
-    
-    public IndexResource(Context context, Request request,
-            Response response){
-         super(context, request, response)  ;
-         //getVariants().add(new Variant(MediaType.TEXT_PLAIN));
-         getVariants().add(new Variant(MediaType.TEXT_HTML));
-         views++;
+
+    /**
+     * Initializes the Resource
+     * @throws ResourceException
+     */
+    @Override
+    public void doInit() throws ResourceException{
+        super.doInit();
+        getVariants().put(Method.GET, new Variant(MediaType.TEXT_HTML));
     }
+
+//    public IndexResource(Context context, Request request,
+//            Response response){
+//         super(context, request, response)  ;
+//         //getVariants().add(new Variant(MediaType.TEXT_PLAIN));
+//         getVariants().add(new Variant(MediaType.TEXT_HTML));
+//         views++;
+//    }
 
 
 
     // GET METHOD...............................................................
 
     @Override
-     public synchronized Representation represent(Variant variant) throws ResourceException
+     public synchronized Representation get(Variant variant) throws ResourceException
     {
 
         StringBuilder builder = new StringBuilder();
@@ -68,39 +80,8 @@ public class IndexResource extends AbstractResource
         }
         builder.append("<br/><br/><div id=\"pageviews\">You are the visitor No."+views+"</div>");
 
-
          return new StringRepresentation(builder.toString(), MediaType.TEXT_HTML);
      }
-
-
-    @Override
-    public boolean allowPost()
-    {
-        return false;
-    }
-
-
-    @Override
-    public boolean allowPut()
-    {
-        return false;
-    }
-
-
-    @Override
-    public boolean allowDelete()
-    {
-        return false;
-    }
-
-
-    @Override
-    public boolean isModifiable()
-    {
-        return false;
-    }
-
-    
 
 
 

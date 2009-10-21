@@ -7,16 +7,17 @@ import java.util.logging.Logger;
 import org.opentox.Resources.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.opentox.util.RepresentationFactory;
-import org.restlet.Context;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Reference;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
+import org.restlet.resource.ResourceException;
 
 
 /**
@@ -46,13 +47,16 @@ public class Model extends AbstractResource{
      * @param request
      * @param response
      */
-    public Model(Context context, Request request, Response response) {
-        super(context, request, response);
-        getVariants().add(new Variant(MediaType.TEXT_XML));
-        getVariants().add(new Variant(MediaType.TEXT_PLAIN));
-        model_id = Reference.decode(request.getAttributes().get("model_id").toString());
-        //algorithm_id = Reference.decode(request.getAttributes().get("algorithm_id").toString());
-        //model_type = Reference.decode(request.getAttributes().get("model_type").toString());
+    @Override
+    public void doInit() throws ResourceException{
+        super.doInit();
+        List<Variant> variants = new ArrayList<Variant>();
+        variants.add(new Variant(MediaType.TEXT_PLAIN));
+        variants.add(new Variant(MediaType.TEXT_XML));
+        /** Sometime we will support HTML representation for models **/
+        //variants.add(new Variant(MediaType.TEXT_HTML));
+        getVariants().put(Method.GET, variants);
+        model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
     }
 
     /**
@@ -61,7 +65,7 @@ public class Model extends AbstractResource{
      * @return StringRepresentation
      */
     @Override
-    public Representation represent(Variant variant)
+    public Representation get(Variant variant)
     {
         /*
         if (model_type.equalsIgnoreCase("regression")){
@@ -145,6 +149,7 @@ public class Model extends AbstractResource{
         }
         */
         File modelXmlFile = new File(modelsXmlDir + "/" + model_id);
+        System.out.println("Requested Model id: "+model_id);
         if (modelXmlFile.exists()){
                 RepresentationFactory model = new RepresentationFactory(modelXmlFile.getAbsolutePath());
                 try {
@@ -166,13 +171,9 @@ public class Model extends AbstractResource{
             }
     }
 
-    @Override
-    public boolean allowDelete(){
-        return true;
-    }
 
     @Override
-    public void removeRepresentations() {
+    public Representation delete() {
         if (model_type.equalsIgnoreCase("classification")){
             
             if (algorithm_id.equalsIgnoreCase("svc")){
@@ -253,6 +254,7 @@ public class Model extends AbstractResource{
             getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             getResponse().setEntity("Error 404. Bad Request!", MediaType.TEXT_PLAIN);
         }
+        return null;
     }
 
 }// End of class

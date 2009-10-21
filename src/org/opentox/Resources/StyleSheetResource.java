@@ -8,12 +8,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+
 
 
 
@@ -30,18 +32,18 @@ public class StyleSheetResource extends AbstractResource
 
     private static final long serialVersionUID = 10012190008701L;
 
-    public StyleSheetResource(Context context, Request request,
-            Response response){
-         super(context, request, response)  ;
-         getVariants().add(new Variant(MediaType.TEXT_CSS));
-             }
+    @Override
+    public void doInit() throws ResourceException{
+        super.doInit();
+         getVariants().put(Method.GET, new Variant(MediaType.TEXT_HTML));
+    }
 
 
 
     // GET METHOD...............................................................
 
     @Override
-     public synchronized Representation represent(Variant variant) throws ResourceException
+     public synchronized Representation get(Variant variant) throws ResourceException
     {
 
         StringBuilder builder = new StringBuilder();
@@ -64,35 +66,5 @@ public class StyleSheetResource extends AbstractResource
      }
 
 
-    @Override
-    public boolean allowPost()
-    {
-        return false;
-    }
-
-
-    @Override
-    public boolean allowPut()
-    {
-        return false;
-    }
-
-
-    @Override
-    public boolean allowDelete()
-    {
-        return false;
-    }
-
-
-    @Override
-    public boolean isModifiable()
-    {
-        return false;
-    }
-
-
-
-
-
+ 
 }

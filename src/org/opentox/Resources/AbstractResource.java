@@ -1,20 +1,13 @@
 package org.opentox.Resources;
 
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Resource;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
@@ -371,7 +364,7 @@ public abstract class AbstractResource  extends ServerResource{
         Set<String> regressionAlgorithms = new HashSet<String>();
         regressionAlgorithms.add("mlr");
         regressionAlgorithms.add("svm");
-        regressionAlgorithms.add("plsr");
+        //regressionAlgorithms.add("plsr");
         return regressionAlgorithms;
     }
 
@@ -382,9 +375,9 @@ public abstract class AbstractResource  extends ServerResource{
     private Set<String> ClassificationAlgorithmsSet(){
         Set<String> classificationAlgorithms = new HashSet<String>();
         classificationAlgorithms.add("svc");
-        classificationAlgorithms.add("j48c");
-        classificationAlgorithms.add("plsc");
-        classificationAlgorithms.add("knnc");
+        //classificationAlgorithms.add("j48c");
+        //classificationAlgorithms.add("plsc");
+        //classificationAlgorithms.add("knnc");
         return classificationAlgorithms;
     }
 
