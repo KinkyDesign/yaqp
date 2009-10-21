@@ -7,7 +7,8 @@ import org.restlet.util.Series;
 
 
 /**
- *
+ * <b>Warning:</b> This class is deprecated and will be completely removed in
+ * the next version
  * Media types for datasets.
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
