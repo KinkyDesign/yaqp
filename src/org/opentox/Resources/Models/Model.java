@@ -144,8 +144,7 @@ public class Model extends AbstractResource{
                     " is not an acceptable value!");
         }
         */
-        File modelXmlFile = new File(modelsXmlDir + "/" + model_id + ".xml");
-        System.out.println("HERE: "+model_id);
+        File modelXmlFile = new File(modelsXmlDir + "/" + model_id);
         if (modelXmlFile.exists()){
                 RepresentationFactory model = new RepresentationFactory(modelXmlFile.getAbsolutePath());
                 try {

@@ -325,7 +325,7 @@ public class Regression extends AbstractResource {
                         //end of PMML element
                     builder.append("</ot:Model>\n");
                     //!! Now store the PMML representation in a file:
-                    FileWriter fileStream = new FileWriter(modelsXmlDir + "/" + model_id + ".xml");
+                    FileWriter fileStream = new FileWriter(modelsXmlDir + "/" + model_id);
                     BufferedWriter output = new BufferedWriter(fileStream);
                     output.write(builder.toString());
                     output.flush();
@@ -716,7 +716,7 @@ public class Regression extends AbstractResource {
                      * If yes, set the status to 200,
                      * otherwise the status is set to 500
                      */
-                    File modelFile = new File(REG_SVM_modelsDir + "/" + modelPrefix + dataid + "-" + NSVM);
+                    File modelFile = new File(REG_SVM_modelsDir + "/" + model_id);
                     boolean modelCreated = modelFile.exists();
                     if (!(modelCreated)) {
                         getResponse().setEntity(
@@ -770,7 +770,7 @@ public class Regression extends AbstractResource {
                        xmlstr.append("</ot:Model>\n");
                        try{
 
-                           FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id + ".xml" );
+                           FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id );
                            BufferedWriter out = new BufferedWriter(fstream);
                            out.write(xmlstr.toString());
                            out.flush();

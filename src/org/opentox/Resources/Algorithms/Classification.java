@@ -535,7 +535,7 @@ public class Classification extends AbstractResource{
                         "-b","1",
                         "-c", cost,
                         "-e", tolerance,
-                        
+                        "-q",
                         scaledPath,
                         modelPath
 
@@ -551,7 +551,7 @@ public class Classification extends AbstractResource{
                         "-d", degree,
                         "-r", coeff0,
                         "-e", tolerance,
-                        
+                        "-q",
                         scaledPath,
                         modelPath
 
@@ -565,7 +565,7 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-                        
+                        "-q",
                         scaledPath,
                         modelPath
 
@@ -579,7 +579,7 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-                        
+                        "-q",
                         scaledPath,
                         modelPath
                     };
