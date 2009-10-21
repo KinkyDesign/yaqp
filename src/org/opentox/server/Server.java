@@ -4,8 +4,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.AbstractResource;
-import org.restlet.data.*;
-import org.restlet.*;
+import org.restlet.Application;
+import org.restlet.Component;
+import org.restlet.data.LocalReference;
+import org.restlet.data.Protocol;
+import org.restlet.resource.Directory;
+import org.restlet.routing.VirtualHost;
 
 /**
  *

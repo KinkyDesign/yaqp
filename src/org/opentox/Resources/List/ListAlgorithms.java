@@ -4,14 +4,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.opentox.Resources.*;
-import org.restlet.Context;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.ReferenceList;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
+import org.restlet.resource.ResourceException;
+
 
 /**
  * List of all algorithms.
@@ -24,23 +24,24 @@ import org.restlet.resource.Variant;
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.1 (Last update: Aug 26, 2009)
+ * @version 1.1 (Last update: Oct 21, 2009)
  */
 public class ListAlgorithms extends AbstractResource {
 
     private static final long serialVersionUID = 100121900060023101L;
     
 
-    public ListAlgorithms(Context context, Request request, Response response) {
-        super(context, request, response);
-        getVariants().add(new Variant(MediaType.TEXT_URI_LIST));
+   @Override
+    public void doInit() throws ResourceException{
+        super.doInit();
+        getVariants().put(Method.GET, new Variant(MediaType.TEXT_URI_LIST));
+        getVariants().put(Method.GET, new Variant(MediaType.TEXT_HTML));
     }
-
+   
     @Override
-    public Representation represent(Variant variant) {
+    public Representation get(Variant variant) {
 
-
-            ReferenceList list = new ReferenceList();
+    ReferenceList list = new ReferenceList();
     String cls=baseURI+"/algorithm/learning/classification";
     String reg=baseURI+"/algorithm/learning/regression";
     String feat=baseURI+"/algorithm/preprocessing/featureselection/";
@@ -48,9 +49,7 @@ public class ListAlgorithms extends AbstractResource {
     Map<String, Set<String>> map = getAlgorithmIdsAsMap();
     Iterator<String> classificationAlgorithms = map.get("classification").iterator();
     Iterator<String> regressionAlgorithms = map.get("regression").iterator();
-    Iterator<String> featureSelectionAlgorithms = map.get("featureselection").iterator();
-
-    
+    Iterator<String> featureSelectionAlgorithms = map.get("featureselection").iterator();    
 
     while (classificationAlgorithms.hasNext()){
         list.add(cls+"/"+classificationAlgorithms.next());
@@ -65,9 +64,16 @@ public class ListAlgorithms extends AbstractResource {
     }
 
     
-    Representation rep = list.getTextRepresentation();
+    Representation rep = null;
 
-    rep.setMediaType(MediaType.TEXT_URI_LIST);
+    if (variant.getMediaType().equals(MediaType.TEXT_URI_LIST)){
+        rep = list.getTextRepresentation();
+        rep.setMediaType(MediaType.TEXT_URI_LIST);
+    }else if (variant.getMediaType().equals(MediaType.TEXT_HTML)){
+        rep = list.getWebRepresentation();
+        rep.setMediaType(MediaType.TEXT_HTML);
+    }
+    
 
     getResponse().setStatus(Status.SUCCESS_OK);
 

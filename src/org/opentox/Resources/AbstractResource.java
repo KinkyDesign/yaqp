@@ -15,6 +15,8 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Resource;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.ServerResource;
 
 /**
  * Every Resource of the package extends this class.
@@ -23,7 +25,7 @@ import org.restlet.resource.Resource;
  * @author Sarimveis Harry
  * @version 1.4 (Last Update: Aug 26, 2009)
  */
-public abstract class AbstractResource  extends Resource{
+public abstract class AbstractResource  extends ServerResource{
 
     /**
      * version unique serial number.
@@ -302,6 +304,15 @@ public abstract class AbstractResource  extends Resource{
                 javadocDir=StaticDir+"/javadoc";
     
 
+    @Override
+    public void doInit() throws ResourceException{
+        super.doInit();
+         logger=Logger.getLogger(getClass().getName());
+         logger.setUseParentHandlers(false);
+         ConsoleHandler ch = new ConsoleHandler();
+         logger.addHandler(ch);
+         System.gc();
+    }
 
 
     /**
@@ -310,17 +321,17 @@ public abstract class AbstractResource  extends Resource{
      * @param request
      * @param response
      */
-    public AbstractResource(Context context, Request request,
-            Response response)
-    {
-        super(context, request, response);
-        
-        logger=Logger.getLogger(getClass().getName());
-        logger.setUseParentHandlers(false);
-        ConsoleHandler ch = new ConsoleHandler();	
-        logger.addHandler(ch);
-        System.gc();
-    }
+//    public AbstractResource(Context context, Request request,
+//            Response response)
+//    {
+//        super(context, request, response);
+//
+//        logger=Logger.getLogger(getClass().getName());
+//        logger.setUseParentHandlers(false);
+//        ConsoleHandler ch = new ConsoleHandler();
+//        logger.addHandler(ch);
+//        System.gc();
+//    }
 
 
     protected String getBaseDirectory(){

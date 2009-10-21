@@ -8,18 +8,15 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.util.svm_train;
-import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Reference;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
-import java.util.Date;
-import weka.experiment.LearningRateResultProducer;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
+import org.restlet.resource.ResourceException;
 
 
 /**
@@ -69,16 +66,26 @@ public class Classification extends AbstractResource{
     private int model_id;
 
     /**
+     * The status of the Resource. It is initialized with
+     * success/created (201) according to RFC 2616.
+     */
+    private Status internalStatus = Status.SUCCESS_CREATED;
+
+    /**
      * Constructor
      * @param context
      * @param request
      * @param response
      */
-    public Classification(Context context, Request request, Response response) {
-        super(context, request, response);
-        getVariants().add(new Variant(MediaType.TEXT_XML));
-        this.algorithmId=Reference.decode(request.getAttributes().get("id").toString());
+
+    @Override
+    public void doInit() throws ResourceException{
+        super.doInit();
+        getVariants().put(Method.GET, new Variant(MediaType.TEXT_XML));
+        getVariants().put(Method.GET, new Variant(MediaType.TEXT_PLAIN));
+        this.algorithmId=Reference.decode(getRequest().getAttributes().get("id").toString());
     }
+    
 
 
     /**
@@ -89,7 +96,7 @@ public class Classification extends AbstractResource{
      * @return StringRepresentation
      */
     @Override
-    public Representation represent(Variant variant) {
+    public Representation get(Variant variant) {
 
         StringBuilder builder = new StringBuilder();
         builder.append(xmlIntro);
@@ -214,51 +221,35 @@ public class Classification extends AbstractResource{
         return new StringRepresentation(builder.toString(),MediaType.TEXT_XML);
     }
 
+
+
+
     /**
-     * Post is allowed.
-     * @return true
+     * Set the private status variable
+     * @param status the new status
      */
-    @Override
-    public boolean allowPost(){
-        return true;
+    private void setInternalStatus(Status status){
+        this.internalStatus=status;
     }
 
+
     /**
-     * Processing of POST requests.
-     * @param entity
+     * Returns the error representation after checking if the parameters posted
+     * to the svm classification algorithm are acceptable. It returns <b>null</b>
+     * if the parameters are acceptable, otherwise a representation in Plain Text
+     * format explaining the problem.
+     * @param form the form containing the posted parameters
+     * @return
      */
-    @Override
-    public void acceptRepresentation(Representation entity)
-    {
+    private Representation checkSvcParameters(Form form){
+        Representation rep = null;
+        MediaType errorMediaType = MediaType.TEXT_PLAIN;
+        Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
+        String errorDetails = "";
 
-        /**
-         * Once the representation is accepted, the status
-         * is set to 202 (Success - Accepted).
-         */
-        getResponse().setStatus(Status.SUCCESS_ACCEPTED);
-        model_id = org.opentox.Applications.OpenToxApplication.dbcon.getModelsStack()+1;
-    
-        /**
-         * Implementation of the SVM classification algorithm.
-         */
-        if (algorithmId.equalsIgnoreCase("svc"))
-        {
-            File svmModelFolder = new File(CLS_SVM_modelsDir);
-            String[] listOfFiles = svmModelFolder.list();
-            int NSVM = listOfFiles.length;
-            
-            
-                /**
-                 * We construct a Form object that handles incoming parameters
-                 * If a parameter "x" has been POSTed, we can retrieve it using
-                 * form.getFirstValue("x");
-                 */
-                Form form = new Form(entity);
 
-                /**
-                 * Retrieve the POSTed parameters.
-                 * If a parameter was not posted set it to its default value...
-                 */
+        setInternalStatus(Status.SUCCESS_ACCEPTED);
+
                 kernel=form.getFirstValue("kernel");
                     if(kernel==null)
                         kernel="RBF";
@@ -288,11 +279,6 @@ public class Classification extends AbstractResource{
                         dataid="0";
 
                 /**
-                 * Check if the POSTed parameters are
-                 * acceptable (Throws Error 400: Client Error - Bad Request)
-                 */
-
-                /**
                  * Check dataId
                  */
                 try{
@@ -301,25 +287,16 @@ public class Classification extends AbstractResource{
                     boolean exists = dataFile.exists();
                     if (!exists){
                         //// File not found Exception!
-                        getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: Data File Not Found on the server!\n\n", MediaType.TEXT_PLAIN);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);    
+                        errorDetails = errorDetails + "* [Inacceptable Parameter Value] The Requested Data File was Not Found on the server.\n";
+                        setInternalStatus(clientPostedWrongParametersStatus);
                     }
                 }catch(NumberFormatException e){
-                    getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: The data file id that you provided is not valid" +
-                                " : "+dataid+"\n\n", MediaType.TEXT_PLAIN);
-                    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);    
+                    
+                    errorDetails = errorDetails + "* [Inacceptable Parameter Value] The data file id that you provided is not valid.\n";
+                    setInternalStatus(clientPostedWrongParametersStatus);
                 }
 
-                // Kernel should be one of rbf, linear, sigmoid or polynomial
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+                
                 if (
                         !(
                         (kernel.equalsIgnoreCase("rbf"))||
@@ -329,191 +306,152 @@ public class Classification extends AbstractResource{
                         )
                     )
                 {
-                   getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: The kernel you specified is not valid : "+
-                                kernel+"\n\n", MediaType.TEXT_PLAIN);
-                   getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);    
+                   errorDetails = errorDetails + "* [Inacceptable Parameter Value] Invalid Kernel Type!\n";
+                   setInternalStatus(clientPostedWrongParametersStatus);
                 }
-                }
+                
 
                 /**
                  * Cost should be convertible to Double and strictly
                  * positive.
                  */
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+                
                 try{
                     d = Double.parseDouble(cost);
                     if (d<=0){
-                        getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: The cost should be strictly positive!"+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                        errorDetails = errorDetails + "* [Inacceptable Parameter Value] The cost should be strictly positive\n";
+                        setInternalStatus(clientPostedWrongParametersStatus);
                     }
                 }catch(NumberFormatException e){
-                    getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: The cost should be Double type, while you specified " +
-                                "a non double value : "+cost+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                    errorDetails = errorDetails +
+                            "* [Inacceptable Parameter Value]  The cost should be Double type, while you specified " +
+                                "a non double value : "+cost+"\n";
+                    setInternalStatus(clientPostedWrongParametersStatus);
                 }
-                }
+                
 
                 /**
                  * Epsilon should be convertible to Double and strictly
                  * positive.
                  */
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+
                  try{
                      d=Double.parseDouble(epsilon);
                      if (d<=0){
-                         getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: Epsilon should be strictly positive!"+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                         getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                         errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsinlon must be strictly positive!\n";
+                         setInternalStatus(clientPostedWrongParametersStatus);
                      }
                  }catch(NumberFormatException e){
-                     getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: Epsilon should be Double type, while you specified " +
-                                "a non double value : "+epsilon+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                     getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);    
+                     errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
+                     setInternalStatus(clientPostedWrongParametersStatus);
                  }
-                }
+                
 
                 /**
                  * Degree should be a strictly positive integer
                  */
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+                
                 try{
                     i=Integer.parseInt(degree);
                     if (i<=0){
-                        getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: The degree should be an Integer greater or equal to 1, while you specified " +
-                                "an inacceptable value : "+degree+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                        errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
+                        setInternalStatus(clientPostedWrongParametersStatus);
                     }
                 }catch(NumberFormatException e){
-                    getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: The degree should be an Integer, while you specified " +
-                                "a non Integer value : "+degree+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                    errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
+                    setInternalStatus(clientPostedWrongParametersStatus);
                 }
-                }
+                
 
 
                 /**
                  * Gamma should be convertible to Double and strictly
                  * positive.
                  */
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+                
                  try{
                      d=Double.parseDouble(gamma);
                      if (d<=0){
-                         getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: Gamma should be strictly positive!"+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                         getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                         errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
+                         setInternalStatus(clientPostedWrongParametersStatus);
                      }
                  }catch(NumberFormatException e){
-                     getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: Gamma should be Double, while you specified " +
-                                "a non double value : "+gamma+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                     getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                     errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
+                     setInternalStatus(clientPostedWrongParametersStatus);
                  }
-                }
+                
 
                 /**
                  * coeff0 should be convertible to Double.
                  */
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+                
                   try{
                      d=Double.parseDouble(coeff0);
                   }catch(NumberFormatException e){
-                      getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: coeff0 should be Double, while you specified " +
-                                "a non double value : "+coeff0+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                     getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                      errorDetails = errorDetails + "* [Inacceptable Parameter Value] coeff must be a number!\n";
+                     setInternalStatus(clientPostedWrongParametersStatus);
                  }
-                }
+                
 
                 /**
                  * Tolerance
-                 */
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+                 */                
                   try{
                      d=Double.parseDouble(tolerance);
                      if (d<=0){
-                         getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                         errorDetails = errorDetails +
+                         "* [Inacceptable Parameter Value] Tolerance must be a strictly positive double (preferably small)!\n";
+                         setInternalStatus(clientPostedWrongParametersStatus);
                      }
                  }catch(NumberFormatException e){
-                     getResponse().setEntity(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: Tolerance should be (preferably small) Double, while you specified " +
-                                "a non double value : "+tolerance+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                     getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                     errorDetails = errorDetails +
+                             "* [Inacceptable Parameter Value] Tolerance must be a strictly positive double (preferably small)!\n";
+                     setInternalStatus(clientPostedWrongParametersStatus);
                  }
-                }
+                
 
 
                 /**
                  * cache size
                  */
-                if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+                
                   try{
                      i=Integer.parseInt(cacheSize);
                      if (d<=0){
-                         getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                         setInternalStatus(clientPostedWrongParametersStatus);
                      }
                  }catch(NumberFormatException e){
-                     getResponse().setEntity(
+                     rep = new StringRepresentation(
                                 "Error 400: Client Error, Bad Requset\n" +
                                 "The request could not be understood by the server due " +
                                 "to malformed syntax.\n" +
                                 "Details: cache size (in MB) should be an Integer, while you specified " +
                                 "a non Integer value : "+cacheSize+"\n\n",
-                                MediaType.TEXT_PLAIN);
-                     getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                                errorMediaType);
+                     setInternalStatus(clientPostedWrongParametersStatus);
                  }
-                }
+                
+                 if (!(errorDetails.equalsIgnoreCase(""))){
+                     rep = new StringRepresentation("Error Code : "+clientPostedWrongParametersStatus.toString()+"\n"+
+                             "Error Code Desription : The request could not be understood by the server due to " +
+                             "malformed syntax.\nThe client SHOULD NOT repeat the request without modifications.\n"+
+                             "Error Explanation :\n"+errorDetails+"\n",errorMediaType);
+                    return rep;
+                 }else{
+                    return null;
+                 }
+                
+    }
 
-                String ker="";
+
+    /***
+     * Returns the options String array which is given as input to the
+     * training algorithm.
+     * @return
+     */
+    private String[] getSvcOptions(){
+        String[] options = {""};
+        String ker="";
                 if (kernel.equalsIgnoreCase("linear"))
                     ker="0";
                 else if (kernel.equalsIgnoreCase("polynomial"))
@@ -524,9 +462,7 @@ public class Classification extends AbstractResource{
                     ker="3";
                 else
                     ker="3";
-
-                String[] options = {""};
-                String scaledPath = scaledDir+"/"+dataSetPrefix+dataid;
+        String scaledPath = scaledDir+"/"+dataSetPrefix+dataid;
                 String modelPath = CLS_SVM_modelsDir + "/" + model_id;
                 if (ker.equalsIgnoreCase("0")){
                     String[] ops={
@@ -535,7 +471,7 @@ public class Classification extends AbstractResource{
                         "-b","1",
                         "-c", cost,
                         "-e", tolerance,
-                        "-q",
+
                         scaledPath,
                         modelPath
 
@@ -551,7 +487,7 @@ public class Classification extends AbstractResource{
                         "-d", degree,
                         "-r", coeff0,
                         "-e", tolerance,
-                        "-q",
+
                         scaledPath,
                         modelPath
 
@@ -565,7 +501,7 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-                        "-q",
+
                         scaledPath,
                         modelPath
 
@@ -579,27 +515,63 @@ public class Classification extends AbstractResource{
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
-                        "-q",
+
                         scaledPath,
                         modelPath
                     };
                     options=ops;
-                     for(int i=0; i<options.length; i++){
-                        System.out.println(options[i]);
-                    }
                 }
+        return options;
+    }
+
+
+
+
+    /**
+     * Processing of POST requests.
+     * @param entity
+     */
+    @Override
+    public Representation post(Representation entity)
+    {
+
+        Representation representation = null;
+
+        /**
+         * Once the representation is accepted, the status
+         * is set to 202 (Success - Accepted) because the action cannot be
+         * carried out immediately (RFC 2616, sec. 10).
+         */
+        setInternalStatus(Status.SUCCESS_ACCEPTED);
+
+
+        model_id = org.opentox.Applications.OpenToxApplication.dbcon.getModelsStack()+1;
+    
+        /**
+         * Implementation of the SVM classification algorithm.
+         */
+        if (algorithmId.equalsIgnoreCase("svc"))
+        {
+                       
+                
+                Form form = new Form(entity);
+                Representation errorRep = checkSvcParameters(form);
+                if (errorRep!=null){
+                    representation = errorRep;
+                }
+
+
+
 
                 /**
                  * If all the posted parameters (kernel type, cost, gamma, etc)
                  * are acceptable the the status is 202.
                  */
-            if (getResponse().getStatus().equals(Status.SUCCESS_ACCEPTED)){
+            if (Status.SUCCESS_ACCEPTED.equals(internalStatus)){
                 try {
                     
-                    getResponse().setEntity(getResponse().getStatus().toString(),MediaType.TEXT_PLAIN);
-                    long before=System.currentTimeMillis();
-                    svm_train.main(options);
-                    long timeSpent=System.currentTimeMillis()-before;
+                    representation = new StringRepresentation(internalStatus.toString(),MediaType.TEXT_PLAIN);
+                    svm_train.main(getSvcOptions());
 
                         /**
                          * Check if the model was created.
@@ -609,16 +581,16 @@ public class Classification extends AbstractResource{
                     File modelFile = new File(CLS_SVM_modelsDir+"/"+model_id);
                     boolean modelCreated = modelFile.exists();
                     if (!(modelCreated)){
-                        getResponse().setEntity(
+                        representation = new StringRepresentation(
                                 "Error 400: Client Error, Bad Requset\n" +
                                 "The server encountered an unexpected condition " +
                                 "which prevented it from fulfilling the request."+
                                 "Details: Unexpected Error while trying to train the model."+"\n\n",
                                 MediaType.TEXT_PLAIN);
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                    }else{
+                        setInternalStatus(Status.SERVER_ERROR_INTERNAL);
+                    }else{ /** if the model was successfully created... **/
                         org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI+"/algorithm/learning/regression/mlr");
-                        getResponse().setStatus(Status.SUCCESS_OK);
+                        setInternalStatus(Status.SUCCESS_OK);
                     }
             
 
@@ -629,9 +601,9 @@ public class Classification extends AbstractResource{
                      * the OpenTox API specification, the URI of the trained model
                      * should be returned
                      */
-                    if (getResponse().getStatus().equals(Status.SUCCESS_OK)){
+                    if (internalStatus.equals(Status.SUCCESS_OK)){
                     
-                    getResponse().setEntity(ModelURI + "/" + model_id+"\n\n", MediaType.TEXT_PLAIN);
+                    representation = new StringRepresentation(ModelURI + "/" + model_id+"\n\n", MediaType.TEXT_PLAIN);
                     // TODO : create and store xml
                        StringBuilder xmlstr = new StringBuilder();
                        xmlstr.append(xmlIntro);
@@ -666,58 +638,58 @@ public class Classification extends AbstractResource{
                        } catch (Exception e) {
                            System.err.println("Error: " + e.getMessage());
                        }
-
-
-
-
-
-
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(Classification.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }// end of svm classification algorithm
+
+
+
+
         /**
          * Implementation of the kNN Algorithm
          */
         else if (algorithmId.equalsIgnoreCase("knn")){
-            getResponse().setEntity("Error 501: Not Implemented\n" +
+            representation = new StringRepresentation("Error 501: Not Implemented\n" +
                     "The server does not support the functionality required to fulfill the request.\n" +
                     "Details: This algorithm is not implemented yet!"+"\n\n",MediaType.TEXT_PLAIN);
-            getResponse().setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
+            setInternalStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
         }
         /**
          * Implementation of the J48 Algorithm
          */
         else if (algorithmId.equalsIgnoreCase("j48")){
-            getResponse().setEntity("Error 501: Not Implemented\n" +
+            representation = new StringRepresentation("Error 501: Not Implemented\n" +
                     "The server does not support the functionality required to fulfill the request.\n" +
                     "Details: This algorithm is not implemented yet!"+"\n\n",MediaType.TEXT_PLAIN);
-            getResponse().setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
+            setInternalStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
         }
         /**
          * Implementation of the PLS Algorithm
          */
         else if (algorithmId.equalsIgnoreCase("pls")){
-            getResponse().setEntity("Error 501: Not Implemented\n" +
+            representation = new StringRepresentation("Error 501: Not Implemented\n" +
                     "The server does not support the functionality required to fulfill the request.\n" +
                     "Details: This algorithm is not implemented yet!"+"\n\n",MediaType.TEXT_PLAIN);
-            getResponse().setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
+            setInternalStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
         }
         /**
          * Unknown Algorithm
          */
         else{
-            getResponse().setEntity("Error 404: Not Found\n" +
+            representation = new StringRepresentation("Error 404: Not Found\n" +
                     "The server has not found anything matching the Request-URI or the server \n" +
                     "does not wish to reveal exactly why the request has been refused, or no other\n" +
                     "response is applicable.\n" +
                     "Details: This classification model : "+algorithmId+" was not found on the server!"+"\n\n",MediaType.TEXT_PLAIN);
-            getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+            setInternalStatus(Status.CLIENT_ERROR_NOT_FOUND);
         }// end of all algorithms
 
-    }// end of acceptRepresentation method
+    getResponse().setStatus(internalStatus);
+    return representation;
+    }// end of post method
 
 
 

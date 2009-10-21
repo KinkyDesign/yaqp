@@ -1,14 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.opentox.database;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,26 +11,28 @@ import java.util.logging.Logger;
 public class InHouseDB {
 
     private int modelsStack;
+
     private final static String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-    private final static String DATABASENAME = "testdb1";
+    private final static String DATABASENAME = "modelsDb";
     private final static String URL = "jdbc:derby:" + DATABASENAME;
     private final static String USER = "itsme";
     private final static String PASSWORD = "letmein";
     private final static String TABLE1_NAME = "MODELS_STACK";
     private final static String TABLE2_NAME = "MODELS";
+
     private static Driver myDriver = null;
     private static Connection connection = null;
 
     /**
      *Database Constructor. Connects to the existing database or creates a new one if database doesn't exist.
      */
-    public InHouseDB() {
+    public InHouseDB(){
         loadDriver();
         getConnection();
         loadTables();
     }
 
-    private void loadDriver() {
+    private void loadDriver(){
         try {
             try {
                 myDriver = (Driver) Class.forName(DRIVER).newInstance();
@@ -53,11 +46,11 @@ public class InHouseDB {
         }
     }
 
-    private void getConnection() {
+    private void getConnection(){
         try {
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
-            if (e.getErrorCode() == 40000) {
+            if(e.getErrorCode() == 40000)  {
                 createDataBase();
             } else {
                 System.out.println(e);
@@ -65,7 +58,7 @@ public class InHouseDB {
         }
     }
 
-    private void loadTables() {
+    private void loadTables(){
         DatabaseMetaData md = null;
         ResultSet rs = null;
         Statement stmt = null;
@@ -78,10 +71,10 @@ public class InHouseDB {
                 rs = md.getTables(null, null, "%", null);
                 try {
                     while (rs.next() && !(exists1 && exists2)) {
-                        if (rs.getString(3).equals(TABLE1_NAME)) {
+                        if (rs.getString(3).equals(TABLE1_NAME)){
                             exists1 = true;
                         }
-                        if (rs.getString(3).equals(TABLE2_NAME)) {
+                        if (rs.getString(3).equals(TABLE2_NAME)){
                             exists2 = true;
                         }
                     }
@@ -89,10 +82,10 @@ public class InHouseDB {
                     Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                if (!exists1) {
+                if (!exists1){
                     createTable1();
                 }
-                if (!exists2) {
+                if (!exists2){
                     createTable2();
                 }
 
@@ -113,7 +106,7 @@ public class InHouseDB {
         }
     }
 
-    private static void createDataBase() {
+    private static void createDataBase(){
         System.out.println("Creating databse: " + DATABASENAME);
         try {
             connection = DriverManager.getConnection(URL + ";create=true", USER, PASSWORD);
@@ -122,8 +115,8 @@ public class InHouseDB {
         }
     }
 
-    private static void createTable1() {
-        System.out.println("Creating table : " + TABLE1_NAME);
+    private static void createTable1(){
+        System.out.println("Creating table : "+TABLE1_NAME);
         String CreateTable = "create table " + TABLE1_NAME + "(STACK INTEGER)";
 
         try {
@@ -132,7 +125,7 @@ public class InHouseDB {
         } catch (SQLException ex) {
             Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
         String CreateValue = "insert into " + TABLE1_NAME + " (\"STACK\")\n" +
                 "values (0)";
         try {
@@ -143,12 +136,12 @@ public class InHouseDB {
         }
     }
 
-    private static void createTable2() {
+    private static void createTable2(){
         System.out.println("Creating table: " + TABLE2_NAME);
         String CreateTable = "create table " + TABLE2_NAME + "(" +
-                "MODEL_ID BIGINT, " +
-                "ALGORITHM_ID VARCHAR(150)," +
-                "MODEL_URI VARCHAR(150))";
+                                  "MODEL_ID INTEGER, " +
+                                  "ALGORITHM_ID VARCHAR(150)," +
+                                  "MODEL_URI VARCHAR(150))";
 
         try {
             Statement stmt = connection.createStatement();
@@ -158,8 +151,9 @@ public class InHouseDB {
         }
     }
 
-    private void IncreaseModelStack() {
-        String increaseValue = "update " + TABLE1_NAME + " set STACK = " + (modelsStack + 1) +
+
+    private void IncreaseModelStack(){
+        String increaseValue = "update " + TABLE1_NAME + " set STACK = " + (modelsStack+1) +
                 " where STACK = " + modelsStack;
         try {
             Statement stmt = connection.createStatement();
@@ -170,8 +164,8 @@ public class InHouseDB {
         modelsStack++;
     }
 
-    public int getModelsStack() {
-        return modelsStack;
+    public int getModelsStack(){
+            return modelsStack;
     }
 
     /**
@@ -180,7 +174,7 @@ public class InHouseDB {
      * @return New model's ID
      */
     public int registerNewModel(String AlgID) {
-        int id = getModelsStack() + 1;
+        int id = getModelsStack()+1;
         String uri = org.opentox.Resources.AbstractResource.baseURI + "/model/" + id;
         String CreateValue = "insert into " + TABLE2_NAME + " values (" + id + ",'" + AlgID + "','" + uri + "')";
         //System.out.println(CreateValue);
@@ -195,58 +189,24 @@ public class InHouseDB {
         }
 
         return id;
-
+        
     }
 
-    public BufferedReader getTableAsStream(String tableName) {
-        ResultSet rs = null;
-        Statement stmt = null;
-        InputStream ins = null;
-        InputStreamReader insr = null;
-        BufferedReader br = null;
-
-        try {
-            stmt = connection.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            rs = stmt.executeQuery("SELECT * from " + tableName);
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            
-            rs.next();
-            ins = rs.getBinaryStream("MODEL_URI");
-            
-
-
-        } catch (SQLException ex) {
-            Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        br = new BufferedReader(new InputStreamReader(ins));
-        return br;
-
-    }
-
-    public static void main(String[] args) throws IOException {
-        long before0 = java.lang.System.currentTimeMillis();
+    /**
+     * For testing purposes only.
+     * Is not used within the service.
+     * @param args
+     */
+    public static void main(String [] args){
+        long before0  = java.lang.System.currentTimeMillis();
         InHouseDB dbcon = new InHouseDB();
-        System.out.println(System.currentTimeMillis() - before0 + "ms for connection");
+        System.out.println(System.currentTimeMillis()-before0+"ms for connection");
         //System.out.println(dbcon.getModelsStack());
 
-        int id = dbcon.registerNewModel("http://www.opentox.org:3000/algorithm/learning/classification/svc");
-        //System.out.println(id);
+        int id =  dbcon.registerNewModel("http://www.opentox.org:3000/algorithm/learning/classification/svc");
+        System.out.println(id);
+        
 
-
-        BufferedReader rdr = dbcon.getTableAsStream(TABLE2_NAME);
-
-
-        System.out.println(rdr.readLine());
-        System.out.println(rdr.readLine());
         System.err.println(dbcon.modelsStack);
     }
 }

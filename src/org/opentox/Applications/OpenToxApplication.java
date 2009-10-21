@@ -1,14 +1,12 @@
  package org.opentox.Applications;
 
 
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentox.Resources.aux.TrainerMLR;
 import org.opentox.Resources.aux.ValidatorMLR;
 import org.opentox.Resources.aux.Selector;
 import org.opentox.Resources.aux.TrainerSVC;
-import org.opentox.Resources.Algorithms.TestSetValidation;
 import org.opentox.Resources.Models.Model;
 import org.opentox.Resources.List.ListAllModels;
 import org.opentox.Resources.Algorithms.AttributeSelection;
@@ -17,31 +15,21 @@ import org.opentox.Resources.Algorithms.Classification;
 import org.opentox.Resources.List.ListAlgorithms;
 import org.opentox.Resources.Algorithms.Regression;
 import org.opentox.Resources.List.ListClassificationAlgorithms;
-import org.opentox.Resources.List.ListValidationRoutines;
 import org.opentox.Resources.List.ListRegressionAlgorithms;
 import org.opentox.Resources.Datasets.DataSet;
-import org.opentox.Resources.List.ListDataSets;
 import org.opentox.Resources.IndexResource;
-import org.opentox.Resources.AbstractResource;
-import org.opentox.Resources.List.ListSomeModels;
 import org.opentox.Resources.StyleSheetResource;
-import org.opentox.Resources.ValidationResults.ValidationResult;
 import org.opentox.Resources.aux.TrainerSVM;
 import org.opentox.Resources.aux.UploadArff;
 import org.opentox.Resources.aux.UploadFromWeb;
 import org.opentox.Resources.aux.ValidatorSVC;
 import org.restlet.Application;
-import org.restlet.Component;
-import org.restlet.Directory;
-import org.restlet.Guard;
 import org.restlet.Restlet;
-import org.restlet.Router; 
-import org.restlet.VirtualHost;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.LocalReference;
-import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
+import org.restlet.routing.Router;
+import org.restlet.security.Guard;
 
 
 /**
@@ -225,21 +213,21 @@ import org.opentox.database.InHouseDB;
          router.attach("/algorithm/learning/classification", ListClassificationAlgorithms.class);
          router.attach("/algorithm/learning/classification/{id}", Classification.class);// {id} stands for the algoritm's id
          router.attach("/algorithm/preprocessing/featureselection/{algorithm_id}",AttributeSelection.class);
-         router.attach("/validation",ListValidationRoutines.class);
-         router.attach("/validation/test_set_validation/{algorithm_id}",TestSetValidation.class);
-         router.attach("/validation_result/{model_type}/{algorithm_id}/{id}", ValidationResult.class);// e.g. /validation_result/classification/svc/validation-36-28-15
+         //router.attach("/validation",ListValidationRoutines.class);
+         //router.attach("/validation/test_set_validation/{algorithm_id}",TestSetValidation.class);
+         //router.attach("/validation_result/{model_type}/{algorithm_id}/{id}", ValidationResult.class);// e.g. /validation_result/classification/svc/validation-36-28-15
          router.attach("/model",ListAllModels.class);
          //router.attach("/model/{model_type}/{algorithm_id}",ListSomeModels.class);
          router.attach("/model/{model_id}", ModelGuard);// The deletion of models is guarded!!!
-         router.attach("/dataset",ListDataSets.class);// {type} stands for the dataset mediatype
-         router.attach("/dataset/{id}",DataSetGuard);// The deletion of datasets is guarded!!!
+         //router.attach("/dataset",ListDataSets.class);// {type} stands for the dataset mediatype
+         //router.attach("/dataset/{id}",DataSetGuard);// The deletion of datasets is guarded!!!
                   
          /**
           * Auxiliary Resources
           * HTML forms for the consumption of the webservices.
           */
-           router.attach("/fileupload/arff",UploalGuard);// File upload is guarded!!!
-           router.attach("/fileupload/fromwww",UploadFromWWWGuard);// File upload is guarded!!!
+           //router.attach("/fileupload/arff",UploalGuard);// File upload is guarded!!!
+           //router.attach("/fileupload/fromwww",UploadFromWWWGuard);// File upload is guarded!!!
            router.attach("/trainer/svc",TrainerSVC.class);
            router.attach("/trainer/svm",TrainerSVM.class);
            router.attach("/trainer/mlr",TrainerMLR.class);
