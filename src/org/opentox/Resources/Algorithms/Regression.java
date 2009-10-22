@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.*;
 
 import org.opentox.util.svm_train;
@@ -76,7 +77,8 @@ public class Regression extends AbstractResource {
         super.doInit();
         List<Variant> variants = new ArrayList<Variant>();
         variants.add(new Variant(MediaType.TEXT_PLAIN));
-        variants.add(new Variant(MediaType.TEXT_XML));        
+        variants.add(new Variant(MediaType.TEXT_XML));
+        variants.add(new Variant(MediaType.TEXT_HTML));
         getVariants().put(Method.GET, variants);
         this.algorithmId = Reference.decode(getRequest().getAttributes().get("id").toString());
     }
@@ -217,7 +219,8 @@ public class Regression extends AbstractResource {
         
 
 
-        if (MediaType.TEXT_XML.equals(variant.getMediaType())) {
+        if ( (MediaType.TEXT_XML.equals(variant.getMediaType())) ||
+                (MediaType.TEXT_HTML.equals(variant.getMediaType())) ){
             if (algorithmId.equalsIgnoreCase("svm")) {                
                 return new StringRepresentation(getSvmXml(), MediaType.TEXT_XML);
 
@@ -769,7 +772,7 @@ public class Regression extends AbstractResource {
              * Retrieve the POSTed parameters.
              * If a parameter was not posted set it to its default value...
              */            
-            checkSvmParameters(form);
+            representation = checkSvmParameters(form);
             String[] options = getSvmOptions();
 
             /**
@@ -778,13 +781,7 @@ public class Regression extends AbstractResource {
              */
             if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
                 try {
-                    representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
-                    
-
-                    for (int k = 0; k < options.length; k++) {
-                        logger.info(options[k]);
-                    }
-
+                    representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);                                        
                     svm_train.main(options);
                     
 
@@ -852,14 +849,14 @@ public class Regression extends AbstractResource {
                             out.flush();
                             out.close();
                         } catch (Exception e) {
-                            System.err.println("Error: " + e.getMessage());
+                            OpenToxApplication.opentoxLogger.severe(e.getMessage());
                         }
 
 
                     }
 
                 } catch (IOException ex) {
-                    Logger.getLogger(Classification.class.getName()).log(Level.SEVERE, null, ex);
+                    OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
                 }                
             }
             return representation;

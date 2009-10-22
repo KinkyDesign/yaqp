@@ -1,16 +1,17 @@
 package org.opentox.Resources.List;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentox.Resources.*;
-import org.restlet.Context;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.ReferenceList;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
+import org.restlet.resource.ResourceException;
 
 /**
  * List of all classification algorithms.
@@ -30,13 +31,17 @@ public class ListClassificationAlgorithms extends AbstractResource {
     private static final long serialVersionUID = 10012190006004001L;
     
 
-    public ListClassificationAlgorithms(Context context, Request request, Response response) {
-        super(context, request, response);
-        getVariants().add(new Variant(MediaType.TEXT_URI_LIST));
+    @Override
+    public void doInit() throws ResourceException{
+        super.doInit();
+        List<Variant> variants = new ArrayList<Variant>();
+        variants.add(new Variant(MediaType.TEXT_URI_LIST));
+        variants.add(new Variant(MediaType.TEXT_HTML));
+        getVariants().put(Method.GET, variants);
     }
 
     @Override
-    public Representation represent(Variant variant) {
+    public Representation get(Variant variant) {
 
 
         ReferenceList list = new ReferenceList();
@@ -50,10 +55,18 @@ public class ListClassificationAlgorithms extends AbstractResource {
         list.add(cls+"/"+classificationAlgorithms.next());
         }
 
-        Representation rep = list.getTextRepresentation();
-        rep.setMediaType(MediaType.TEXT_URI_LIST);
+        Representation rep=null;
 
+        if (MediaType.TEXT_URI_LIST.equals(variant.getMediaType())) {
+            rep = list.getTextRepresentation();
+            rep.setMediaType(MediaType.TEXT_URI_LIST);
+        } else if (MediaType.TEXT_HTML.equals(variant.getMediaType())) {
+            rep = list.getWebRepresentation();
+            rep.setMediaType(MediaType.TEXT_HTML);
+        }
         return rep;
+
+        
 
     }
 }

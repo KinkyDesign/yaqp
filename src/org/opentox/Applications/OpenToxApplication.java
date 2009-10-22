@@ -1,33 +1,30 @@
  package org.opentox.Applications;
 
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentox.Resources.aux.TrainerMLR;
-import org.opentox.Resources.aux.ValidatorMLR;
-import org.opentox.Resources.aux.Selector;
-import org.opentox.Resources.aux.TrainerSVC;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.Models.Model;
 import org.opentox.Resources.List.ListAllModels;
-import org.opentox.Resources.Algorithms.AttributeSelection;
 import org.opentox.Resources.List.ListLearningAlgorithms;
 import org.opentox.Resources.Algorithms.Classification;
 import org.opentox.Resources.List.ListAlgorithms;
 import org.opentox.Resources.Algorithms.Regression;
 import org.opentox.Resources.List.ListClassificationAlgorithms;
 import org.opentox.Resources.List.ListRegressionAlgorithms;
-import org.opentox.Resources.Datasets.DataSet;
 import org.opentox.Resources.IndexResource;
 import org.opentox.Resources.StyleSheetResource;
-import org.opentox.Resources.aux.TrainerSVM;
-import org.opentox.Resources.aux.UploadArff;
-import org.opentox.Resources.aux.UploadFromWeb;
-import org.opentox.Resources.aux.ValidatorSVC;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
+import org.restlet.data.LocalReference;
+import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.security.Guard;
 
@@ -64,15 +61,22 @@ import org.restlet.security.Guard;
      private static final long serialVersionUID = 749479721274764426L;
 
      public  static final InHouseDB dbcon = new InHouseDB();
+
      
+     public static Logger opentoxLogger;
+
+
     
 
      /**
       * Constructor.
       */
-     public OpenToxApplication(){
+     public OpenToxApplication() throws IOException{
         System.gc();
-        
+        opentoxLogger=Logger.getLogger("org.restlet");
+        FileHandler fileHand = new FileHandler("opentoxServerLogs.xml");
+        opentoxLogger.addHandler(fileHand);
+        opentoxLogger.setLevel(Level.ALL);                
         }
      
 
@@ -139,14 +143,7 @@ import org.restlet.security.Guard;
          Map<String,char[]> secrets = SetUserIds();
 
 
-         UploalGuard.getSecrets().putAll(secrets);
-         UploalGuard.setNonceLifespan(4000);
-         UploalGuard.setNext(UploadArff.class);
-
-         UploadFromWWWGuard.getSecrets().putAll(secrets);
-         UploadFromWWWGuard.setNext(UploadFromWeb.class);
-
-
+         
          /**
           * Guard for the deletion of resources.
           * Only administrators can delete Resources.
@@ -165,22 +162,7 @@ import org.restlet.security.Guard;
          ModelGuard.getSecrets().putAll(SetAdminIds());
          ModelGuard.setNext(Model.class);
 
-         /**
-          * Guards the removal of datasets...
-          */
-         final Guard DataSetGuard = new Guard(getContext(), ChallengeScheme.HTTP_BASIC,
-                 "Only administrators are authorized to delete dataset...")
-          {
-             @Override
-             public int authenticate(Request req){
-                if (req.getMethod().equals(org.restlet.data.Method.GET)) return AUTHENTICATION_VALID;
-                return super.authenticate(req);
-             }
-          };
-         DataSetGuard.getSecrets().putAll(SetAdminIds());
-         DataSetGuard.setNext(DataSet.class);
-
-
+         
 
          Router router = new Router(getContext());
 
@@ -212,31 +194,12 @@ import org.restlet.security.Guard;
          router.attach("/algorithm/learning/regression/{id}", Regression.class);// {id} stands for the algoritm's id
          router.attach("/algorithm/learning/classification", ListClassificationAlgorithms.class);
          router.attach("/algorithm/learning/classification/{id}", Classification.class);// {id} stands for the algoritm's id
-         router.attach("/algorithm/preprocessing/featureselection/{algorithm_id}",AttributeSelection.class);
-         //router.attach("/validation",ListValidationRoutines.class);
-         //router.attach("/validation/test_set_validation/{algorithm_id}",TestSetValidation.class);
-         //router.attach("/validation_result/{model_type}/{algorithm_id}/{id}", ValidationResult.class);// e.g. /validation_result/classification/svc/validation-36-28-15
          router.attach("/model",ListAllModels.class);
-         //router.attach("/model/{model_type}/{algorithm_id}",ListSomeModels.class);
          router.attach("/model/{model_id}", ModelGuard);// The deletion of models is guarded!!!
-         //router.attach("/dataset",ListDataSets.class);// {type} stands for the dataset mediatype
-         //router.attach("/dataset/{id}",DataSetGuard);// The deletion of datasets is guarded!!!
-                  
-         /**
-          * Auxiliary Resources
-          * HTML forms for the consumption of the webservices.
-          */
-           //router.attach("/fileupload/arff",UploalGuard);// File upload is guarded!!!
-           //router.attach("/fileupload/fromwww",UploadFromWWWGuard);// File upload is guarded!!!
-           router.attach("/trainer/svc",TrainerSVC.class);
-           router.attach("/trainer/svm",TrainerSVM.class);
-           router.attach("/trainer/mlr",TrainerMLR.class);
-           router.attach("/selector",Selector.class);
-           router.attach("/validator/mlr", ValidatorMLR.class);
-           router.attach("/validator/svc", ValidatorSVC.class);
 
-                 
-         
+
+
+                    
 
          return router;
      }

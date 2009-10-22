@@ -37,11 +37,7 @@ public abstract class AbstractResource  extends ServerResource{
                     "\"http://www.w3.org/TR/html4/loose.dtd\">" +
                     "<html><head><title>NTUA - RESTful Web Services</title></head><body>";
 
-    /**
-     * Logger
-     */
-    protected Logger logger ;
-
+    
     /**
      * End of HTML files
      */
@@ -300,11 +296,7 @@ public abstract class AbstractResource  extends ServerResource{
     @Override
     public void doInit() throws ResourceException{
         super.doInit();
-         logger=Logger.getLogger(getClass().getName());
-         logger.setUseParentHandlers(false);
-         ConsoleHandler ch = new ConsoleHandler();
-         logger.addHandler(ch);
-         System.gc();
+        System.gc();
     }
 
 

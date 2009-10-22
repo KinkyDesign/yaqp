@@ -1,6 +1,8 @@
 package org.opentox.Resources.List;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentox.Resources.*;
@@ -31,11 +33,17 @@ public class ListAlgorithms extends AbstractResource {
     private static final long serialVersionUID = 100121900060023101L;
     
 
-   @Override
+    /**
+     * Initialize the resource.
+     * @throws ResourceException
+     */
+    @Override
     public void doInit() throws ResourceException{
         super.doInit();
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_URI_LIST));
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_HTML));
+        List<Variant> variants = new ArrayList<Variant>();
+        variants.add(new Variant(MediaType.TEXT_URI_LIST));
+        variants.add(new Variant(MediaType.TEXT_HTML));
+        getVariants().put(Method.GET, variants);
     }
    
     @Override

@@ -1,16 +1,15 @@
 package org.opentox.Resources.List;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.opentox.Resources.*;
-import java.io.File;
-
-import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.ReferenceList;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
@@ -25,16 +24,24 @@ import org.restlet.resource.ResourceException;
 public class ListAllModels extends AbstractResource {
 
     private static final long serialVersionUID = 482012197707002001L;
-
     /**
-     * Initialize the resource.
-     * @throws ResourceException
+     * searchAlgorithm can be any keyword related to algorithms such as
+     * classification, regression, learning, svm, svc, mlr, knn. This keyword
+     * is not case sensitive, so svm will give the same results with SVM ro Svm.
      */
+    private static final String ALGORITHM_TYPE_QUERY = "searchAlgorithm";
+    private String searchAlgorithm = "";
+
     @Override
     public void doInit() throws ResourceException {
+        org.opentox.Applications.OpenToxApplication.opentoxLogger.info("ALL MODELS!");
         super.doInit();
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_URI_LIST));
-        getVariants().put(Method.GET, new Variant(MediaType.TEXT_HTML));
+        List<Variant> variants = new ArrayList<Variant>();
+        variants.add(new Variant(MediaType.TEXT_URI_LIST));
+        variants.add(new Variant(MediaType.TEXT_HTML));
+        getVariants().put(Method.GET, variants);
+        Form queryForm = getReference().getQueryAsForm();
+        searchAlgorithm = queryForm.getFirstValue(ALGORITHM_TYPE_QUERY);
     }
 
     /**
@@ -44,17 +51,26 @@ public class ListAllModels extends AbstractResource {
      */
     @Override
     public Representation get(Variant variant) {
+ 
         Representation rep = null;
         ReferenceList list = new ReferenceList();
-        list = org.opentox.Applications.OpenToxApplication.dbcon.getModelsAsReferenceList();
+        System.out.println(searchAlgorithm);
+        if (!(searchAlgorithm == null)) {            
+                list = org.opentox.Applications.OpenToxApplication.dbcon.getReferenceListFromAlgId(searchAlgorithm);            
+        } else {
+            list = org.opentox.Applications.OpenToxApplication.dbcon.getModelsAsReferenceList();
+        }
 
-        if (MediaType.TEXT_URI_LIST.equals(variant.getMediaType())) {
+
+        if ((MediaType.TEXT_URI_LIST).equals(variant.getMediaType())) {
             rep = list.getTextRepresentation();
             rep.setMediaType(MediaType.TEXT_URI_LIST);
-        } else if (MediaType.TEXT_HTML.equals(variant.getMediaType())) {
+        } else if ((MediaType.TEXT_HTML).equals(variant.getMediaType())) {
             rep = list.getWebRepresentation();
             rep.setMediaType(MediaType.TEXT_HTML);
         }
         return rep;
     }
+
+
 }

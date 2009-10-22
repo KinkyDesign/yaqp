@@ -35,7 +35,7 @@ public class Server {
                   AbstractResource.HTMLDir);
 
 
-           Directory javadocDirectory = new Directory(component.getContext().createChildContext(), javadoc);
+           Directory javadocDirectory = new Directory(component.getContext().createChildContext(),javadoc);
            Directory homeDirectory = new Directory(component.getContext().createChildContext(), home);
 
 

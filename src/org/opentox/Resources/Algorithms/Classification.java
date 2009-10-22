@@ -19,7 +19,7 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-
+import org.opentox.Applications.OpenToxApplication;
 
 /**
  * Resource for classification algorithms.
@@ -87,7 +87,7 @@ public class Classification extends AbstractResource{
         variants.add(new Variant(MediaType.TEXT_PLAIN));
         variants.add(new Variant(MediaType.TEXT_XML));
         /** Sometime we will support HTML representation for models **/
-        //variants.add(new Variant(MediaType.TEXT_HTML));
+        variants.add(new Variant(MediaType.TEXT_HTML));
         getVariants().put(Method.GET, variants);
         this.algorithmId=Reference.decode(getRequest().getAttributes().get("id").toString());
     }
@@ -296,8 +296,7 @@ public class Classification extends AbstractResource{
                         errorDetails = errorDetails + "* [Inacceptable Parameter Value] The Requested Data File was Not Found on the server.\n";
                         setInternalStatus(clientPostedWrongParametersStatus);
                     }
-                }catch(NumberFormatException e){
-                    
+                }catch(NumberFormatException e){                    
                     errorDetails = errorDetails + "* [Inacceptable Parameter Value] The data file id that you provided is not valid.\n";
                     setInternalStatus(clientPostedWrongParametersStatus);
                 }
@@ -595,7 +594,7 @@ public class Classification extends AbstractResource{
                                 MediaType.TEXT_PLAIN);
                         setInternalStatus(Status.SERVER_ERROR_INTERNAL);
                     }else{ /** if the model was successfully created... **/
-                        org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI+"/algorithm/learning/regression/mlr");
+                        org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI+"/algorithm/learning/classification/svc");
                         setInternalStatus(Status.SUCCESS_OK);
                     }
             
@@ -646,7 +645,7 @@ public class Classification extends AbstractResource{
                        }
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(Classification.class.getName()).log(Level.SEVERE, null, ex);
+                    OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
                 }
             }
         }// end of svm classification algorithm
