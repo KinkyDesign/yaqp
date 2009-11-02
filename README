@@ -4,13 +4,15 @@ Copyright 2009 - Yet Antother Qsar Project
 http://opentox.ntua.gr:3000/
 ==================================================================================
 
-This is the release 1.3 (alpha) of the web service yaqp (yet another qsar project) and brings the following features:
+This is the release 1.3 (alpha) of the web service yaqp (yet another qsar project) 
+and brings the following features:
 
 - The service is based on Restlet 2.0 - Milestone 3
 - Model URIs are refactored to be compliant with the OpenTox specifications
 - A database is created (new class org.opentox.database.InHouseDB)
 
-The release 1.2 (alpha) of the web service yaqp (yet another qsar project) and brings the following features:
+The release 1.2 (alpha) of the web service yaqp (yet another qsar project) and 
+brings the following features:
 
 - storing arff files on the server (Requires a user account)
 - Provide various representations of stored data (xml and other)
@@ -30,11 +32,12 @@ We put effort so that our services be compliant with the OpenTox specification
 ==================================================================================
 Summary
 ==================================================================================
-Project Name : YAQP (under OpenTox)
+Project Name      : YAQP (under OpenTox)
 Programming Lang. : Java
-Project Type : Restful WebServices
-Developed by :	Sopasakis Pantelis
-Home Page : http://opentox.ntua.gr:3000/
+Project Type      : Restful WebServices
+Developed by      : Sopasakis Pantelis, Kolotouros Dimitris
+Home Page         : http://opentox.ntua.gr/
+Services Running  @ http://opentox.ntua.gr:3000
 
 
 ==================================================================================
@@ -61,8 +64,8 @@ installed on your system, install it typing:
 
 sudo apt-get install curl
 
-Find a complete guide for usign curl at http://opentox.ntua.gr:3000/guide. Feel free
-to contact us via email at chvng@mail.ntua.gr.
+Find a complete guide for usign curl at http://opentox.ntua.gr/guide. Feel free
+to contact us via email at chvng[at]mail[dot]ntua[dot]gr.
 
 
 
