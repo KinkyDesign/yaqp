@@ -30,7 +30,7 @@ import org.restlet.resource.ResourceException;
  */
 public class ListAlgorithms extends AbstractResource {
 
-    private static final long serialVersionUID = 100121900060023101L;
+    private static final long serialVersionUID = 98723648273928734L;
     
 
     /**
@@ -49,7 +49,7 @@ public class ListAlgorithms extends AbstractResource {
     @Override
     public Representation get(Variant variant) {
 
-    ReferenceList list = new ReferenceList();
+    ReferenceList list = new ReferenceList();    
     String cls=baseURI+"/algorithm/learning/classification";
     String reg=baseURI+"/algorithm/learning/regression";
     String feat=baseURI+"/algorithm/preprocessing/featureselection/";

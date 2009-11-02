@@ -1,12 +1,15 @@
  package org.opentox.Applications;
 
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.Models.Model;
 import org.opentox.Resources.List.ListAllModels;
@@ -18,13 +21,12 @@ import org.opentox.Resources.List.ListClassificationAlgorithms;
 import org.opentox.Resources.List.ListRegressionAlgorithms;
 import org.opentox.Resources.IndexResource;
 import org.opentox.Resources.StyleSheetResource;
+import org.opentox.Resources.fileupload.UploadArff;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
-import org.restlet.data.LocalReference;
-import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.security.Guard;
 
@@ -60,9 +62,14 @@ import org.restlet.security.Guard;
 
      private static final long serialVersionUID = 749479721274764426L;
 
-     public  static final InHouseDB dbcon = new InHouseDB();
+     /**
+      * Connection to the Models' database.
+      */
+     public  static InHouseDB dbcon;
 
-     
+     /**
+      * Server logs.
+      */
      public static Logger opentoxLogger;
 
 
@@ -72,11 +79,18 @@ import org.restlet.security.Guard;
       * Constructor.
       */
      public OpenToxApplication() throws IOException{
-        System.gc();
+        if (!(new File(AbstractResource.Directories.logDir)).exists()) {
+                    new File(AbstractResource.Directories.logDir).mkdirs();
+                    System.out.println("x");
+        }
         opentoxLogger=Logger.getLogger("org.restlet");
-        FileHandler fileHand = new FileHandler("opentoxServerLogs.xml");
+        
+        FileHandler fileHand = new FileHandler(AbstractResource.Directories.logDir+"/"+new Date());
+        fileHand.setFormatter(new SimpleFormatter());
         opentoxLogger.addHandler(fileHand);
-        opentoxLogger.setLevel(Level.ALL);                
+        opentoxLogger.setLevel(Level.INFO);
+        dbcon = new InHouseDB();
+        AbstractResource.Directories.checkDirs();
         }
      
 
@@ -98,17 +112,15 @@ import org.restlet.security.Guard;
       *     XML representation of classification algorithm</li>
       * <li><tt>POST /algorithm/learning/classification/svm/{id}</tt>
       *     Train a new classification model.</li>
-      * <li><tt>GET /model</tt>
-      *     List (in xml format) of all available models</li>
-      * <li><tt>GET /model/{model_type}/{algorithm_id}</tt>
-      *     List of all available models of a specified type (classification or regression)</li>
-      * <li><tt>GET /model/{model_type}/{algorithm_id}/{model_id}</tt>
-      *     Retrieve a stored model.</li>
-      * <li><tt>GET /fileupload</tt>
-      *     HTML form that facilitates the user in uploading a new datafile on the server.</li>
+      * <li><tt>GET /model?searchAlgorithm=keyword</tt>
+      *     List (in text/uri-list format) of all available models. You can also
+      * use the optional query ?searchAlgorithm=keyword to search for model URIs
+      * that were built using an algorithm relevant to a keyword. For example, this
+      * keyword could be 'classificataion' or 'regression' or 'svc' etc...</li>
       * </ul>
       * </p>
       */
+
      @Override
          public final synchronized Restlet createRoot() {
 
@@ -160,21 +172,23 @@ import org.restlet.security.Guard;
              }
           };
          ModelGuard.getSecrets().putAll(SetAdminIds());
-         ModelGuard.setNext(Model.class);
+         ModelGuard.setNext(Model.class);   
 
          
 
          Router router = new Router(getContext());
+         
 
          /**
           * We set Retry Delay to 1sec
           */
          router.setRetryDelay(1L);
 
+
          /**
           * We set maximum attempts to 5
           */
-         router.setMaxAttempts(5);
+         router.setMaxAttempts(20);
 
          /**
           * Index Resource and stylesheet
@@ -183,6 +197,7 @@ import org.restlet.security.Guard;
           */
          router.attach("", IndexResource.class);
          router.attach("/styles/style1.css",StyleSheetResource.class);
+         router.attach("/up",UploadArff.class);
 
          /**
           * Resources compliant to the

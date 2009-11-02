@@ -37,7 +37,7 @@ public class Server {
             component.start();
         } catch (Exception ex) {
             org.opentox.Applications.OpenToxApplication.opentoxLogger.severe("Exception while " +
-                    "starting the component: "+ex.getMessage());
+                    "starting the component : "+ex.getMessage());
         }
 
     }
