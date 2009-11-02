@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentox.util.svm_train;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -62,9 +61,21 @@ public class Classification extends AbstractResource{
      */
     private String dataid, kernel, degree, cacheSize,
             cost, epsilon, gamma, coeff0, tolerance;
+
+    /**
+     * Auxiliary integer variable.
+     */
     private int i;
+
+    /**
+     * Auxiliary double variable.
+     */
     private double d;
 
+    /**
+     * Unique Integer value corresponding to a model - either classification
+     * or regression
+     */
     private int model_id;
 
     /**
@@ -473,7 +484,6 @@ public class Classification extends AbstractResource{
                     String[] ops={
                         "-s", "0",
                         "-t", "0",
-                        "-b","1",
                         "-c", cost,
                         "-e", tolerance,
                         "-q",
@@ -486,7 +496,6 @@ public class Classification extends AbstractResource{
                     String[] ops={
                         "-s", "0",// C-SVC (Classifier)
                         "-t", ker,
-                        "-b","1",
                         "-c", cost,
                         "-g", gamma,
                         "-d", degree,
@@ -502,7 +511,6 @@ public class Classification extends AbstractResource{
                     String[] ops={
                         "-s", "0",// C-SVC (Classifier)
                         "-t", ker,
-                        "-b","1",
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
@@ -516,7 +524,6 @@ public class Classification extends AbstractResource{
                     String[] ops={
                         "-s", "0",// C-SVC (Classifier)
                         "-t", ker,
-                        "-b","1",
                         "-c", cost,
                         "-g", gamma,
                         "-e", tolerance,
@@ -616,8 +623,8 @@ public class Classification extends AbstractResource{
                                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
                                "xsi:schemaLocation=\"http://opentox.org/1.0/Algorithm.xsd\" " +
                                "ID=\""+model_id+"\" Name=\"SVM Classification Model\">\n");
-                           xmlstr.append("<ot:link href=\"" + SvcModelURI + "/" + model_id +  "\" />\n");
-                           xmlstr.append("<ot:AlgorithmID href=\"" + SvcAlgorithmURI +  "\"/>\n");
+                           xmlstr.append("<ot:link href=\"" + URIs.modelURI + "/" + model_id +  "\" />\n");
+                           xmlstr.append("<ot:AlgorithmID href=\"" + URIs.svcAlgorithmURI +  "\"/>\n");
                            xmlstr.append("<DatasetID href=\"\"/>\n");
                            xmlstr.append("<AlgorithmParameters>\n");
                                xmlstr.append("<param name=\"kernel\"  type=\"string\">" + kernel + "</param>\n");

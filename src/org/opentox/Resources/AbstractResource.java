@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Logger;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
@@ -199,7 +197,7 @@ public abstract class AbstractResource  extends ServerResource{
      * services are deployed on another domain.
      */
     public static String
-                baseURI="http://opentox.ntua.gr:"+port+"/OpenToxServices";
+                baseURI="http://opentox.ntua.gr:"+port;
 
     public static final String
             ModelURI = baseURI + "/model";

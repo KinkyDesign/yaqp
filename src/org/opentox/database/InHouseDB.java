@@ -17,7 +17,7 @@ public class InHouseDB {
     private int modelsStack;
     private final static String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
     private final static String DATABASENAME = "modelsDb";
-    private final static String URL = "jdbc:derby:" + DATABASENAME;
+    private final static String DB_URL = "jdbc:derby:" + DATABASENAME;
     private final static String USER = "itsme";
     private final static String PASSWORD = "letmein";
     private final static String MODELS_STACK_TABLE = "MODELS_STACK";
@@ -36,6 +36,7 @@ public class InHouseDB {
     }
 
     private void loadDriver() {
+        
         try {
             try {
                 myDriver = (Driver) Class.forName(DRIVER).newInstance();
@@ -52,8 +53,11 @@ public class InHouseDB {
 
 
     private void getConnection() {
+        
         try {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            OpenToxApplication.opentoxLogger.info("Attempting connection to "+DATABASENAME);
+            connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+            OpenToxApplication.opentoxLogger.info("Successfully connected to "+DATABASENAME);
         } catch (SQLException e) {
             if (e.getErrorCode() == 40000) {
                 createDataBase();
@@ -124,7 +128,7 @@ public class InHouseDB {
     private static void createDataBase() {
         OpenToxApplication.opentoxLogger.info("CREATING DATABASE :"+DATABASENAME);
         try {
-            connection = DriverManager.getConnection(URL + ";create=true", USER, PASSWORD);
+            connection = DriverManager.getConnection(DB_URL + ";create=true", USER, PASSWORD);
 
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.severe("InHouseDB Exception with error code :"+ex.getErrorCode()+"\n" +
@@ -135,7 +139,7 @@ public class InHouseDB {
 
 
     private static void createModelsStackTable() {
-        System.out.println("Creating table : " + MODELS_STACK_TABLE);
+        OpenToxApplication.opentoxLogger.info("Creating Table : "+MODELS_STACK_TABLE);
         String CreateTable = "create table " + MODELS_STACK_TABLE + "(STACK INTEGER)";
 
         try {
@@ -156,7 +160,7 @@ public class InHouseDB {
     }
 
     private static void createModelInfoTable() {
-        System.out.println("Creating table: " + MODEL_INFO_TABLE);
+        OpenToxApplication.opentoxLogger.info("Creating table: " + MODEL_INFO_TABLE);
         String CreateTable = "create table " + MODEL_INFO_TABLE + "(" +
                 "MODEL_ID INTEGER, " +
                 "ALGORITHM_ID VARCHAR(150)," +
@@ -172,7 +176,7 @@ public class InHouseDB {
 
 
     private static void createUsersTable(){
-        System.out.println("Creating table: " + USER_ACCOUNTS_TABLE);
+        OpenToxApplication.opentoxLogger.info("Creating table: " + USER_ACCOUNTS_TABLE);
         String CreateTable = "create table " + USER_ACCOUNTS_TABLE + "(" +
                 "USER_NAME VARCHAR(20), " +
                 "USER_PASSWORD VARCHAR(20)," +
@@ -209,9 +213,7 @@ public class InHouseDB {
     public int registerNewModel(String AlgID) {
         int id = getModelsStack() + 1;
         String uri = org.opentox.Resources.AbstractResource.baseURI + "/model/" + id;
-        String CreateValue = "insert into " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
-        //System.out.println(CreateValue);
-
+        String CreateValue = "insert into " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";        
         Statement stmt;
         try {
             stmt = connection.createStatement();
@@ -268,7 +270,6 @@ public class InHouseDB {
     public ReferenceList getReferenceListFromAlgId(String algorithmId) {
         String SelectAllSvc = "SELECT * FROM " + MODEL_INFO_TABLE +
                 " WHERE ALGORITHM_ID LIKE '%" + algorithmId + "%'";
-        System.out.println(SelectAllSvc);
         ResultSet rs = null;
         ReferenceList list = new ReferenceList();
 
@@ -278,7 +279,6 @@ public class InHouseDB {
             rs = stmt.executeQuery(SelectAllSvc);
             while (rs.next()) {
                 list.add(rs.getString("MODEL_URI"));
-                System.err.println(rs.getString("MODEL_URI"));
             }
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
