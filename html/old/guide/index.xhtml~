@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" 
+>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>opentox.ntua.gr:3000 - DataBase</title>
+    <link rel="stylesheet" href="../images/styles.css" type="text/css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1>
+           Tox + 
+        </h1>
+        <p>
+           opentox.ntua.gr:3000 web services 
+        </p>
+      </div>
+      <div id="nav">
+        <ul>
+          <li>
+            <a href="../" title="home page" >home</a>
+          </li>
+          <li>
+            <a href="../webservices" title="webServices">web services</a>
+          </li>
+          <li>
+            <a href="../database" title="database">database</a>
+          </li>
+          <li>
+            <a href="../guide" title="guide">guide</a>
+          </li>
+          <li>
+            <a href="../interface" title="interfaces">interfaces</a>
+          </li>
+          <li>
+            <a href="../links" title="links">links</a>
+          </li>
+          <li>
+            <a href="mailto:chvng@mail.ntua.gr" title="contact">contact</a>
+          </li>
+        </ul>
+        <form action="#" method="get">
+          <p>
+            <input type="text" name="q" value="Search..." /><input type="submit" value="Go" class="button" />
+          </p>
+        </form>
+      </div>
+      <div id="content">
+        <!--
+Main Body of the page
+-->
+        <div id="page">
+          <p>
+            <!-- Section : Introduction -->
+            <BR/>
+            <BR/>
+          </p>
+          <div id="intro">
+            <h2>
+               Complete Guide to the Services 
+            </h2>
+            <p align="justify">
+               A detailed guide to the services is provided. This is intended to help both experienced and begineer users. For all implemented GET methods over a URI we provide the supported mediatypes (e.g. HTML, XML). For all implemented POST methods we provide the set of parameters and their default values. Delete methods always assume administrative skills. The guide consists of seven parts: 
+            </p>
+            <ol>
+              <li>
+                <a href="#sec1">Upload ARFF files</a>
+              </li>
+              <li>
+                <a href="#sec2">Data Set Operations</a>
+              </li>
+              <li>
+                <a href="#sec3">Classification Models</a>
+              </li>
+              <li>
+                <a href="#sec4">Regression Models</a>
+              </li>
+              <li>
+                <a href="#sec5">Operations involving Models</a>
+              </li>
+              <li>
+                <a href="#sec6">Evaluation of Classification Models</a>
+              </li>
+              <li>
+                <a href="#sec7">Evaluation of Regression Models</a>
+              </li>
+            </ol>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+          </div>
+          <div id="sec1" >
+            <h2>
+              <!-- Section : 1 - File Upload 
+-->1. Upload Files 
+            </h2>
+            <br/>
+            <br/>
+            <p align="justify">
+               First of all we provide a list of the involved URIs: 
+            </p>
+            <ol>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/fileupload/arff 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/fileupload/fromwww (Under Developement) 
+              </li>
+            </ol>
+            <br/>
+            <br/>
+            <h3>
+               Description 
+            </h3>
+            <p align="justify">
+               &nbsp;We define the term &quot;dataset&quot; to be a map from a set of compounds to a set of features (features are meant to be both molecular descriptors and toxicological endpoints). A dataset can be easily represented by an ARFF file. The user can find an extended tutorial of how to build properly such a file, at the <a href="../webservices">web services section</a> of the site. &nbsp;Uploading Files requires user authentication. For the time, a single account has been created for testing purposes. Provide the username itsme and the password letmein if the server asks for authentication (Soon this test account will be disabled so ask for an account via <a href="mailto:chvng@mail.ntua.gr">email</a>). The authentication protocol we use is HTTP-BASIC. &nbsp;You may upload only arff files on the server, smaller than 100kB, which comply with the standards published at our main page. You can also ask for a personal account (username and password). 
+            </p>
+            <br/>
+            <br/>
+            <h3>
+               cURL commands 
+            </h3>
+            <br/>
+            <p align="justify">
+               Use the POST method to upload a file on the server. The file must be smaller than 100kB and be compliant to the specifications explained <a href="../webservices">here</a>. In case you try to upload empty, malformed, or very large files a status code 400 (Client Error, Bad Request) is returned in the header of the response. Otherwise a URI is attached to the uploaded dataset. 
+              <br/>
+              <br/>
+              <code>curl -v --basic --user itsme:letmein -X POST -F file=@$HOME/Documents/myFile.arff http://opentox.ntua.gr:3000/OpenToxServices/fileupload/arff </code>
+            </p>
+            <br/>
+            <br/>
+            <h3>
+               Status Codes - Exceptions 
+            </h3>
+            <br/>
+            <ol>
+              <li>
+                 Success Accepted: The file you posted is still being uploaded and preprocessed - Status 202 
+              </li>
+              <li>
+                 Success OK - The file you POSTed was successfully uploaded and preprocessed (scaled etc...) 
+              </li>
+              <li>
+                 The file you tried to upload exceeded the limit of 100kB! - Status 400 
+              </li>
+              <li>
+                 The file you provided does not comply with the standards (not an ARFF file or Malformed File) - Status 400 
+              </li>
+              <li>
+                 You have not posted any files - Status 400 
+              </li>
+              <li>
+                 No file was uploaded/Unresolved Error - Status 500 
+              </li>
+              <li>
+                 cURL Error: Local File not found 
+              </li>
+            </ol>
+            <p>
+              <br/>
+              <a href="../guide">(Back to Top)</a>
+            </p>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+          </div>
+          <div id="sec2">
+            <h2>
+              <!-- Section : 2 - Data Set Operations
+			-->2. DataSet Operations 
+            </h2>
+            <p>
+               List of involved URIs: 
+            </p>
+            <ol>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/dataset 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/dataset/{id} 
+              </li>
+            </ol>
+            <br/>
+            <br/>
+            <h3>
+               cURL commands 
+            </h3>
+            <br/>
+            <p align="justify">
+               Get a URI list of all available datasets. 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/uri-list&quot; http://opentox.ntua.gr:3000/OpenToxServices/dataset </code><em>Supported Variants for http://opentox.ntua.gr:3000/OpenToxServices/dataset : text/uri-list </em>
+              <br/>
+              <br/>
+               Get the arff representation of a dataset 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:dataset/arff&quot; http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35 </code>
+              <br/>
+               Get the xrff representation of a dataset 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:dataset/xrff&quot; http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35 </code>
+              <br/>
+               Get the dsd representation of a dataset 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:dataset/dsd&quot; http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35 </code>
+              <br/>
+              <br/>
+               Get the PMML DataDictionary (Meta information about the dataset) of a dataset 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:dataset/meta&quot; http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35 </code><em>Supported Variants for http://opentox.ntua.gr:3000/OpenToxServices/dataset/{id} : dataset/arff, dataset/xrff, dataset/dsd, dataset/meta </em>
+              <br/>
+              <br/>
+               Download a variant of a dataset 
+              <br/>
+              <br/>
+              <code>wget -v --header &quot;Accept:dataset/xrff&quot; http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35 --output-document=$HOME/Documents/downloadedFile.xrff </code>
+              <br/>
+               Delete a dataset (Requires Administrative Skills) 
+              <br/>
+              <br/>
+              <code>curl -v --basic --user admin:password -X DELETE http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35 </code>
+              <br/>
+              <a href="../guide">(Back to Top)</a>
+            </p>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+          </div>
+          <div id="sec3" >
+            <h2>
+              <!-- Section : 3 - Classification Models
+-->3. Classification Models 
+            </h2>
+            <p>
+               List of involved URIs: 
+            </p>
+            <ol>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/algorithm 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/algorithm/classification 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/algorithm/classification/svc 
+              </li>
+            </ol>
+            <br/>
+            <br/>
+            <h3>
+               cURL commands 
+            </h3>
+            <br/>
+            <p align="justify">
+               Get a URI list of all available algorithms (including classification, regression and preprocessing). 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/uri-list&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm </code>
+              <br/>
+               Get a URI list of all available learning algorithms 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/uri-list&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning </code>
+              <br/>
+               Get a URI list of all available classification algorithms 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/uri-list&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/classification </code>
+              <br/>
+               Get the XML representation of a classification algorithm (see the above line for a list of all available classification algorithms) 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/xml&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/classification/svc </code>
+              <br/>
+               Get the xml schema of the abovementioned XML representation 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/xml&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/classification/xsd </code>
+              <br/>
+               In order to train an SVM classification model you have to provide a set of parameters. The are the id of an uploaded dataset (<em>dataId</em>) which is a positive integer that must correspond to an uploaded file (e.g. instead of http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35 the dataId is just 35), the <em>kernel</em> of the SVM (choose among rbf, linear, polynomial or sigmoid), the <em>gamma</em> parameter which is a positive real number, <em>coeff0</em> which is a positive integer. In case you use the polynomial kernel you have to provide the <em>degree</em> of the kernel which is a positive integer. The <em>cost</em> is a strictly positive real number that is advisable to be chosen large enough (usually 1000 is far enough) but not extremely(!) large (not 10000000) because this would cause arithmetic instability. The <em>tolerance</em> of the learning algorithm can be adjusted. You can also modify the <em>cacheSize</em> of the algorithm in MB to accelerate the process (default 50MB). For more information get the specifications of the algorithm in XML fomat <a href="../OpenToxServices/algorithm/learning/classification/svc">here</a>. Here is an example of how you can train an svm model: 
+              <br/>
+              <br/>
+              <code>curl -v -H &quot;Accept:text/plain&quot; -X POST -d &quot;dataId=35&amp;cost=500&amp;kernel=rbf&amp;gamma=1.5&amp;tolerance=0.00001&amp;cacheSize=100&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/classification/svc </code>
+              <br/>
+               It is mandatory to post a valid <em>dataId</em> parameter which corresponds to an uploaded dataset. However, if you dont post any of the other parameters, a default value will be assigned to it. For example: 
+              <br/>
+              <br/>
+              <code> curl -v -H &quot;Accept:text/plain&quot; -X POST -d &quot;dataId=35&amp;cost=500&amp;gamma=1.5&amp;tolerance=0.00001&amp;cacheSize=100&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/classification/svc </code>
+              <br/>
+              <a href="../guide">(Back to Top)</a>
+              <br/>
+              <br/>
+              <br/>
+              <br/>
+            </p>
+          </div>
+          <div id="sec4">
+            <h2>
+               4. Regression Models 
+            </h2>
+            <p>
+               List of involved URIs: 
+            </p>
+            <ol>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/algorithm 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/algorithm/regression 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/algorithm/regression/svm 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/algorithm/regression/mlr 
+              </li>
+            </ol>
+            <br/>
+            <h3>
+               cURL commands 
+            </h3>
+            <br/>
+            <p>
+               Get a URI list of all available regression algorithms 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/uri-list&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/classification </code>
+              <br/>
+               Get the XML representation of a regression algorithm (see the above line for a list of all available regression algorithms) 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/xml&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/regression/svm curl -v -X GET -H &quot;Accept:text/xml&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/regression/mlr </code>
+              <br/>
+               Get the xml schema of the abovementioned XML representation 
+              <br/>
+              <br/>
+              <code>curl -v -X GET -H &quot;Accept:text/xml&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/regression/xsd </code>
+              <br/>
+               Train an SVM regression model. The posted paramteres are identical to the ones mentioned for the case of SVM classifier. The only difference is that the dataset should have a target of type <em>real</em> and not <em>categorical</em>. Take a look at the XML representation of the algorithm <a href="../OpenToxServices/algorithm/learning/regression/svm">here</a>
+              <br/>
+              <br/>
+              <code>curl -v -H &quot;Accept:text/plain&quot; -X POST -d &quot;dataId=8&amp;cost=500&amp;kernel=rbf&amp;gamma=1.5&amp;tolerance=0.00001&amp;cacheSize=100&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/regression/svm </code>
+              <br/>
+               Train a Multiple Linear Regression model. No algorithm-specific parameters have to be posted. Take a look at the XML representation of the algorithm <a href="../OpenToxServices/algorithm/learning/regression/mlr">here</a>. 
+              <br/>
+              <br/>
+              <code>curl -v -H &quot;Accept:text/plain&quot; -X POST -d &quot;dataId=8&quot; http://opentox.ntua.gr:3000/OpenToxServices/algorithm/learning/regression/mlr </code>
+            </p>
+            <br/>
+            <a href="../guide">(Back to Top)</a>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+          </div>
+<!--
+Section : 5 - Operations Involving Models
+-->
+          <div id="sec5">
+            <h2>
+               5. Operations involving Models 
+            </h2>
+            <p>
+               List of involved URIs: 
+            </p>
+            <ol>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/model 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/model/classification/svc 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/model/classification/svc/{model_id} 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/model/regression/mlr/ 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/model/regression/mlr/{model_id} 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/model/regression/svm 
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/model/regression/svm/{model_id} 
+              </li>
+            </ol>
+            <br/>
+            <h3>
+               cURL commands 
+            </h3>
+            <br/>
+             Get an XML listing all available models (both classification and regression). 
+            <br/>
+            <br/>
+            <code> curl -H "Accept:text/xml" http://opentox.ntua.gr:3000/OpenToxServices/model </code>
+            <br/>
+             Get a URI-list of all available SVM classification models
+            <br/>
+            <br/>
+            <code> curl -H "Accept:text/xml" http://opentox.ntua.gr:3000/OpenToxServices/model/classification/svc </code>
+            <br/>
+             Get a URI-list of all available MLR  models
+            <br/>
+            <br/>
+            <code> curl -H "Accept:text/xml" http://opentox.ntua.gr:3000/OpenToxServices/model/regression/mlr </code>
+            <br/>
+             Delete a model (Only administrators are authorized to delete models)
+            <br/>
+            <br/>
+            <code> curl -X DELETE -u admin:pass http://opentox.ntua.gr:3000/OpenToxServices/model/classification/svc/{model_id}<br/>
+ curl -X DELETE -u admin:pass http://opentox.ntua.gr:3000/OpenToxServices/model/classification/svc/{model_id} </code>
+<br/>
+            <a href="../guide">(Back to Top)</a>
+<br/><br/><br/><br/>
+          </div>
+
+<div id="sec6">
+<h2>6. Evaluation of Classification Models</h2>
+<br/>	<br/>
+<p>
+               List of involved URIs: 
+            </p>
+            <ol>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/validation
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/validation/test_set_validation/svc
+              </li>
+            </ol>
+            <br/>
+            <h3>
+               cURL commands 
+            </h3>
+<br/>
+Get a URI list of all available validation routines:
+<br/><br/>
+<code>curl -H "Accept:text/uri-list" http://opentox.ntua.gr:3000/OpenToxServices/validation</code>
+<br/>
+Validate an SVM classification model with a test dataset
+<br/><br/>
+<code>curl -X POST -d "dataid=35&amp;modelid=35-27" http://opentox.ntua.gr:3000/OpenToxServices/validation/test_set_validation/svc</code>
+<br/>
+            <a href="../guide">(Back to Top)</a>
+<br/>
+<br/>
+<br/>
+<br/>
+</div>
+
+
+
+
+<div id="sec7">
+<h2>7. Evaluation of Regression Models</h2>
+<br/>	<br/>
+<p>
+               List of involved URIs: 
+            </p>
+            <ol>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/validation
+              </li>
+              <li>
+                 http://opentox.ntua.gr:3000/OpenToxServices/validation/test_set_validation/mlr
+              </li>
+            </ol>
+            <br/>
+            <h3>
+               cURL commands 
+            </h3>
+<br/>
+Get a URI list of all available validation routines:
+<br/><br/>
+<code>curl -H "Accept:text/uri-list" http://opentox.ntua.gr:3000/OpenToxServices/validation</code>
+<br/>
+Validate an MLR model with a test dataset
+<br/><br/>
+<code>curl -X POST -d "dataid=8&amp;modelid=8" http://opentox.ntua.gr:3000/OpenToxServices/validation/test_set_validation/mlr</code>
+<br/>
+<br/>
+            <a href="../guide">(Back to Top)</a>
+</div>
+
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <!--
+End of Main Body
+-->
+        </div>
+        <!--
+Sidebar
+-->
+        <div id="sidebar">
+          <h4>
+             About us 
+          </h4>
+          <p>
+             This site offers toxicological prediction services. 
+          </p>
+          <h4>
+             Quick Links 
+          </h4>
+          <ul>
+            <li>
+              <a href="http://www.opentox.org" >Official OpenTox site</a>
+            </li>
+            <li>
+              <a href="./OpenToxServices" >Old site</a>
+            </li>
+            <li>
+              <a href="http://www.spyka.net/forums">Weka</a>
+            </li>
+            <li>
+              <a href="http://www.profileartist.net" >Restlet</a>
+            </li>
+            <li>
+              <a href="http://www.rguha.net/code/java/">Chemistry Developement Kit</a>
+            </li>
+          </ul>
+          <h4>
+             Collaborations 
+          </h4>
+          <ul>
+            <li>
+              <a href="" title="AMBIT">AMBIT</a>
+            </li>
+            <li>
+              <a href="" title="tum web services">TUM</a>
+            </li>
+            <li>
+              <a href="" title="Christoph Helma">CH</a>
+            </li>
+          </ul>
+        </div>
+        <!--
+End of Sidebar
+-->
+        <div class="clear">
+        </div>
+      </div>
+      <div id="footer">
+        <p>
+           &copy; 2009 opentox.ntua.gr:3000. Design: <a href="http://www.spyka.net" title="spyka Webmaster">spyka webmaster</a> available from <a href="http://www.justfreetemplates.com" title="free css templates">Just Free Templates</a>. Valid <a href="http://validator.w3.org/check/referer" title="valid XHTML strict">XHTML</a> and <a href="http://jigsaw.w3.org/css-validator/check/referer" title="CSS">CSS</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

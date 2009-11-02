@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>beta - a free web template by spyka webmaster</title>
+<link rel="stylesheet" href="../images/styles.css" type="text/css" />
+</head>
+<body>
+<div id="container">
+	<div id="header">
+		<h1>Tox +</h1>
+		<p>opentox.ntua.gr:3000 web services</p>
+	</div>
+		<div id="nav">
+		<ul>
+			<li><a href="../" title="home page" >home</a></li>
+			<li><a href="../webservices" title="webServices">web services</a></li>
+			<li><a href="" title="database">database</a></li>
+			<li><a href="../guide" title="guide">guide</a></li>
+			<li><a href="../interface" title="interfaces">interfaces</a></li>
+			<li><a href="../links" title="links">links</a></li>
+			<li><a href="mailto:chvng@mail.ntua.gr" title="contact">contact</a></li>
+		</ul>
+		<form action="#" method="get">
+			<p>
+				<input type="text" name="q" value="Search..." />
+				<input type="submit" value="Go" class="button" />
+			</p>
+		</form>
+	</div>
+	<div id="content">
+<!--
+Main Body of the page
+-->
+		<div id="page">
+			<h2>DataBase</h2>
+			<p align="justify">
+			In our database you can find a collection of datasets in arff, xrff and dsd formats, a set of trained models and a set of model validation results. Using some simple <a href="http://curl.haxx.se/">curl</a> commands you can retrieve a set of the available datasets, models or validation results from the server. Before proceeding to the next paragraph, make sure you have successfully installed curl:
+<br/><br/>
+<code>
+sudo apt-get install curl
+</code>
+<br/>
+All users have the right to view the information stored on the server, so avoid uploading sensitive information. Only authorized users have the right to upload files on the server and only administrators have the right to delete server resources. 
+			</p>
+<br/>
+<h2>Datasets</h2>
+<p align="justify">
+A data set is in fact a map of a set of molecular descriptors to their corresponding endpoints, thus forming a relationship between structural characteristics of chemical compounds and their toxicological properties. Follow <a href="../OpenToxServices/model">this link</a> to view all the available models on the server. The following command can be used to retrieve the URIs of all available datasets on the server:
+<br/>
+<br/>
+<code>
+curl -H "Accept:text/uri-list" http://opentox.ntua.gr:3000/OpenToxServices/dataset
+</code>
+<br/>
+Retrieve the ARFF representation of a dataset:
+<br/>
+<br/>
+<code>
+curl -H "Accept:dataset/arff" http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35
+</code>
+<br/>
+Retrieve the XRFF representation of a dataset:
+<br/>
+<br/>
+<code>
+curl -H "Accept:dataset/xrff" http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35
+</code>
+<br/>
+Retrieve the DSD representation of a dataset:
+<br/>
+<br/>
+<code>
+curl -H "Accept:dataset/dsd" http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35
+</code>
+<br/>
+Retrieve meta-information about a dataset:
+<br/>
+<br/>
+<code>
+curl -H "Accept:dataset/meta" http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35
+</code>
+<br/>
+If you want a detailed response, including the request and response header information, use the curl option -v. For example:
+<br/>
+<br/>
+<code>
+curl -v -H "Accept:dataset/meta" http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-35
+</code>
+<br/>
+Authorized users can delete a dataset using the <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.7">DELETE</a> method. You may ask for an administrator's password via <a href="mailto:chvng@mail.ntua.gr">email</a>. If you have administrative skills and need to delete a dataset, use the following command:
+<br/>
+<br/>
+<code>
+curl -X DELETE --basic --user admin:password -v -H "Accept:dataset/meta" http://opentox.ntua.gr:3000/OpenToxServices/dataset/dataSet-XX
+</code>
+<br/>
+Where admin and password should be replaced by your username and password.
+<br/>
+<br/>
+<br/>
+
+
+</p>
+<h2>Models</h2>
+<p align="justify">
+Return a URI list for all available SVM classification models:
+<br/>
+<br/>
+<code>
+curl -H "Accept:text/uri-list" http://opentox.ntua.gr:3000/OpenToxServices/model/classification/svc
+</code>
+<br/>
+Return a URI list for all available Multiple Linear Regression models:
+<br/>
+<br/>
+<code>
+curl -H "Accept:text/uri-list" http://localhost:3000/OpenToxServices/model/regression/mlr
+</code>
+<br/>
+
+</p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<!--
+End of Main Body
+-->
+		</div>
+
+<!--
+Sidebar
+-->
+		<div id="sidebar">
+			<h4>About us</h4>
+			<p>This site offers toxicological prediction services.</p>
+			<h4>Quick Links</h4>
+			<ul>
+				<li><a href="http://www.opentox.org" >Official OpenTox site</a></li>
+				<li><a href="./OpenToxServices" >Old site</a></li>
+				<li><a href="http://www.spyka.net/forums" title="webmaster forums">Weka</a></li>
+				<li><a href="http://www.profileartist.net" title="premium templates">Restlet</a></li>
+								<li><a href="http://www.rguha.net/code/java/">Chemistry Developement Kit</a></li>
+
+			</ul>
+			<h4>Collaborations</h4>
+			<ul>
+				<li><a href="" title="AMBIT">AMBIT</a></li>
+				<li><a href="" title="tum web services">TUM</a></li>
+				<li><a href="" title="Christoph Helma">CH</a></li>
+			</ul>
+		</div>
+<!--
+End of Sidebar
+-->
+
+		<div class="clear"></div>
+	</div>
+	<div id="footer">
+		<p>&copy; 2009 opentox.ntua.gr:3000. Design: <a href="http://www.spyka.net" title="spyka Webmaster">spyka webmaster</a> available from <a href="http://www.justfreetemplates.com" title="free css templates">Just Free Templates</a>. Valid <a href="http://validator.w3.org/check/referer" title="valid XHTML strict">XHTML</a> and <a href="http://jigsaw.w3.org/css-validator/check/referer" title="CSS">CSS</a></p>
+	</div>
+			
+</div>
+</body>
+</html>

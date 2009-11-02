@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>opentox.ntua.gr:3000 - Web Services</title>
+    <link rel="stylesheet" href="../images/styles.css" type="text/css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1>
+           Tox + 
+        </h1>
+        <p>
+           opentox.ntua.gr:3000 web services 
+        </p>
+      </div>
+      <div id="nav">
+        <ul>
+          <li>
+            <a href="../" title="home page">home</a>
+          </li>
+          <li>
+            <a href="" title="webServices">web services</a>
+          </li>
+          <li>
+            <a href="../database" title="database">database</a>
+          </li>
+          <li>
+            <a href="../guide" title="guide">guide</a>
+          </li>
+          <li>
+            <a href="../interface" title="interfaces">interfaces</a>
+          </li>
+          <li>
+            <a href="../links" title="links">links</a>
+          </li>
+          <li>
+            <a href="mailto:chvng@mail.ntua.gr" title="contact">contact</a>
+          </li>
+        </ul>
+        		<form action="#" method="get">
+			<p>
+				<input type="text" name="q" value="Search..." />
+				<input type="submit" value="Go" class="button" />
+			</p>
+		</form>
+
+      </div>
+      <div id="content">
+        <!--
+Main Body of the page
+-->
+        <div id="page">
+          <h2>
+             RESTful Web Services 
+          </h2>
+          <p align="justify">
+             At first a brief description of what a RESTful web service is will be presented. No expert knowledge is assumed nor we mean to thoroughly examine the server-client terminology. We start with some elementary definitions: A <a href="">client</a> (that is practically your computer) can communicate with a <a href="">server</a> (that is our computer) using the well known <a href="">HTTP protocol</a>. The term <a href="">request</a> refers to what the client asks the server to do and <a href="">response</a> is what the server answers to the user. The information conducted between the client and the server has two parts: the body (content) and the <a href="">header</a>. The body of the request or the response is what you usually see while the header contains information you usually dont see but are vital for the communication. A <a href="">resource</a> is any information that can be provided from the server. The client can perform four basic types of requests, namely <a href="">GET</a>, <a href="">POST</a>, <a href="">PUT</a> and <a href="">DELETE</a>, also known as HTTP methods. Using the GET method, the client asks the server for a certain resource. Using the POST method the client provides some parameters to the server and the latter replies with a response according to the posted parametes. Using PUT the client can upload a file or in general put some content in the server. The DELETE method is invoked when the user needs to remove some content from the server. 
+            <br/>
+            <br/>
+             A server must implement some of these methods. In fact when someone is building a web service, tells the server how to respond to a request. A request is applied on a certain <a href="">URI</a> and the server responds from the same URI, so a URI can be thought of as a communication gate between the client and the server. As mentioned above, one or more of the HTTP methods GET, POST, PUT or DELETE can be implemented on the server-side. A client is expected to know certain things to be able to use the web service: 
+            <br/>
+            <ol>
+              <li>
+                 The URI of the service. 
+              </li>
+              <li>
+                 The HTTP methods that are implemented and what every method does. 
+              </li>
+              <li>
+                 As far as the POST method is concerned, the client should know the names of the parameters to be posted 
+              </li>
+              <li>
+                 Header information that the client should send with the request. 
+              </li>
+              <li>
+                 If the resource is protected by an authentication protocol, the user should be granted a username-password pair. 
+              </li>
+            </ol>
+             The above information are systematically provided to the client via a RESTful API. To cut a long story short, we give detailed instructions on how you can use the services we offer. The only thing you should do before proceeding to the next paragraph is to download and install <a href="">cURL</a> on your system. If you are a linux user, open a terminal and type: 
+            <br/>
+            <br/>
+            <code>sudo apt-get isntall curl</code>
+            <br/>
+            <br/>
+            <br/>
+		</p>
+            <h2>
+               Data Format 
+            </h2>
+          <p align="justify">
+             ARFF (Attribute Relation File Format) files are simple ASCII text files that are widely accepted for representing a list of instances that share a specific set of attributes. For more information about how to build an ARFF file you can visit this quite explanatory link: <a href="http://www.cs.waikato.ac.nz/~ml/weka/arff.html">http://www.cs.waikato.ac.nz/~ml/weka/arff.html</a> or <a href="http://weka.wikispaces.com/ARFF+(book+version)">http://weka.wikispaces.com/ARFF+(book+version)</a>. The well known data mining open source software <a href="http://www.cs.waikato.ac.nz/ml/weka/">Weka</a> is 100% compliant with ARFF files. The wide acceptance of arff files (among others) for the representation of data related to data mining purposes is the reason why we have chosen it for our services. Other file formats such as XRFF will be supported in the near future. 
+            <br/>
+            <br/>
+             We give an example of how to build an ARFF format to represent a set of molecules related with a set of molecular descriptors and an endpoint. At the top of your file, you may include some comments such as your name and a brief desription of the data set followed by the name of the relation (the name of your data set which should contain to blank spaces). 
+            <br/>
+            <br/>
+            <code> % John Smith (johnSmith@js.net)<br/> % My first data set<br/> % Date: Jun 15, 2009<br/> @relation DataSet_John_Smith </code>
+            <br/>
+             Then create a list of the attributes of your data set. The first attribute should always be devoted to the name or the id of the chemical compound (for example phenolophtalein or 123-XA-4D). The name or id of the compound should contain no blank spaces and no commas (,). So instead of writing "1,2,3 trichloro benzene" prefer "1-2-3-trichloro-benzene". The data type of the compound's name/id is <em>String</em>. So the first attribute should be registered as: 
+            <br/>
+            <br/>
+            <code> @attribute id String </code>
+            <br/>
+             After the id attribute a list of molecular descriptors should be declared. The proposed data type for the molecular descriptors is <em>real</em>. For example: 
+            <br/>
+            <br/>
+            <code> @attribute homo real<br/> @attribute lumo real<br/> @attribute logP real<br/> @attribute molarRefractivity real<br/> @attribute dipoleMoment real<br/> @attribute wienerIndex real<br/> @attribute molecularWeight real<br/> @attribute myDescriptor_01 real<br/>
+            </code>
+            <br/>
+             The last attribute in the list should be the endpoint (the target). In case you want to use this data set to build classification models the data type of the target attribute should be <em>categorical</em>. For example if the allowed values for the target attribute are only {0,1} (e.g. 0 stands for non-toxic and 1 for toxic) then you write: 
+            <br/>
+            <br/>
+            <code>@attribute class {0,1}</code>
+            <br/>
+             In case your compounds are characterized as non-toxic(0), skin-irritants(1) or carcinogenic(2), then you should write: 
+            <br/>
+            <br/>
+            <code>@attribute endPoint {0,1,2}</code>
+            <br/>
+             For the time being, only numerical values are allowed as class indices. So instead of typing: 
+            <br/>
+            <br/>
+            <code>@attribute myEndPoint {nonToxic, aLittleToxic, highlyToxic, extremelyToxic}</code>
+            <br/>
+             type instead: 
+            <br/>
+            <br/>
+            <code>@attribute myEndPoint {1, 2, 3, 4}</code>
+            <br/>
+             If your target value is not categorical but real, e.g. your endpoint is the well-known LD<sub>50</sub> toxicity value, then simply type: 
+            <br/>
+            <br/>
+            <code> @attribute LD_50 real </code>
+            <br/>
+             Note however that this dataset cannot be used for building classification models. Have you done listing all the attribute of your data set you are now ready to include the data in your ARFF file. The data are included after the @DATA tag. Each line is devoted to a single instance and the values corresponding to the various attributes of the data set are seperated by a comma. The number of entries at each line should be equal to number of attributes. The first value corresponds to the first attribute, the second to the second and so on. We now give an example of how to build an ARFF file corresponding to a set of molecules which are characterized as toxic and non-toxic. 
+            <br/>
+            <br/>
+            <code> % John Smith - my First Data set<br/> % Data Set id: 0001<br/> % Date : Jun 15, 2009<br/> %<br/> % 0 --> Non-Toxic<br/> % 1 --> Toxic<br/> @relation myFirstDataSet_John_Smith<br/> @atttribute id String<br/> @attribute homo real<br/> @attribute lumo real<br/> @attribute logP real<br/> @attribute molarRefractivity real<br/> @attribute dipoleMoment real<br/> @attribute wienerIndex real<br/> @attribute molecularWeight real<br/> @attribute myDescriptor_01 real<br/> @attribute toxicity {0,1}<br/> @DATA<br/> compound1,1000,102,0.132,0.22,0.00314,3.45,1032.231,101,0<br/> compound2,1200,137,0.841,0.45,0.00078,3.01,980.31,102,0<br/> compound3,872,26,0.902,0.69,0.0014,9.21,46.90,143,1<br/> compound4,537,91,1.092,0.39,0.0001,8.00,57.33,9000,0<br/> .<br/> .<br/> .<br/>
+            </code>
+            <br/>
+          </p>
+          <h2>
+             Summary of Services 
+          </h2>
+          <p align="justify">
+             Let us summarize what a client can using these web services. 
+            <br/>
+            <ul>
+              <li>
+                 Upload a dataset on the server 
+              </li>
+              <li>
+                 View an uploaded dataset in 4 different formats: arff, xrff (xml), dsd and PMML Data Dictionary (meta inf about the dataset) 
+              </li>
+              <li>
+                 Delete an uploaded dataset (Requires Administrative Skills) 
+              </li>
+              <li>
+                 Select attributes from a data set using the algorithm "infoGainAttributeEvaluation" thus create a new dataset containing less attributes. 
+              </li>
+              <li>
+                 Train a Support Vector Machine (SVM) classification model. 
+              </li>
+              <li>
+                 Get the parameters of a trained SVM model. 
+              </li>
+              <li>
+                 Delete a trained SVM model (Requires Administrative Skills). 
+              </li>
+              <li>
+                 Evaluate a trained SVM classification model using an uploaded dataset. 
+              </li>
+              <li>
+                 Train a Support Vector Machine (SVM) regression model or a Multiple Linear Regression (MLR) model. 
+              </li>
+              <li>
+                 Get the parameters of a trained regression model. 
+              </li>
+              <li>
+                 Delete a trained regression SVM or MLR model (Requires Administrative Skills). 
+              </li>
+              <li>
+                 Evaluate a trained regression model using a dataset. 
+              </li>
+              <li>
+                 Delete a validation result. 
+              </li>
+            </ul>
+             To start using these services read this <a href="../guide">guide</a> or visit our <a href="../interface">interfaces</a>
+          </p>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <!--
+	End of Main Body
+	-->
+        </div>
+        <!--
+	Sidebar
+	-->
+        <div id="sidebar">
+          <h4>
+             About us 
+          </h4>
+          <p>
+             This site offers toxicological prediction services. 
+          </p>
+          <h4>
+             Quick Links 
+          </h4>
+          <ul>
+            <li>
+              <a href="http://www.opentox.org" >Official OpenTox site</a>
+            </li>
+            <li>
+              <a href="./OpenToxServices" >Old site</a>
+            </li>
+            <li>
+              <a href="" title="weke">Weka</a>
+            </li>
+            <li>
+              <a href="http://www.restlet.org" title="restlet site">Restlet</a>
+            </li>
+            
+              				<li><a href="http://www.rguha.net/code/java/">Chemistry Developement Kit</a></li>
+            
+          </ul>
+          <h4>
+             Collaborations 
+          </h4>
+          <ul>
+            <li>
+              <a href="" title="AMBIT">AMBIT</a>
+            </li>
+            <li>
+              <a href="" title="tum web services">TUM</a>
+            </li>
+            <li>
+              <a href="" title="Christoph Helma">CH</a>
+            </li>
+          </ul>
+        </div>
+        <!--
+End of Sidebar
+-->
+        <div class="clear">
+        </div>
+      </div>
+      <div id="footer">
+        <p>
+           &copy; 2009 opentox.ntua.gr:3000. Design: <a href="http://www.spyka.net" title="spyka Webmaster">spyka webmaster</a> available from <a href="http://www.justfreetemplates.com" title="free css templates">Just Free Templates</a>. Valid <a href="http://validator.w3.org/check/referer" title="valid XHTML strict">XHTML</a> and <a href="http://jigsaw.w3.org/css-validator/check/referer" title="CSS">CSS</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
