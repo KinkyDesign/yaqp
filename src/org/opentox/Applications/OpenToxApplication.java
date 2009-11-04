@@ -4,8 +4,6 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +25,9 @@ import org.restlet.Restlet;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
+import org.opentox.database.Priviledges;
 import org.restlet.routing.Router;
+import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Guard;
 
 
@@ -91,9 +91,9 @@ import org.restlet.security.Guard;
         opentoxLogger.setLevel(Level.INFO);
         dbcon = new InHouseDB();
         AbstractResource.Directories.checkDirs();
+        
         }
      
-
      /**
       * Creates a root Restlet that will receive all incoming calls.
       * <p>Brief list of services:
@@ -136,24 +136,7 @@ import org.restlet.security.Guard;
                 if (req.getMethod().equals(org.restlet.data.Method.GET)) return AUTHENTICATION_VALID;
                 return super.authenticate(req);
              }
-         };
-
-         /**
-          * Create another guard...
-          */
-         final Guard UploadFromWWWGuard = new Guard(getContext(), ChallengeScheme.HTTP_BASIC,
-                 "To avoid spamming we ask you to provide your username and password...")
-         {
-             @Override
-             public int authenticate(Request req){
-                if (req.getMethod().equals(org.restlet.data.Method.GET)) return AUTHENTICATION_VALID;
-                return super.authenticate(req);
-             }
-         };
-        
-
-         Map<String,char[]> secrets = SetUserIds();
-
+         };        
 
          
          /**
@@ -171,7 +154,7 @@ import org.restlet.security.Guard;
                 return super.authenticate(req);
              }
           };
-         ModelGuard.getSecrets().putAll(SetAdminIds());
+         ModelGuard.getSecrets().putAll(InHouseDB.getCredentialsAsMap(Priviledges.ADMIN));
          ModelGuard.setNext(Model.class);   
 
          
@@ -222,25 +205,6 @@ import org.restlet.security.Guard;
 
      
 
-
-    private Map<String, char[]> SetUserIds() {
-        Map<String, char[]> secret = new HashMap<String, char[]>();
-        secret.put("itsme", "letmein".toCharArray());
-        secret.putAll(SetAdminIds());
-        return secret;
-    }
-
-    /**
-     * True Random Passwords generated from
-     * http://www.goodpassword.com/
-     * @return secret
-     */
-    private Map<String, char[]> SetAdminIds() {
-        Map<String, char[]> secret = new HashMap<String, char[]>();
-        secret.put("????","?".toCharArray());
-        secret.put("??","?".toCharArray());
-        return secret;
-    }
 
      
      }

@@ -1,16 +1,26 @@
 package org.opentox.database;
 
 
+import java.io.IOException;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.restlet.data.ReferenceList;
 import org.opentox.Applications.OpenToxApplication;
 
 /**
+ * This is a class to manage access to the database behind the services. 
+ * In this database one finds 3 tables. The first one contains information about the trained
+ * models such as their internal id, their URI (globally recognizable) and the URI
+ * of the algorithm that was used to train every model. The second table contains
+ * information about which is the next id to be assigned to a new model and the third
+ * one contains authorization/authentication information such as the user name, the
+ * password and the priviledged assigned to each user.
  *
  * @author OpenTox - http://www.opentox.org
- * @author tartoufo1973
+ * @author Kolotouros Dimitris
+ * @author Sopasakis Pantelis
  */
 public class InHouseDB {
 
@@ -27,7 +37,8 @@ public class InHouseDB {
     private static Connection connection = null;
 
     /**
-     *Database Constructor. Connects to the existing database or creates a new one if database doesn't exist.
+     * Database Constructor.
+     * Connects to the existing database or creates a new one if database doesn't exist.
      */
     public InHouseDB() {
         loadDriver();
@@ -35,6 +46,9 @@ public class InHouseDB {
         loadTables();
     }
 
+    /**
+     * Loads the Driver that is used to establish a new connection.
+     */
     private void loadDriver() {
         
         try {
@@ -51,7 +65,9 @@ public class InHouseDB {
     }
 
 
-
+    /**
+     * Establishes a connection to the database.
+     */
     private void getConnection() {
         
         try {
@@ -62,13 +78,17 @@ public class InHouseDB {
             if (e.getErrorCode() == 40000) {
                 createDataBase();
             } else {
-                OpenToxApplication.opentoxLogger.log(Level.SEVERE,null,e);
+               OpenToxApplication.opentoxLogger.log(Level.SEVERE,null,e);
             }
         }
     }
 
 
 
+    /**
+     * Load the tables in the database.
+     * If one or more tables do not exist, they are created ab-initio.
+     */
     private void loadTables() {
         DatabaseMetaData md = null;
         ResultSet rs = null;
@@ -94,7 +114,7 @@ public class InHouseDB {
                         }
                     }
                 } catch (SQLException ex) {
-                    Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
+                    OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
                 }
 
                 if (!exists1) {
@@ -114,17 +134,20 @@ public class InHouseDB {
                         modelsStack = rs.getInt("STACK");
                     }
                 } catch (SQLException ex) {
-                    Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
+                    OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
+                OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(InHouseDB.class.getName()).log(Level.SEVERE, null, ex);
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
     }
 
 
+    /**
+     * If the database does not exist, it is created.
+     */
     private static void createDataBase() {
         OpenToxApplication.opentoxLogger.info("CREATING DATABASE :"+DATABASENAME);
         try {
@@ -137,7 +160,10 @@ public class InHouseDB {
     }
 
 
-
+    /**
+     * Creates the table MODELS_STACK which contains information about the id
+     * of the next model to be trained.
+     */
     private static void createModelsStackTable() {
         OpenToxApplication.opentoxLogger.info("Creating Table : "+MODELS_STACK_TABLE);
         String CreateTable = "create table " + MODELS_STACK_TABLE + "(STACK INTEGER)";
@@ -159,6 +185,10 @@ public class InHouseDB {
         }
     }
 
+
+    /**
+     * Generates the table that contains information about models.
+     */
     private static void createModelInfoTable() {
         OpenToxApplication.opentoxLogger.info("Creating table: " + MODEL_INFO_TABLE);
         String CreateTable = "create table " + MODEL_INFO_TABLE + "(" +
@@ -175,6 +205,9 @@ public class InHouseDB {
     }
 
 
+    /**
+     * Generates the table which contains a/a data.
+     */
     private static void createUsersTable(){
         OpenToxApplication.opentoxLogger.info("Creating table: " + USER_ACCOUNTS_TABLE);
         String CreateTable = "create table " + USER_ACCOUNTS_TABLE + "(" +
@@ -188,6 +221,61 @@ public class InHouseDB {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
     }
+
+
+    /**
+     * This method is used to add a new user to the USERS table. The username,
+     * the password
+     * @param UserName
+     * @param PassWord
+     * @param Priviledges
+     */
+    public static void addUser(String UserName, String PassWord, Priviledges priviledges){
+        String addUser = "INSERT INTO "+USER_ACCOUNTS_TABLE+ " VALUES ('"+UserName+"' , '"+
+                PassWord+"' , '"+priviledges.getLevel()+"' )";
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate(addUser);
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Delete a user.
+     * @param UserName
+     */
+    public static void removeUser(String UserName){
+        String removeUser = "DELETE FROM "+USER_ACCOUNTS_TABLE+" WHERE USER_NAME = '"+UserName+"'";
+        Statement stmt;
+        try {
+            stmt = connection.createStatement();
+            stmt.executeUpdate(removeUser);
+            OpenToxApplication.opentoxLogger.info("The user '"+UserName+"' was deleted!");
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+
+    public static Map<String,char[] > getCredentialsAsMap(Priviledges priviledges){
+        Map<String, char[]> secret = new HashMap<String, char[]>();
+        String getCredentials = "SELECT * FROM "+USER_ACCOUNTS_TABLE+" WHERE AUTH LIKE '%"+
+                priviledges.getLevel()+"%'";
+        ResultSet rs = null;
+        try {
+            Statement stmt = connection.createStatement();
+            rs = stmt.executeQuery(getCredentials);
+            while (rs.next()) {
+                secret.put(rs.getString("USER_NAME"),rs.getString("USER_PASSWORD").toCharArray());
+            }
+
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+        return secret;
+    }
+
 
     private void IncreaseModelStack() {
         String increaseValue = "update " + MODELS_STACK_TABLE + " set STACK = " + (modelsStack + 1) +
@@ -213,7 +301,7 @@ public class InHouseDB {
     public int registerNewModel(String AlgID) {
         int id = getModelsStack() + 1;
         String uri = org.opentox.Resources.AbstractResource.baseURI + "/model/" + id;
-        String CreateValue = "insert into " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";        
+        String CreateValue = "INSERT INTO " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
         Statement stmt;
         try {
             stmt = connection.createStatement();
@@ -224,11 +312,24 @@ public class InHouseDB {
         }
 
         return id;
-
     }
 
     /**
-     * TODO:
+     * This method is used to delete a model registered in the database.
+     * @param ID
+     */
+    public void removeModel(String ID){
+        String removeModel = "DELETE FROM "+MODEL_INFO_TABLE+" WHERE MODEL_ID="+ID;
+        Statement stmt;
+        try {
+            stmt = connection.createStatement();
+            stmt.executeUpdate(removeModel);
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }       
+    }
+
+    /**
      *
      * @return
      */
@@ -291,9 +392,10 @@ public class InHouseDB {
      * Is not used within the service.
      * @param args
      */
-    public static void main(String[] args) {
-        long before0 = java.lang.System.currentTimeMillis();
-        InHouseDB dbcon = new InHouseDB();
-        dbcon.getRegressionModelsAsReferenceList();
+    public static void main(String[] args) throws IOException {
+
+        OpenToxApplication a = new OpenToxApplication();
+
+        
     }
 }

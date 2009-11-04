@@ -11,24 +11,26 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.MediaTypes.OpenToxMediaType;
+import org.restlet.Client;
 import org.restlet.data.MediaType;
+import org.restlet.data.Protocol;
+import org.restlet.data.Status;
 import weka.core.Instances;
 
 /**
- *
+ * This class
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
-public class opentoxClient {
+public class opentoxClient extends AbstractClient{
 
     private static final long serialVersionUID = -2394809235191723442L;
+
 
       public synchronized static boolean isServerAlive(URI serverUri, int attempts) throws InterruptedException {
         java.net.Socket soc = null;
@@ -72,7 +74,7 @@ public class opentoxClient {
             con.setDoOutput(true);
             con.setUseCaches(false);
             con.addRequestProperty("Accept", mime.toString());
-
+            
             if ((con.getResponseCode() >= 200) && (con.getResponseCode() < 300)) {
                 return true;
             } else {
@@ -120,10 +122,5 @@ public class opentoxClient {
           
       }
 
-//      public static void main(String[] args) throws URISyntaxException{
-//          System.out.println(
-//                  getInstances(new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/5")).toString()
-//                  );
-//      }
 
 }

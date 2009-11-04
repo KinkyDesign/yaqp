@@ -2,13 +2,18 @@ package org.opentox.Resources.Models;
 
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Resources.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentox.Applications.OpenToxApplication;
+import org.opentox.client.opentoxClient;
+import org.opentox.database.InHouseDB;
 import org.opentox.util.RepresentationFactory;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -67,88 +72,8 @@ public class Model extends AbstractResource{
     @Override
     public Representation get(Variant variant)
     {
-        /*
-        if (model_type.equalsIgnoreCase("regression")){
-            if (algorithm_id.equalsIgnoreCase("mlr")){
-                File MLRmodelFile = new File(REG_MLR_modelsDir+"/"+model_id);
-                if (MLRmodelFile.exists()){
-                    RepresentationFactory model = new RepresentationFactory(MLRmodelFile.getAbsolutePath());
-                    try {
-                        getResponse().setStatus(Status.SUCCESS_OK);
-                        return new StringRepresentation(model.getString().toString(), MediaType.TEXT_XML);
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                        return new StringRepresentation("Model not found! Exception Details: "+ex.getMessage());
-                    } catch (IOException ex) {
-                        Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                        return new StringRepresentation("IO Exception! Details: "+ex.getMessage());
-                    }
-                }
-                else{
-                    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                    return new StringRepresentation("Model not found!");
-                }// end of MLR representation
-                
-                
-            }else if (algorithm_id.equalsIgnoreCase("svm")){
-                    File SVMmodelFile = new File(REG_SVM_modelsDir+"/xml/"+model_id+".xml");
-                    logger.info("Looking for : "+REG_SVM_modelsDir+"/xml/"+model_id+".xml");
-                    RepresentationFactory model = new RepresentationFactory(REG_SVM_modelsDir+"/xml/"+model_id+".xml");
-                    try {
-                        getResponse().setStatus(Status.SUCCESS_OK);
-                        return new StringRepresentation(model.getString().toString(), MediaType.TEXT_XML);
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                        return new StringRepresentation("Model not found! Exception Details: "+ex.getMessage());
-                    } catch (IOException ex) {
-                        Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                        return new StringRepresentation("IO Exception! Details: "+ex.getMessage());
-                    }
-                }
-            else{
-                getResponse().setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
-                return new StringRepresentation("Not implemented yet! Only MLR is implemented for the moment...");
-            }
-            
-        }
-        else if (model_type.equalsIgnoreCase("classification")){
-            if (algorithm_id.equalsIgnoreCase("svc")){
-                File SvmClsModel = new File(CLS_SVM_modelsDir+"/"+model_id);
-                if (SvmClsModel.exists()){
-                    //todo : delete the following line and return xml ok
-                    RepresentationFactory model = new RepresentationFactory(CLS_SVM_modelsDir+"/xml/"+model_id + ".xml");
-                    
-                    try {
-                        return new StringRepresentation(model.getString().toString(), MediaType.TEXT_XML);
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                        return new StringRepresentation("Model not found! Exception Details: "+ex.getMessage());
-                    } catch (IOException ex) {
-                        Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                        return new StringRepresentation("IO Exception! Details: "+ex.getMessage());
-                    }
-                }else{// The requested model does not exist :(
-                    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                    return new StringRepresentation("Model not found!");
-                }
-            }
-
-
-            return new StringRepresentation("Not implemented yet!");
-        }
-        else{
-            getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-            return new StringRepresentation("model_type can be either classification or regression. "+model_type+"" +
-                    " is not an acceptable value!");
-        }
-        */
-        File modelXmlFile = new File(modelsXmlDir + "/" + model_id);
+        
+        File modelXmlFile = new File(Directories.modelXmlDir + "/" + model_id);
         System.out.println("Requested Model id: "+model_id);
         if (modelXmlFile.exists()){
                 RepresentationFactory model = new RepresentationFactory(modelXmlFile.getAbsolutePath());
@@ -174,87 +99,34 @@ public class Model extends AbstractResource{
 
     @Override
     public Representation delete() {
-        if (model_type.equalsIgnoreCase("classification")){
+        String responseText=null;
+        try {
+            if (opentoxClient.IsMimeAvailable(new URI("http://localhost:3000/model/" + model_id),
+                    MediaType.TEXT_XML, false)) {
+                OpenToxApplication.dbcon.removeModel(model_id);
+                File modelFile = new File(Directories.modelXmlDir+"/"+model_id);
+                System.out.println(modelFile);
+                responseText = "The resource was detected and removed from OT database successfully!";
+                if (modelFile.exists()){
+                    boolean success = modelFile.renameTo(new File(Directories.trash, modelFile.getName()));
+                    if (success)
+                        OpenToxApplication.opentoxLogger.severe("Model : "+ model_id+" moved to trash!");
+                }else{
+                    OpenToxApplication.opentoxLogger.severe("Model File not found! Will not apply DELETE!");
+                }
+            }else{
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND );
+                responseText = "Model not found on the server!";
+            }
             
-            if (algorithm_id.equalsIgnoreCase("svc")){
-
-                if (!(model_id.equals("allOfThem"))){
-                    File svmModelToBeDeleted = new File(CLS_SVM_modelsDir+"/"+model_id);
-                    if (!(svmModelToBeDeleted.exists())){
-                        getResponse().setEntity("The specified model was not found on the server.\n",
-                                MediaType.TEXT_PLAIN);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                    }else{
-                        svmModelToBeDeleted.delete();
-                        if (svmModelToBeDeleted.exists()){
-                            getResponse().setEntity("Internal Server Error!\n" +
-                                "The model was not deleted!\n", MediaType.TEXT_PLAIN);
-                            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-
-                        }
-                    }
-                }else{
-                    File SvmModelsFolder = new File(CLS_SVM_modelsDir);
-                    File[] SvmModels = SvmModelsFolder.listFiles();
-                    if (SvmModels.length>0){
-                        for (int i=0;i<SvmModels.length;i++){
-                            SvmModels[i].delete();
-                        }
-                    }else{
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                        getResponse().setEntity("No SVM models were found on the server!\n", MediaType.TEXT_PLAIN);
-                    }
-
-                }
-                
-            }else{
-                getResponse().setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
-                // other than svm classification models
-            }
-
-        }else if (model_type.equalsIgnoreCase("regression")){
-
-            if (algorithm_id.equalsIgnoreCase("mlr")){
-
-                if (!(model_id.equals("allOfThem"))){
-                    File MlrModelToBeDeleted = new File(REG_MLR_modelsDir+"/"+model_id);
-                    if (!(MlrModelToBeDeleted.exists())){
-                        getResponse().setEntity("The specified model was not found on the server.\n",
-                                MediaType.TEXT_PLAIN);
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                    }else{
-                        MlrModelToBeDeleted.delete();
-                        if (MlrModelToBeDeleted.exists()){
-                            getResponse().setEntity("Internal Server Error!\n" +
-                                "The model was not deleted!\n", MediaType.TEXT_PLAIN);
-                            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                        }
-                    }
-                }else{
-                    File MlrModelsFolder = new File(REG_MLR_modelsDir);
-                    File[] MlrModels = MlrModelsFolder.listFiles();
-                    if (MlrModels.length>0){
-                        for (int i=0;i<MlrModels.length;i++)
-                        {
-                            MlrModels[i].delete();
-                        }
-                    }else{
-                        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                        getResponse().setEntity("No MLR models were found on the server!\n", MediaType.TEXT_PLAIN);
-                    }
-                }
-                
-
-            }else{
-                getResponse().setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
-                // other than MLR regression models
-            }
-
-        }else{
-            getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-            getResponse().setEntity("Error 404. Bad Request!", MediaType.TEXT_PLAIN);
+        } catch (URISyntaxException ex) {
+            responseText = "Model Not Found!";
+            OpenToxApplication.opentoxLogger.severe("Model URI : http://localhost:3000/model/" + model_id+
+            "seems to be invalid!");
         }
-        return null;
+        return new StringRepresentation(responseText+"\n");
+        
     }
+        
 
 }// End of class

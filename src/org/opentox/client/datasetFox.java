@@ -19,9 +19,8 @@ import org.restlet.resource.ResourceException;
 import weka.core.Instances;
 
 /**
- * Given a dataset URI on a server that is compliant with the OpenTox
- * specifications, retrieve the compounds, the feature definitions and
- * store the features in a <em>weka.core.Instances</em> object.
+ * This class contains methods that facilitate the restful methods on dataset
+ * URIs.
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Kolotouros Dimitris
@@ -131,6 +130,13 @@ public class datasetFox extends Thread {
 
 
 
+    /**
+     * This is used only for testing purposes!
+     * @param args
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
     public static void main(String[] args) throws  InterruptedException, IOException, URISyntaxException {
         URI url = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2");
         datasetFox dsf = new datasetFox(url, "7");

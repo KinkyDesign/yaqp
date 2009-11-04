@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +15,7 @@ import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.*;
 
 import org.opentox.client.opentoxClient;
-import org.opentox.util.svm_train;
+import org.opentox.util.libSVM.svm_train;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
@@ -62,23 +63,94 @@ import weka.filters.unsupervised.attribute.RemoveType;
 public class Regression extends AbstractResource {
 
     private static final long serialVersionUID = -5538766798434922154L;
+    /**
+     * The id of the regression algorithm.
+     * This can be either mlr or svm.
+     */
     private volatile String algorithmId;
     private int i;
-    private String targetAttribute;
     private double d;
+    /**
+     * The name of the target attribute which normally is the
+     * URI of a feature definition.
+     */
+    private String targetAttribute;
+    /**
+     * The URI of the dataset which is used to build the regression model.
+     */
     private URI datasetURI;
-    private String  dataset, kernel, degree, cacheSize,
-            cost, epsilon, gamma, coeff0, tolerance;
+    /**
+     * The name of the dataset.
+     */
+//    private String dataset;
+    /**
+     * The kernel used in the SVM model.
+     * This can be rbf, linear, sigmoid or polynomial.
+     */
+    private String kernel;
+    /**
+     * The degree of the polynomial kernel (when used).
+     */
+    private String degree;
+    /**
+     * The cahed memory used in model training.
+     */
+    private String cacheSize;
+    /**
+     * The Cost coefficient.
+     */
+    private String cost;
+    /**
+     * The parameter epsilon used in SVM models.
+     */
+    private String epsilon;
+    /**
+     * The kernel parameter gamma used in various kernel functions.
+     */
+    private String gamma;
+    /**
+     * The bias of the support vector model.
+     */
+    private String coeff0;
+    /**
+     * The tolerance used in model training.
+     */
+    private String tolerance;
+    /**
+     * The id of the generated model.
+     */
     private int model_id;
+    /**
+     * An Instances object used to store the data.
+     */
+    private Instances dataInstances;
     /**
      * The status of the Resource. It is initialized with
      * success/created (201) according to RFC 2616.
      */
     private Status internalStatus = Status.SUCCESS_CREATED;
 
+    /**
+     * Initialize the resource. Supported Variants are:
+     * <ul>
+     * <li>text/plain</li>
+     * <li>text/xml</li>
+     * <li>text/html</li>
+     * </ul>
+     * Allowed Methods are:
+     * <ul>
+     * <li>GET</li>
+     * <li>POST</li>
+     * </ul>
+     * @throws ResourceException
+     */
     @Override
     public void doInit() throws ResourceException {
         super.doInit();
+        Collection<Method> allowedMethods = new ArrayList<Method>();
+        allowedMethods.add(Method.GET);
+        allowedMethods.add(Method.POST);
+        getAllowedMethods().addAll(allowedMethods);
         List<Variant> variants = new ArrayList<Variant>();
         variants.add(new Variant(MediaType.TEXT_PLAIN));
         variants.add(new Variant(MediaType.TEXT_XML));
@@ -96,36 +168,35 @@ public class Regression extends AbstractResource {
         this.internalStatus = status;
     }
 
-
-    private String getSvmXml(){
+    private String getSvmXml() {
         StringBuilder builder = new StringBuilder();
         builder.append(xmlIntro);
         builder.append("<algorithm name=\"Support Vector Machine\" id=\"svm\">\n");
-                builder.append("<AlgorithmType>regression</AlgorithmType>\n");
-                builder.append("<Parameters>\n");
-                builder.append("<!-- \n" +
-                        "The id of the dataset used for the training\n" +
-                        "of the model\n" +
-                        "-->\n");
-                builder.append("<param type=\"String\" defaultvalue=\"0\">dataId</param>\n");
-                builder.append("<param type=\"String\" defaultvalue=\"RBF\">kernel</param>\n");
-                builder.append("<param type=\"Double\" defaultvalue=\"10\">cost</param>\n");
-                builder.append("<param type=\"Double\" defaultvalue=\"0.1\">epsilon</param>\n");
-                builder.append("<param type=\"Double\" defaultvalue=\"1\">gamma</param>\n");
-                builder.append("<param type=\"Double\" defaultvalue=\"0\">coeff0</param>\n");
-                builder.append("<param type=\"Integer\" defaultvalue=\"3\">degree</param>\n");
-                builder.append("<param type=\"Double\" defaultvalue=\"1E-4\">tolerance</param>\n");
-                builder.append("<param type=\"Integer\" defaultvalue=\"50\">cacheSize</param>\n");
-                builder.append("</Parameters>\n");
-                builder.append("<statisticsSupported>\n");
-                builder.append("<statistic>RMSE</statistic>\n");
-                builder.append("<statistic>MSE</statistic>\n");
-                builder.append("</statisticsSupported>\n");
-                builder.append("</algorithm>\n\n");
-                return builder.toString();
+        builder.append("<AlgorithmType>regression</AlgorithmType>\n");
+        builder.append("<Parameters>\n");
+        builder.append("<!-- \n" +
+                "The id of the dataset used for the training\n" +
+                "of the model\n" +
+                "-->\n");
+        builder.append("<param type=\"String\" defaultvalue=\"0\">dataId</param>\n");
+        builder.append("<param type=\"String\" defaultvalue=\"RBF\">kernel</param>\n");
+        builder.append("<param type=\"Double\" defaultvalue=\"10\">cost</param>\n");
+        builder.append("<param type=\"Double\" defaultvalue=\"0.1\">epsilon</param>\n");
+        builder.append("<param type=\"Double\" defaultvalue=\"1\">gamma</param>\n");
+        builder.append("<param type=\"Double\" defaultvalue=\"0\">coeff0</param>\n");
+        builder.append("<param type=\"Integer\" defaultvalue=\"3\">degree</param>\n");
+        builder.append("<param type=\"Double\" defaultvalue=\"1E-4\">tolerance</param>\n");
+        builder.append("<param type=\"Integer\" defaultvalue=\"50\">cacheSize</param>\n");
+        builder.append("</Parameters>\n");
+        builder.append("<statisticsSupported>\n");
+        builder.append("<statistic>RMSE</statistic>\n");
+        builder.append("<statistic>MSE</statistic>\n");
+        builder.append("</statisticsSupported>\n");
+        builder.append("</algorithm>\n\n");
+        return builder.toString();
     }
 
-    private String getSvmHtml(){
+    private String getSvmHtml() {
         StringBuilder builder = new StringBuilder();
         builder.append(htmlHEAD);
         builder.append("<h1>Support Vector Machine Regression Algorithm</h1>");
@@ -170,46 +241,46 @@ public class Regression extends AbstractResource {
         return builder.toString();
     }
 
-    private String getPlsrXml(){
+    private String getPlsrXml() {
         StringBuilder builder = new StringBuilder();
         builder.append(xmlIntro);
         builder.append("<algorithm name=\"Partial Least Squares\" id=\"pls\">\n");
-                builder.append("<AlgorithmType>regression</AlgorithmType>\n");
-                builder.append("<Parameters>\n");
-                builder.append("<!-- \n" +
-                        "The id of the dataset used for the training\n" +
-                        "of the model\n" +
-                        "-->\n");
-                builder.append("<param type=\"String\" defaultvalue=\"0\">dataId</param>\n");
-                builder.append("<param type=\"Integer\" defaultvalue=\"1\">nComp</param>\n");
-                builder.append("</Parameters>\n");
-                builder.append("<statisticsSupported>\n");
-                builder.append("<statistic>x</statistic>\n");
-                builder.append("</statisticsSupported>\n");
-                builder.append("</algorithm>\n\n");
-                return builder.toString();
+        builder.append("<AlgorithmType>regression</AlgorithmType>\n");
+        builder.append("<Parameters>\n");
+        builder.append("<!-- \n" +
+                "The id of the dataset used for the training\n" +
+                "of the model\n" +
+                "-->\n");
+        builder.append("<param type=\"String\" defaultvalue=\"0\">dataId</param>\n");
+        builder.append("<param type=\"Integer\" defaultvalue=\"1\">nComp</param>\n");
+        builder.append("</Parameters>\n");
+        builder.append("<statisticsSupported>\n");
+        builder.append("<statistic>x</statistic>\n");
+        builder.append("</statisticsSupported>\n");
+        builder.append("</algorithm>\n\n");
+        return builder.toString();
     }
 
-    private String getMlrXml(){
+    private String getMlrXml() {
         StringBuilder builder = new StringBuilder();
         builder.append(xmlIntro);
         builder.append("<algorithm name=\"Multiple Linear Regression\" id=\"mlr\">\n");
-                builder.append("<AlgorithmType>regression</AlgorithmType>\n");
-                builder.append("<Parameters>\n");
-                builder.append("<!-- \n" +
-                        "The id of the dataset used for the training\n" +
-                        "of the model\n" +
-                        "-->\n");
-                builder.append("<param type=\"String\" defaultvalue=\"0\">dataId</param>\n");
-                builder.append("</Parameters>\n");
-                builder.append("<statisticsSupported>\n");
-                builder.append("<statistic>RootMeanSquaredError</statistic>\n");
-                builder.append("<statistic>RelativeAbsoluteError</statistic>\n");
-                builder.append("<statistic>RootRelativeSquaredError</statistic>\n");
-                builder.append("<statistic>MeanAbsolutError</statistic>\n");
-                builder.append("</statisticsSupported>\n");
-                builder.append("</algorithm>\n\n");
-                return builder.toString();
+        builder.append("<AlgorithmType>regression</AlgorithmType>\n");
+        builder.append("<Parameters>\n");
+        builder.append("<!-- \n" +
+                "The id of the dataset used for the training\n" +
+                "of the model\n" +
+                "-->\n");
+        builder.append("<param type=\"String\" defaultvalue=\"0\">dataId</param>\n");
+        builder.append("</Parameters>\n");
+        builder.append("<statisticsSupported>\n");
+        builder.append("<statistic>RootMeanSquaredError</statistic>\n");
+        builder.append("<statistic>RelativeAbsoluteError</statistic>\n");
+        builder.append("<statistic>RootRelativeSquaredError</statistic>\n");
+        builder.append("<statistic>MeanAbsolutError</statistic>\n");
+        builder.append("</statisticsSupported>\n");
+        builder.append("</algorithm>\n\n");
+        return builder.toString();
     }
 
     /**
@@ -224,8 +295,8 @@ public class Regression extends AbstractResource {
 
 
 
-        if ( (MediaType.TEXT_XML.equals(variant.getMediaType())) ||
-                (MediaType.TEXT_HTML.equals(variant.getMediaType())) ){
+        if ((MediaType.TEXT_XML.equals(variant.getMediaType())) ||
+                (MediaType.TEXT_HTML.equals(variant.getMediaType()))) {
             if (algorithmId.equalsIgnoreCase("svm")) {
                 return new StringRepresentation(getSvmXml(), MediaType.TEXT_XML);
 
@@ -243,9 +314,9 @@ public class Regression extends AbstractResource {
             ReferenceList list = new ReferenceList();
             list.add(getOriginalRef());
             return list.getTextRepresentation();
-        }else {
+        } else {
             getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
-            return new StringRepresentation(variant.getMediaType()+" is Not supported media type!", MediaType.TEXT_PLAIN);
+            return new StringRepresentation(variant.getMediaType() + " is Not supported media type!", MediaType.TEXT_PLAIN);
         }
     }
 
@@ -287,8 +358,7 @@ public class Regression extends AbstractResource {
         }
     }
 
-
-    private Representation checkSvmParameters(Form form){
+    private Representation checkSvmParameters(Form form) {
         Representation rep = null;
         MediaType errorMediaType = MediaType.TEXT_PLAIN;
         Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
@@ -297,196 +367,189 @@ public class Regression extends AbstractResource {
 
         setInternalStatus(Status.SUCCESS_ACCEPTED);
 
-                kernel=form.getFirstValue("kernel");
-                    if(kernel==null)
-                        kernel="RBF";
-                cost=form.getFirstValue("cost");
-                    if (cost==null)
-                        cost="100";
-                gamma = form.getFirstValue("gamma");
-                    if (gamma==null)
-                        gamma="1.5";
-                epsilon=form.getFirstValue("epsilon");
-                    if (epsilon==null)
-                        epsilon="0.1";
-                coeff0=form.getFirstValue("coeff0");
-                    if (coeff0==null)
-                        coeff0="0";
-                degree=form.getFirstValue("degree");
-                    if (degree==null)
-                        degree="3";
-                tolerance=form.getFirstValue("tolerance");
-                    if (tolerance==null)
-                        tolerance="0.0001";
-                cacheSize=form.getFirstValue("cacheSize");
-                    if (cacheSize==null)
-                        cacheSize="50";
-                dataset=form.getFirstValue("dataId");
-                    if (dataset==null)
-                        dataset="0";
-
-                /**
-                 * Check dataId
-                 */
-                try{
-                    i=Integer.parseInt(dataset);
-                    File dataFile = new File(dsdDir+"/"+dataSetPrefix+dataset);
-                    boolean exists = dataFile.exists();
-                    if (!exists){
-                        //// File not found Exception!
-                        errorDetails = errorDetails + "* [Inacceptable Parameter Value] The Requested Data File was Not Found on the server.\n";
-                        setInternalStatus(clientPostedWrongParametersStatus);
-                    }
-                }catch(NumberFormatException e){
-
-                    errorDetails = errorDetails + "* [Inacceptable Parameter Value] The data file id that you provided is not valid.\n";
-                    setInternalStatus(clientPostedWrongParametersStatus);
-                }
+        kernel = form.getFirstValue("kernel");
+        if (kernel == null) {
+            kernel = "RBF";
+        }
+        cost = form.getFirstValue("cost");
+        if (cost == null) {
+            cost = "100";
+        }
+        gamma = form.getFirstValue("gamma");
+        if (gamma == null) {
+            gamma = "1.5";
+        }
+        epsilon = form.getFirstValue("epsilon");
+        if (epsilon == null) {
+            epsilon = "0.1";
+        }
+        coeff0 = form.getFirstValue("coeff0");
+        if (coeff0 == null) {
+            coeff0 = "0";
+        }
+        degree = form.getFirstValue("degree");
+        if (degree == null) {
+            degree = "3";
+        }
+        tolerance = form.getFirstValue("tolerance");
+        if (tolerance == null) {
+            tolerance = "0.0001";
+        }
+        cacheSize = form.getFirstValue("cacheSize");
+        if (cacheSize == null) {
+            cacheSize = "50";
+        }
 
 
-                if (
-                        !(
-                        (kernel.equalsIgnoreCase("rbf"))||
-                        (kernel.equalsIgnoreCase("linear"))||
-                        (kernel.equalsIgnoreCase("sigmoid"))||
-                        (kernel.equalsIgnoreCase("polynomial"))
-                        )
-                    )
-                {
-                   errorDetails = errorDetails + "* [Inacceptable Parameter Value] Invalid Kernel Type!\n";
-                   setInternalStatus(clientPostedWrongParametersStatus);
-                }
+        /**
+         * Get and Check the posted dataset.
+         * Check whether the posted dataset id parameter is indeed
+         * a URI.
+         */
+        try {
+            datasetURI = new URI(form.getFirstValue("dataset"));
+            dataInstances = opentoxClient.getInstances(datasetURI);
+        } catch (URISyntaxException ex) {
+            setInternalStatus(clientPostedWrongParametersStatus);
+            errorDetails = errorDetails + "[Wrong Posted Parameter ]: The client did" +
+                    " not post a valid URI for the dataset";
+        }
 
 
-                /**
-                 * Cost should be convertible to Double and strictly
-                 * positive.
-                 */
+        targetAttribute = form.getFirstValue("target");
 
-                try{
-                    d = Double.parseDouble(cost);
-                    if (d<=0){
-                        errorDetails = errorDetails + "* [Inacceptable Parameter Value] The cost should be strictly positive\n";
-                        setInternalStatus(clientPostedWrongParametersStatus);
-                    }
-                }catch(NumberFormatException e){
-                    errorDetails = errorDetails +
-                            "* [Inacceptable Parameter Value]  The cost should be Double type, while you specified " +
-                                "a non double value : "+cost+"\n";
-                    setInternalStatus(clientPostedWrongParametersStatus);
-                }
+        if (!((kernel.equalsIgnoreCase("rbf")) ||
+                (kernel.equalsIgnoreCase("linear")) ||
+                (kernel.equalsIgnoreCase("sigmoid")) ||
+                (kernel.equalsIgnoreCase("polynomial")))) {
+            errorDetails = errorDetails + "* [Inacceptable Parameter Value] Invalid Kernel Type!\n";
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
 
 
-                /**
-                 * Epsilon should be convertible to Double and strictly
-                 * positive.
-                 */
+        /**
+         * Cost should be convertible to Double and strictly
+         * positive.
+         */
+        try {
+            d = Double.parseDouble(cost);
+            if (d <= 0) {
+                errorDetails = errorDetails + "* [Inacceptable Parameter Value] The cost should be strictly positive\n";
+                setInternalStatus(clientPostedWrongParametersStatus);
+            }
+        } catch (NumberFormatException e) {
+            errorDetails = errorDetails +
+                    "* [Inacceptable Parameter Value]  The cost should be Double type, while you specified " +
+                    "a non double value : " + cost + "\n";
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
 
-                 try{
-                     d=Double.parseDouble(epsilon);
-                     if (d<=0){
-                         errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsinlon must be strictly positive!\n";
-                         setInternalStatus(clientPostedWrongParametersStatus);
-                     }
-                 }catch(NumberFormatException e){
-                     errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
-                     setInternalStatus(clientPostedWrongParametersStatus);
-                 }
+
+        /**
+         * Epsilon should be convertible to Double and strictly
+         * positive.
+         */
+        try {
+            d = Double.parseDouble(epsilon);
+            if (d <= 0) {
+                errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsinlon must be strictly positive!\n";
+                setInternalStatus(clientPostedWrongParametersStatus);
+            }
+        } catch (NumberFormatException e) {
+            errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
 
 
-                /**
-                 * Degree should be a strictly positive integer
-                 */
-
-                try{
-                    i=Integer.parseInt(degree);
-                    if (i<=0){
-                        errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
-                        setInternalStatus(clientPostedWrongParametersStatus);
-                    }
-                }catch(NumberFormatException e){
-                    errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
-                    setInternalStatus(clientPostedWrongParametersStatus);
-                }
+        /**
+         * Degree should be a strictly positive integer
+         */
+        try {
+            i = Integer.parseInt(degree);
+            if (i <= 0) {
+                errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
+                setInternalStatus(clientPostedWrongParametersStatus);
+            }
+        } catch (NumberFormatException e) {
+            errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
 
 
 
-                /**
-                 * Gamma should be convertible to Double and strictly
-                 * positive.
-                 */
-
-                 try{
-                     d=Double.parseDouble(gamma);
-                     if (d<=0){
-                         errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
-                         setInternalStatus(clientPostedWrongParametersStatus);
-                     }
-                 }catch(NumberFormatException e){
-                     errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
-                     setInternalStatus(clientPostedWrongParametersStatus);
-                 }
-
-
-                /**
-                 * coeff0 should be convertible to Double.
-                 */
-
-                  try{
-                     d=Double.parseDouble(coeff0);
-                  }catch(NumberFormatException e){
-                      errorDetails = errorDetails + "* [Inacceptable Parameter Value] coeff must be a number!\n";
-                     setInternalStatus(clientPostedWrongParametersStatus);
-                 }
+        /**
+         * Gamma should be convertible to Double and strictly
+         * positive.
+         */
+        try {
+            d = Double.parseDouble(gamma);
+            if (d <= 0) {
+                errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
+                setInternalStatus(clientPostedWrongParametersStatus);
+            }
+        } catch (NumberFormatException e) {
+            errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
 
 
-                /**
-                 * Tolerance
-                 */
-                  try{
-                     d=Double.parseDouble(tolerance);
-                     if (d<=0){
-                         errorDetails = errorDetails +
-                         "* [Inacceptable Parameter Value] Tolerance must be a strictly positive double (preferably small)!\n";
-                         setInternalStatus(clientPostedWrongParametersStatus);
-                     }
-                 }catch(NumberFormatException e){
-                     errorDetails = errorDetails +
-                             "* [Inacceptable Parameter Value] Tolerance must be a strictly positive double (preferably small)!\n";
-                     setInternalStatus(clientPostedWrongParametersStatus);
-                 }
+        /**
+         * coeff0 should be convertible to Double.
+         */
+        try {
+            d = Double.parseDouble(coeff0);
+        } catch (NumberFormatException e) {
+            errorDetails = errorDetails + "* [Inacceptable Parameter Value] coeff must be a number!\n";
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
+
+
+        /**
+         * Tolerance
+         */
+        try {
+            d = Double.parseDouble(tolerance);
+            if (d <= 0) {
+                errorDetails = errorDetails +
+                        "* [Inacceptable Parameter Value] Tolerance must be a strictly positive double (preferably small)!\n";
+                setInternalStatus(clientPostedWrongParametersStatus);
+            }
+        } catch (NumberFormatException e) {
+            errorDetails = errorDetails +
+                    "* [Inacceptable Parameter Value] Tolerance must be a strictly positive double (preferably small)!\n";
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
 
 
 
-                /**
-                 * cache size
-                 */
+        /**
+         * cache size
+         */
+        try {
+            i = Integer.parseInt(cacheSize);
+            if (d <= 0) {
+                setInternalStatus(clientPostedWrongParametersStatus);
+            }
+        } catch (NumberFormatException e) {
+            rep = new StringRepresentation(
+                    "Error 400: Client Error, Bad Requset\n" +
+                    "The request could not be understood by the server due " +
+                    "to malformed syntax.\n" +
+                    "Details: cache size (in MB) should be an Integer, while you specified " +
+                    "a non Integer value : " + cacheSize + "\n\n",
+                    errorMediaType);
+            setInternalStatus(clientPostedWrongParametersStatus);
+        }
 
-                  try{
-                     i=Integer.parseInt(cacheSize);
-                     if (d<=0){
-                         setInternalStatus(clientPostedWrongParametersStatus);
-                     }
-                 }catch(NumberFormatException e){
-                     rep = new StringRepresentation(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The request could not be understood by the server due " +
-                                "to malformed syntax.\n" +
-                                "Details: cache size (in MB) should be an Integer, while you specified " +
-                                "a non Integer value : "+cacheSize+"\n\n",
-                                errorMediaType);
-                     setInternalStatus(clientPostedWrongParametersStatus);
-                 }
-
-                 if (!(errorDetails.equalsIgnoreCase(""))){
-                     rep = new StringRepresentation("Error Code : "+clientPostedWrongParametersStatus.toString()+"\n"+
-                             "Error Code Desription : The request could not be understood by the server due to " +
-                             "malformed syntax.\nThe client SHOULD NOT repeat the request without modifications.\n"+
-                             "Error Explanation :\n"+errorDetails+"\n",errorMediaType);
-                    return rep;
-                 }else{
-                    return null;
-                 }
+        if (!(errorDetails.equalsIgnoreCase(""))) {
+            rep = new StringRepresentation("Error Code : " + clientPostedWrongParametersStatus.toString() + "\n" +
+                    "Error Code Desription : The request could not be understood by the server due to " +
+                    "malformed syntax.\nThe client SHOULD NOT repeat the request without modifications.\n" +
+                    "Error Explanation :\n" + errorDetails + "\n", errorMediaType);
+            return rep;
+        } else {
+            return null;
+        }
 
     }
 
@@ -498,179 +561,178 @@ public class Regression extends AbstractResource {
      * @param data the weka.core.Instances object containing the data.
      * @return xml representation for the trained mlr model
      */
-    private String MlrTrain(Instances data){
+    private String MlrTrain(Instances data) {
         StringBuilder builder = new StringBuilder();
 
 
         LinearRegression linreg = new LinearRegression();
-                    /*
-                     * Options:
-                     * No attribute selection algorithm.
-                     * Do not try to eliminate colinear attributes.
-                     */
-                    String[] linRegOptions = {"-S", "1", "-C"};
+        /*
+         * Options:
+         * No attribute selection algorithm.
+         * Do not try to eliminate colinear attributes.
+         */
+        String[] linRegOptions = {"-S", "1", "-C"};
 
 
-    try {
+        try {
             linreg.setOptions(linRegOptions);
             linreg.buildClassifier(data);
         } catch (Exception ex) {
             OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n" +
-                    "Details :"+ex.getMessage()+"\n");
+                    "Details :" + ex.getMessage() + "\n");
         }
-                    // Build the classifier
+        // Build the classifier
 
 
-                    double[] coeffs = linreg.coefficients();
+        double[] coeffs = linreg.coefficients();
 
-                    builder.append(xmlIntro);
-                    
+        builder.append(xmlIntro);
 
 
-                    //beginning of PMML element
-                    builder.append(PMMLIntro);
-                    builder.append("<Model ID=\"" + model_id + "\" Name=\"MLR Model\">\n");
-                    builder.append("<link href=\"" + ModelURI + "/" + model_id + "\" />\n");
-                    builder.append("<AlgorithmID href=\"" + URIs.mlrAlgorithmURI + "\"/>\n");
-                    builder.append("<DatasetID href=\""+datasetURI.toString()+"\"/>\n");
-                    builder.append("<AlgorithmParameters />\n");
-                    builder.append("<FeatureDefinitions>\n");
-                    for (int k=1;k<=data.numAttributes();k++){
-                        builder.append("<link href=\""+data.attribute(k-1).name()+"\"/>\n");
-                    }
-                    builder.append("<target index=\""+data.attribute(targetAttribute).index()+"\" name=\""+
-                            targetAttribute+"\"/>\n");
-                    builder.append("</FeatureDefinitions>\n");
-                    builder.append("<User>Guest</User>\n");
-                    builder.append("<Timestamp>" + java.util.GregorianCalendar.getInstance().getTime() + "</Timestamp>\n");
-                    builder.append("</Model>\n");
 
-                    builder.append("<DataDictionary numberOfFields=\"" + data.numAttributes() + "\" >\n");
-                    for (int k = 0; k <=
-                            data.numAttributes() - 1; k++) {
-                        builder.append("<DataField name=\"" + data.attribute(k).name() + "\" optype=\"continuous\" dataType=\"double\" />\n");
-                    }
+        //beginning of PMML element
+        builder.append(PMMLIntro);
+        builder.append("<Model ID=\"" + model_id + "\" Name=\"MLR Model\">\n");
+        builder.append("<link href=\"" + ModelURI + "/" + model_id + "\" />\n");
+        builder.append("<AlgorithmID href=\"" + URIs.mlrAlgorithmURI + "\"/>\n");
+        builder.append("<DatasetID href=\"" + datasetURI.toString() + "\"/>\n");
+        builder.append("<AlgorithmParameters />\n");
+        builder.append("<FeatureDefinitions>\n");
+        for (int k = 1; k <= data.numAttributes(); k++) {
+            builder.append("<link href=\"" + data.attribute(k - 1).name() + "\"/>\n");
+        }
+        builder.append("<target index=\"" + data.attribute(targetAttribute).index() + "\" name=\"" +
+                targetAttribute + "\"/>\n");
+        builder.append("</FeatureDefinitions>\n");
+        builder.append("<User>Guest</User>\n");
+        builder.append("<Timestamp>" + java.util.GregorianCalendar.getInstance().getTime() + "</Timestamp>\n");
+        builder.append("</Model>\n");
 
-                    builder.append("</DataDictionary>\n");
-                    // RegressionModel
-                    builder.append("<RegressionModel modelName=\"" + dataset + "\"" +
-                            " functionName=\"regression\"" +
-                            " modelType=\"linearRegression\"" +
-                            " algorithmName=\"linearRegression\"" +
-                            " targetFieldName=\"" + data.attribute(data.numAttributes() - 1).name() + "\"" +
-                            ">\n");
-                    // RegressionModel::MiningSchema
-                    builder.append("<MiningSchema>\n");
-                    for (int k = 0; k <=
-                            data.numAttributes() - 2; k++) {
-                        builder.append("<MiningField name=\"" +
-                                data.attribute(k).name() + "\" />\n");
-                    }
+        builder.append("<DataDictionary numberOfFields=\"" + data.numAttributes() + "\" >\n");
+        for (int k = 0; k <=
+                data.numAttributes() - 1; k++) {
+            builder.append("<DataField name=\"" + data.attribute(k).name() + "\" optype=\"continuous\" dataType=\"double\" />\n");
+        }
 
-                    builder.append("<MiningField name=\"" +
-                            data.attribute(data.numAttributes() - 1).name() + "\" " +
-                            "usageType=\"predicted\"/>\n");
-                    builder.append("</MiningSchema>\n");
+        builder.append("</DataDictionary>\n");
+        // RegressionModel
+        builder.append("<RegressionModel modelName=\"" + datasetURI.toString() + "\"" +
+                " functionName=\"regression\"" +
+                " modelType=\"linearRegression\"" +
+                " algorithmName=\"linearRegression\"" +
+                " targetFieldName=\"" + data.attribute(data.numAttributes() - 1).name() + "\"" +
+                ">\n");
+        // RegressionModel::MiningSchema
+        builder.append("<MiningSchema>\n");
+        for (int k = 0; k <=
+                data.numAttributes() - 2; k++) {
+            builder.append("<MiningField name=\"" +
+                    data.attribute(k).name() + "\" />\n");
+        }
 
-                    // RegressionModel::RegressionTable
-                    builder.append("<RegressionTable intercept=\"" + coeffs[coeffs.length - 1] + "\">\n");
-                    for (int k = 0; k <=
-                            data.numAttributes() - 2; k++) {
-                        builder.append("<NumericPredictor name=\"" +
-                                data.attribute(k).name() + "\" " +
-                                " exponent=\"1\" " +
-                                "coefficient=\"" + coeffs[k] + "\"/>\n");
-                    }
+        builder.append("<MiningField name=\"" +
+                data.attribute(data.numAttributes() - 1).name() + "\" " +
+                "usageType=\"predicted\"/>\n");
+        builder.append("</MiningSchema>\n");
 
-                    builder.append("</RegressionTable>\n");
+        // RegressionModel::RegressionTable
+        builder.append("<RegressionTable intercept=\"" + coeffs[coeffs.length - 1] + "\">\n");
+        for (int k = 0; k <=
+                data.numAttributes() - 2; k++) {
+            builder.append("<NumericPredictor name=\"" +
+                    data.attribute(k).name() + "\" " +
+                    " exponent=\"1\" " +
+                    "coefficient=\"" + coeffs[k] + "\"/>\n");
+        }
 
-                    builder.append("</RegressionModel>\n");
-                    builder.append("</PMML>\n\n");
-                    
-                    
+        builder.append("</RegressionTable>\n");
+
+        builder.append("</RegressionModel>\n");
+        builder.append("</PMML>\n\n");
+
+
         return builder.toString();
     }
-
 
     /**
      *
      * @return
      */
-    private String[] getSvmOptions(){
+    private String[] getSvmOptions(String scaledPath, String modelPath) {
         String[] options = {""};
 
 
         String ker = "";
-            if (kernel.equalsIgnoreCase("linear")) {
-                ker = "0";
-            } else if (kernel.equalsIgnoreCase("polynomial")) {
-                ker = "1";
-            } else if (kernel.equalsIgnoreCase("rbf")) {
-                ker = "2";
-            } else if (kernel.equalsIgnoreCase("sigmoid")) {
-                ker = "3";
-            } else {
-                ker = "3";
-            }
+        if (kernel.equalsIgnoreCase("linear")) {
+            ker = "0";
+        } else if (kernel.equalsIgnoreCase("polynomial")) {
+            ker = "1";
+        } else if (kernel.equalsIgnoreCase("rbf")) {
+            ker = "2";
+        } else if (kernel.equalsIgnoreCase("sigmoid")) {
+            ker = "3";
+        } else {
+            ker = "3";
+        }
 
-            String scaledPath = scaledDir + "/" + dataSetPrefix + dataset;
-            String modelPath = REG_SVM_modelsDir + "/" + model_id;
 
-            if (ker.equalsIgnoreCase("0")) {
-                String[] ops = {
-                    "-s", "3",// epsilon-SVr
-                    "-t", "0",
-                    "-c", cost,
-                    "-e", tolerance,
-                    "-q",
-                    scaledPath,
-                    modelPath
-                };
-                options =
-                        ops;
-            } else if (ker.equalsIgnoreCase("1")) {
-                String[] ops = {
-                    "-s", "3",// epsilon-SVr
-                    "-t", ker,
-                    "-c", cost,
-                    "-g", gamma,
-                    "-d", degree,
-                    "-r", coeff0,
-                    "-e", tolerance,
-                    "-q",
-                    scaledPath,
-                    modelPath
-                };
-                options =
-                        ops;
-            } else if (ker.equalsIgnoreCase("2")) {
-                String[] ops = {
-                    "-s", "3",// epsilon-SVr
-                    "-t", ker,
-                    "-c", cost,
-                    "-g", gamma,
-                    "-e", tolerance,
-                    "-q",
-                    scaledPath,
-                    modelPath
-                };
-                options =
-                        ops;
-            } else if (ker.equalsIgnoreCase("3")) {
-                String[] ops = {
-                    "-s", "3",// epsilon-SVr
-                    "-t", ker,
-                    "-c", cost,
-                    "-g", gamma,
-                    "-e", tolerance,
-                    "-q",
-                    scaledPath,
-                    modelPath
-                };
-                options =
-                        ops;
-            }
-            return options;
+
+
+        if (ker.equalsIgnoreCase("0")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", "0",
+                "-c", cost,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        } else if (ker.equalsIgnoreCase("1")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", ker,
+                "-c", cost,
+                "-g", gamma,
+                "-d", degree,
+                "-r", coeff0,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        } else if (ker.equalsIgnoreCase("2")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", ker,
+                "-c", cost,
+                "-g", gamma,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        } else if (ker.equalsIgnoreCase("3")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", ker,
+                "-c", cost,
+                "-g", gamma,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        }
+        return options;
     }
 
     /**
@@ -693,36 +755,36 @@ public class Regression extends AbstractResource {
         if (algorithmId.equalsIgnoreCase("mlr")) {
             Form form = new Form(entity);
             Representation errorRep = checkMlrParameters(form);
-                if (errorRep!=null){
-                    representation = errorRep;
-                }
+            if (errorRep != null) {
+                representation = errorRep;
+            }
 
 
             if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
                 try {
                     // Load the data in an Instances-type object:
 
-                    Instances data = opentoxClient.getInstances(datasetURI);
-                    data.setClass(data.attribute(targetAttribute));
-                    
-                    
+                    dataInstances = opentoxClient.getInstances(datasetURI);
+                    dataInstances.setClass(dataInstances.attribute(targetAttribute));
+
+
                     /* Removes all string attributes!
-                     TODO: Parse values one by one... */                    
-                    for (int j=0;j<data.numAttributes();j++){
-                        if (data.attribute(j).isString()){
-                            data.deleteAttributeAt(j);
+                    TODO: Parse values one by one... */
+                    for (int j = 0; j < dataInstances.numAttributes(); j++) {
+                        if (dataInstances.attribute(j).isString()) {
+                            dataInstances.deleteAttributeAt(j);
                             j--;
                         }
                     }
-                    
-                    String mlrXml = MlrTrain(data);
+
+                    String mlrXml = MlrTrain(dataInstances);
 
                     // Now, construct the XML:
                     model_id = org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(
                             baseURI + "/algorithm/learning/regression/mlr");
 
                     //!! Now store the PMML representation in a file:
-                    FileWriter fileStream = new FileWriter(modelsXmlDir + "/" + model_id);
+                    FileWriter fileStream = new FileWriter(Directories.modelXmlDir + "/" + model_id);
                     BufferedWriter output = new BufferedWriter(fileStream);
                     output.write(mlrXml);
                     output.flush();
@@ -739,14 +801,14 @@ public class Regression extends AbstractResource {
                     String errorMessage = "Error 500: Server Error, Internal\n" +
                             "Description: The server encountered an unexpected condition which prevented it \n" +
                             "from fulfilling the request.\n" +
-                            "Details.....\n"+
-                            "Error Message           : "+ex.getMessage()+"\n"+
-                            "Localized Error Message : "+ex.getLocalizedMessage() +"\n"+
-                            "Exception               : "+ex.toString()+"\n";
+                            "Details.....\n" +
+                            "Error Message           : " + ex.getMessage() + "\n" +
+                            "Localized Error Message : " + ex.getLocalizedMessage() + "\n" +
+                            "Exception               : " + ex.toString() + "\n";
                     representation = new StringRepresentation(
                             errorMessage,
                             MediaType.TEXT_PLAIN);
-                    setInternalStatus(Status.SERVER_ERROR_INTERNAL);                   
+                    setInternalStatus(Status.SERVER_ERROR_INTERNAL);
                     OpenToxApplication.opentoxLogger.info(errorMessage);
                 }
             }
@@ -754,9 +816,6 @@ public class Regression extends AbstractResource {
             return representation;
 
         }// end of MLR algorithm
-
-
-
         /**
          * Implementation of the SVM algorithm...
          */
@@ -764,113 +823,79 @@ public class Regression extends AbstractResource {
 
 
             File svmModelFolder = new File(REG_SVM_modelsDir);
+
             String[] listOfFiles = svmModelFolder.list();
             int NSVM = listOfFiles.length;
 
             Form form = new Form(entity);
-
-
+            representation = checkSvmParameters(form);
+            /**
+             * Preprocess the data (The instances object has already been created
+             * - see checkSvmParameters). Now remove all string attributes and
+             * scale the data. Then Save the instances as a libSvm file in
+             * /temp/scaled
+             */
+            System.out.println(dataInstances);
+            Preprocessing.removeStringAtts(dataInstances);
+            dataInstances = Preprocessing.scale(dataInstances);
+            weka.core.converters.LibSVMSaver saver = new weka.core.converters.LibSVMSaver();
+            saver.setInstances(dataInstances);
 
             /**
-             * Retrieve the POSTed parameters.
-             * If a parameter was not posted set it to its default value...
+             * Generate a temporary file name consisting of about 25 random
+             * characters (random length). Then create a java.io.File object
+             * pointing to the file containing the scaled data.
              */
-            representation = checkSvmParameters(form);
-            String[] options = getSvmOptions();
+            String key = new String();
+            int flag = (int) (Math.random() * 10) + 20;
+
+            int rand = 0;
+            for (int x = 0; x < flag; x++) {
+                rand = ((int) (Math.random() * 10)) % 3;
+                if ((rand == 0)) {
+                    key += (int) (Math.random() * 10);
+                } else if ((rand == 1)) {
+                    key += (char) (Math.random() * 26 + 65);
+                } else {
+                    key += (char) (Math.random() * 26 + 97);
+                }
+            }
+            File tempScaledFile = new File(Directories.tempScaledDir + "/" + key);
+            try {
+                saver.setFile(tempScaledFile);
+                saver.writeBatch();
+                /**
+                 * Now the scaled data are availabel in DSD (libsvm) format.
+                 * Now get the options for svmtrain.
+                 */
+                String[] options = getSvmOptions(tempScaledFile.toString(), Directories.svmModel + "/" + key);
+                if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
+                    representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
+                    svm_train.main(options);
+                }
+
+            } catch (IOException ex) {
+                OpenToxApplication.opentoxLogger.log(Level.SEVERE,
+                        "Error while tryning to save the dataset as LibSVM file", ex);
+            }
+
+            String[] options = getSvmOptions(tempScaledFile.toString(), "");
 
             /**
              * If all the posted parameters (kernel type, cost, gamma, etc)
              * are acceptable the the status is 202.
              */
-            if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
-                try {
-                    representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
-                    svm_train.main(options);
-
-
-                    /**
-                     * Check if the model was created.
-                     * If yes, set the status to 200,
-                     * otherwise the status is set to 500
-                     */
-                    File modelFile = new File(REG_SVM_modelsDir + "/" + model_id);
-                    boolean modelCreated = modelFile.exists();
-                    if (!(modelCreated)) {
-                        representation = new StringRepresentation(
-                                "Error 400: Client Error, Bad Requset\n" +
-                                "The server encountered an unexpected condition " +
-                                "which prevented it from fulfilling the request." +
-                                "Details: Unexpected Error while trying to train the model.\n\n",
-                                MediaType.TEXT_PLAIN);
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                    } else {
-                        getResponse().setStatus(Status.SUCCESS_OK);
-                    }
-
-                    /**
-                     * If the model was successfully created, that is the
-                     * status is 200, return a report to the user in
-                     * HTML form. This is for testing reasons only as according to
-                     * the OpenTox API specification, the URI of the trained model
-                     * should be returned
-                     */
-                    if (getResponse().getStatus().equals(Status.SUCCESS_OK)) {
-                        //String model_id = modelPrefix + dataid + "-" + NSVM;
-                        model_id = org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI + "/algorithm/learning/regression/svm");
-
-                        representation = new StringRepresentation(ModelURI + "/" + model_id + "\n", MediaType.TEXT_PLAIN);
-
-                        StringBuilder xmlstr = new StringBuilder();
-                        xmlstr.append(xmlIntro);
-                        xmlstr.append("<ot:Model xmlns:ot=\"http://opentox.org/1.0/\" " +
-                                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
-                                "xsi:schemaLocation=\"http://opentox.org/1.0/Algorithm.xsd\" " +
-                                "ID=\"" + model_id + "\" Name=\"SVM Regression Model\">\n");
-                        xmlstr.append("<ot:link href=\"" + URIs.modelURI + "/" + model_id + "\" />\n");
-                        xmlstr.append("<ot:AlgorithmID href=\"" + URIs.svmAlgorithmURI + "\"/>\n");
-                        xmlstr.append("<DatasetID href=\"\"/>\n");
-                        xmlstr.append("<AlgorithmParameters>\n");
-                        xmlstr.append("<param name=\"kernel\"  type=\"string\">" + kernel + "</param>\n");
-                        xmlstr.append("<param name=\"cost\"  type=\"double\">" + cost + "</param>\n");
-                        xmlstr.append("<param name=\"epsilon\"  type=\"double\">" + epsilon + "</param>\n");
-                        xmlstr.append("<param name=\"gamma\"  type=\"double\">" + gamma + "</param>\n");
-                        xmlstr.append("<param name=\"coeff0\"  type=\"double\">" + coeff0 + "</param>\n");
-                        xmlstr.append("<param name=\"degree\"  type=\"int\">" + degree + "</param>\n");
-                        xmlstr.append("<param name=\"tolerance\"  type=\"double\">" + tolerance + "</param>\n");
-                        xmlstr.append("<param name=\"cacheSize\"  type=\"double\">" + cacheSize + "</param>\n");
-                        xmlstr.append("</AlgorithmParameters>\n");
-                        xmlstr.append("<FeatureDefinitions>\n");
-                        xmlstr.append("</FeatureDefinitions>\n");
-                        xmlstr.append("<User>Guest</User>\n");
-                        xmlstr.append("<Timestamp>" + java.util.GregorianCalendar.getInstance().getTime() + "</Timestamp>\n");
-                        xmlstr.append("</ot:Model>\n");
-                        try {
-
-                            FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id);
-                            BufferedWriter out = new BufferedWriter(fstream);
-                            out.write(xmlstr.toString());
-                            out.flush();
-                            out.close();
-                        } catch (Exception e) {
-                            OpenToxApplication.opentoxLogger.severe(e.getMessage());
-                        }
-
-
-                    }
-
-                } catch (IOException ex) {
-                    OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
-                }
-            }
             return representation;
-        }else{
-            return new StringRepresentation("--",MediaType.TEXT_PLAIN);
+        } else {
+            getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+            return new StringRepresentation("Sorry, this algorithm is not supported!", MediaType.TEXT_PLAIN);
         }
 
 
 
     }// end of acceptRepresentation
 
+    @Deprecated
     private String REG_MLR_FilePath(String dataid) {
         return arffDir + "/" + dataSetPrefix + dataid;
     }
