@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.Normalize;
@@ -13,11 +11,16 @@ import weka.filters.unsupervised.attribute.Normalize;
 /**
  *
  * @author tartoufo1973
+ * @author Sopasakis Pantelis
  */
 public class Preprocessing {
 
 
-
+    /**
+     * Scales the data producing a dataset whose values lie within [-1,1]
+     * @param data
+     * @return
+     */
     public static Instances scale(Instances data){
 
         Instances scaledData = data;

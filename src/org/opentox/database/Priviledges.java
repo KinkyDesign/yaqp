@@ -14,7 +14,7 @@ import sun.awt.SunToolkit.InfiniteLoop;
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
-public class Priviledges implements AuthorizationHierarchy{
+public final class Priviledges implements AuthorizationHierarchy{
 
     /**
      * Private Constructor.
@@ -26,11 +26,14 @@ public class Priviledges implements AuthorizationHierarchy{
 
     /**
      * User priviledges level.
-     * This can be one of "user/simple", "user/priviledged" or "user/admin"
+     * This can be one of "guest", "user/simple", "user/priviledged" or "user/admin"
      */
     private String level;
 
-   
+    /**
+     * Guest Users with no priviledges.
+     */
+    public static Priviledges GUEST = new Priviledges("guest");   
 
     /**
      * Simple Users.
@@ -50,7 +53,11 @@ public class Priviledges implements AuthorizationHierarchy{
     
 
 
-    
+    /**
+     * Returns the identifier of a Priviledge. e.g. Priviledges.ADMIN.getLevel() returns
+     * the String "user/admin"
+     * @return
+     */
     public String getLevel(){
         return level;
     }
@@ -58,7 +65,7 @@ public class Priviledges implements AuthorizationHierarchy{
     /**
      * Compares two authorization levels.<br/>
      * Implements the ordering:
-     * <pre>"user/simple" &lt; "user/priviledged" &lt; "user/admin"</pre>
+     * <pre>"guest" &lt; "user/simple" &lt; "user/priviledged" &lt; "user/admin"</pre>
      * Returns 1 if a.compareTo(b) means that a is more priviledged that b,
      * Return 0 if the two Priviledges are equal and -1 else. The method returns
      * -2 if no decission is taken...
@@ -67,40 +74,51 @@ public class Priviledges implements AuthorizationHierarchy{
      */
     @Override
     public int compareTo(AuthorizationHierarchy other) {
-       /*** If this is USER then any other user can be equal or
-            or greater to this.
-        **/
-       if (level.equalsIgnoreCase(Priviledges.USER.getLevel())){
-           if (other.getLevel().equalsIgnoreCase(level)){
-               return 0;
-           }else{
-               return -1;
-           }
-       /*** If this is the PRIVILEDGED USER **/
-       }if (level.equalsIgnoreCase(Priviledges.PRIVILEDGED_USER.getLevel())){
-           if(PRIVILEDGED_USER.getLevel().equalsIgnoreCase(other.getLevel())){
-               return 0;
-           }else if (USER.getLevel().equalsIgnoreCase(other.getLevel())){
-               return 1;
-           }else{
-               return -1;
-           }
-       /*** If this is the ADMIN user then any other user is equal
-            or less priviledged that this one.
-        **/
-       } if (level.equalsIgnoreCase(Priviledges.ADMIN.getLevel())){
-           if (Priviledges.ADMIN.getLevel().equalsIgnoreCase(other.getLevel())){
-               return 0;
-           }else{
-               return 1;
-           }
-       }else{
-           return -2;
-       }
+
+        if (Priviledges.GUEST.getLevel().equals(level)){ /** this=guest **/
+            if (other.getLevel().equals(level)){
+                return 0; // this == other
+            }else{
+                return -1; // this < other
+            }
+        }else if (Priviledges.USER.getLevel().equals(level)){/** this=user **/
+            if (other.getLevel().equals(USER.getLevel())){
+                return 0;   // this == other
+            }else if (other.getLevel().equals(GUEST.getLevel())){
+                return 1;   // this > other
+            }else if (other.getLevel().equals(PRIVILEDGED_USER.getLevel())){
+                return -1;  // this < other
+            }else if (other.getLevel().equals(ADMIN.getLevel())){
+                return -1;  // this< other
+            }else{
+                return -2;  // ????
+            }
+        }else if (Priviledges.PRIVILEDGED_USER.getLevel().equals(level)){/** this=priviledged **/
+            if (other.getLevel().equals(PRIVILEDGED_USER.getLevel())){
+                return 0;   // this == other
+            }else if (other.getLevel().equals(GUEST.getLevel())){
+                return 1;   // this > other
+            }else if (other.getLevel().equals(USER.getLevel())){
+                return 1;   // this > other
+            } else if (other.getLevel().equals(ADMIN.getLevel())){
+                return -1;  // this > other
+            }else{
+                return -2;  // ????
+            }
+        }else if (Priviledges.ADMIN.getLevel().equals(level)){
+            if (other.getLevel().equals(ADMIN.getLevel())){
+                return 0;   // this == other
+            }else{
+                return 1;   // this > other
+            }
+        }else{
+            return -2;      // ????
+        }
 
     }
 
-   
+
+    
 
     
 }

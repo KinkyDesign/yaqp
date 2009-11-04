@@ -348,10 +348,11 @@ public class Regression extends AbstractResource {
 
 
         if (!(errorDetails.equalsIgnoreCase(""))) {
-            rep = new StringRepresentation("Error Code : " + clientPostedWrongParametersStatus.toString() + "\n" +
+            rep = new StringRepresentation(
+                    "Error Code            : " + clientPostedWrongParametersStatus.toString() + "\n" +
                     "Error Code Desription : The request could not be understood by the server due to " +
                     "malformed syntax.\nThe client SHOULD NOT repeat the request without modifications.\n" +
-                    "Error Explanation :\n" + errorDetails + "\n", errorMediaType);
+                    "Error Explanation     :\n" + errorDetails + "\n", errorMediaType);
             return rep;
         } else {
             return null;
@@ -672,10 +673,8 @@ public class Regression extends AbstractResource {
         } else if (kernel.equalsIgnoreCase("sigmoid")) {
             ker = "3";
         } else {
-            ker = "3";
+            ker = "2";
         }
-
-
 
 
         if (ker.equalsIgnoreCase("0")) {
@@ -819,13 +818,7 @@ public class Regression extends AbstractResource {
         /**
          * Implementation of the SVM algorithm...
          */
-        else if (algorithmId.equalsIgnoreCase("svm")) {
-
-
-            File svmModelFolder = new File(REG_SVM_modelsDir);
-
-            String[] listOfFiles = svmModelFolder.list();
-            int NSVM = listOfFiles.length;
+        else if (algorithmId.equalsIgnoreCase("svm")) {            
 
             Form form = new Form(entity);
             representation = checkSvmParameters(form);
@@ -835,7 +828,6 @@ public class Regression extends AbstractResource {
              * scale the data. Then Save the instances as a libSvm file in
              * /temp/scaled
              */
-            System.out.println(dataInstances);
             Preprocessing.removeStringAtts(dataInstances);
             dataInstances = Preprocessing.scale(dataInstances);
             weka.core.converters.LibSVMSaver saver = new weka.core.converters.LibSVMSaver();
@@ -876,17 +868,21 @@ public class Regression extends AbstractResource {
 
             } catch (IOException ex) {
                 OpenToxApplication.opentoxLogger.log(Level.SEVERE,
-                        "Error while tryning to save the dataset as LibSVM file", ex);
+                        "Error while tryning to save the dataset as LibSVM file : ", ex);
             }
 
-            String[] options = getSvmOptions(tempScaledFile.toString(), "");
+            
 
             /**
              * If all the posted parameters (kernel type, cost, gamma, etc)
              * are acceptable the the status is 202.
              */
             return representation;
-        } else {
+        } /** end of svm implementation **/
+        /**
+         * In case the user asks for other algorithms...
+         */
+        else {
             getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
             return new StringRepresentation("Sorry, this algorithm is not supported!", MediaType.TEXT_PLAIN);
         }
@@ -895,8 +891,5 @@ public class Regression extends AbstractResource {
 
     }// end of acceptRepresentation
 
-    @Deprecated
-    private String REG_MLR_FilePath(String dataid) {
-        return arffDir + "/" + dataSetPrefix + dataid;
-    }
+    
 }

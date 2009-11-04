@@ -91,7 +91,7 @@ import org.restlet.security.Guard;
         opentoxLogger.setLevel(Level.INFO);
         dbcon = new InHouseDB();
         AbstractResource.Directories.checkDirs();
-        
+        System.out.println(dbcon.verifyCredentials("chung", "nakgl6443".toCharArray(), Priviledges.ADMIN));
         }
      
      /**
@@ -123,27 +123,12 @@ import org.restlet.security.Guard;
 
      @Override
          public final synchronized Restlet createRoot() {
-
-         /**
-          * Guard sensitive resources!
-          * Create a guard - set username and password...
-          */
-         final Guard UploalGuard = new Guard(getContext(), ChallengeScheme.HTTP_DIGEST,
-                 "To avoid spamming we ask you to provide your username and password..."){
-             @Override
-             public int authenticate(Request req)
-             {
-                if (req.getMethod().equals(org.restlet.data.Method.GET)) return AUTHENTICATION_VALID;
-                return super.authenticate(req);
-             }
-         };        
-
+         
          
          /**
           * Guard for the deletion of resources.
           * Only administrators can delete Resources.
-          * ..........
-          * ..........
+          * TODO: Authenticate Administrators using
           */
           final Guard ModelGuard = new Guard(getContext(), ChallengeScheme.HTTP_BASIC,
                  "Only administrators are authorized to delete models...")

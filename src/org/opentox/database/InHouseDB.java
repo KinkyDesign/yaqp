@@ -3,6 +3,7 @@ package org.opentox.database;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -258,6 +259,32 @@ public class InHouseDB {
     }
 
 
+    /**
+     * Verify if a given pair of user name and password are registered in the
+     * database. If yes, returns true, else returns false. Both username
+     * and password are case sensitive.<br/><br/>
+     * <b>Note:</b> If some credentials correspond to an administrator, then
+     * <tt>verifyCredentials(userName,pass,Privilegdges.ADMIN)</tt>, returns true
+     * while <tt>verifyCredentials(userName,pass,Privilegdges.USER)</tt> returns
+     * false. Of course an administrator has all the authorization that a simple
+     * user has, but this method verifies just if a given triplet of username, password
+     * and given provilegdes is valid.
+     * @param userName The user name.
+     * @param password character array of the password.
+     * @param priviledges User authorization level.
+     * @return true/false.
+     */
+    public static boolean verifyCredentials(String userName, char[] password, Priviledges priviledges){
+        HashMap<String, char[]> map = (HashMap<String, char[]>) getCredentialsAsMap(priviledges);
+        return Arrays.equals(map.get(userName),  password);
+    }
+
+
+    /**
+     * Returns a Map&lt;String,char[]&gt; for the credentials of a given authorization level.
+     * @param priviledges
+     * @return
+     */
     public static Map<String,char[] > getCredentialsAsMap(Priviledges priviledges){
         Map<String, char[]> secret = new HashMap<String, char[]>();
         String getCredentials = "SELECT * FROM "+USER_ACCOUNTS_TABLE+" WHERE AUTH LIKE '%"+
