@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.*;
 
@@ -30,8 +29,6 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.RemoveType;
 
 /**
  * Resource for regression algorithms.
@@ -419,6 +416,8 @@ public class Regression extends AbstractResource {
 
         targetAttribute = form.getFirstValue("target");
 
+        dataInstances.setClass(dataInstances.attribute(targetAttribute));
+
         if (!((kernel.equalsIgnoreCase("rbf")) ||
                 (kernel.equalsIgnoreCase("linear")) ||
                 (kernel.equalsIgnoreCase("sigmoid")) ||
@@ -617,7 +616,7 @@ public class Regression extends AbstractResource {
 
         builder.append("</DataDictionary>\n");
         // RegressionModel
-        builder.append("<RegressionModel modelName=\"" + datasetURI.toString() + "\"" +
+        builder.append("<RegressionModel modelName=\"" + URIs.modelURI+"/"+model_id + "\"" +
                 " functionName=\"regression\"" +
                 " modelType=\"linearRegression\"" +
                 " algorithmName=\"linearRegression\"" +
@@ -625,15 +624,18 @@ public class Regression extends AbstractResource {
                 ">\n");
         // RegressionModel::MiningSchema
         builder.append("<MiningSchema>\n");
-        for (int k = 0; k <=
-                data.numAttributes() - 2; k++) {
-            builder.append("<MiningField name=\"" +
+        for (int k = 0; k <= data.numAttributes() - 1; k++) {
+            if (k!=dataInstances.classIndex())
+                builder.append("<MiningField name=\"" +
                     data.attribute(k).name() + "\" />\n");
+            
         }
-
-        builder.append("<MiningField name=\"" +
-                data.attribute(data.numAttributes() - 1).name() + "\" " +
+                 builder.append("<MiningField name=\"" +
+                data.attribute(dataInstances.classIndex()).name() + "\" " +
                 "usageType=\"predicted\"/>\n");
+
+
+
         builder.append("</MiningSchema>\n");
 
         // RegressionModel::RegressionTable
@@ -735,6 +737,84 @@ public class Regression extends AbstractResource {
     }
 
     /**
+     *
+     * @param dsdFile path to DSD model file.
+     * @return pmml representation of the DSD file
+     */
+    private String PmmlFromDsD(File dsdFile){
+        StringBuilder pmml = new StringBuilder();
+        pmml.append(xmlIntro);
+        pmml.append(PMMLIntro);
+        
+        /** ##Data Dictionary **/
+        pmml.append("<DataDictionary numberOfFields=\""+(dataInstances.numAttributes())+"\">\n");
+        for (int k=0;k<dataInstances.numAttributes();k++){
+            pmml.append("<DataField name=\""+dataInstances.attribute(k).name()+"\" optype=\"continuous\" dataType=\"double\"/>\n");
+        }
+        pmml.append("</DataDictionary>\n");
+
+        /** ##SupportVectorMachineModel **/
+        pmml.append("<SupportVectorMachineModel modelName=\""+URIs.modelURI+"/"+model_id+"\" "+
+                "algorithmName=\"supportVectorMachine\" "+
+                "functionName=\"regression\" "+
+                "svmRepresentation=\"SupportVectors\" "+
+                "alternateBinaryTargetCategory=\"no\" >\n");
+        /** #Mining Schema **/
+        pmml.append("<MiningSchema>\n");
+        for (int k=0;k<dataInstances.numAttributes();k++){
+            if (k!=dataInstances.classIndex()){
+                pmml.append("<MiningField name=\""+dataInstances.attribute(k).name()+"\" />\n");
+            }else{
+                pmml.append("<MiningField name=\""+dataInstances.attribute(k).name()+"\" usageType=\"predicted\" />\n");
+            }
+        }
+        pmml.append("</MiningSchema>\n");
+
+        /** #RadialBasisKernelType **/
+        pmml.append("<RadialBasisKernelType gamma=\""+gamma+"\" description=\"Radial basis kernel type\" />\n" );
+
+        /** #VectorDictionary **/
+        pmml.append("<VectorDictionary numberOfVectors=\""+dataInstances.numAttributes()+"\" >\n");
+        pmml.append("<VectorFields numberOfFields=\""+(dataInstances.numAttributes()-1)+"\">\n");
+            for (int k=0;k<dataInstances.numAttributes();k++){
+                if (k!=dataInstances.classIndex()){
+                    pmml.append("<FieldRef field=\""+dataInstances.attribute(k).name()+"\" />\n");
+                }
+            }
+        
+        pmml.append("</VectorFields>\n");
+        for (int k=0;k<dataInstances.numInstances();k++){
+            pmml.append("<VectorInstance id=\"node"+k+"\">\n");
+            pmml.append("<REAL-SparseArray n=\""+(dataInstances.numAttributes()-1)+"\">\n");
+            pmml.append("<Indices>");
+            for (int j=1;j<=dataInstances.numAttributes()-1;j++){
+                pmml.append(j+" ");
+            }
+            pmml.append("</Indices>\n");
+            pmml.append("<REAL-Entries>");
+            for (int j=1;j<=dataInstances.numAttributes()-1;j++){
+                pmml.append(dataInstances.instance(k).value(j-1)+" ");
+            }
+            pmml.append("</REAL-Entries>\n");
+            pmml.append("</REAL-SparseArray>\n");
+            pmml.append("</VectorInstance>\n");
+        }
+        pmml.append("</VectorDictionary>\n");
+
+        pmml.append("<SupportVectorMachine>");
+        pmml.append("<SupportVectors numberOfAttributes=\""+(dataInstances.numAttributes()-1)+"\" " +
+                "numberOfSupportVectors=\""+dataInstances.numInstances()+"\" >");
+        
+        pmml.append("</SupportVectors>");
+        pmml.append("</SupportVectorMachine>");
+
+        pmml.append("</SupportVectorMachineModel>\n");
+        pmml.append("</PMML>");
+        return pmml.toString();
+    }
+
+
+    /**
      * POST Method
      *
      */
@@ -765,6 +845,9 @@ public class Regression extends AbstractResource {
 
                     dataInstances = opentoxClient.getInstances(datasetURI);
                     dataInstances.setClass(dataInstances.attribute(targetAttribute));
+                    System.out.println(
+                            dataInstances.classAttribute().name()
+                            );
 
 
                     /* Removes all string attributes!
@@ -830,8 +913,11 @@ public class Regression extends AbstractResource {
              */
             Preprocessing.removeStringAtts(dataInstances);
             dataInstances = Preprocessing.scale(dataInstances);
+            
+            
             weka.core.converters.LibSVMSaver saver = new weka.core.converters.LibSVMSaver();
-            saver.setInstances(dataInstances);
+            
+            saver.setInstances(new Instances(dataInstances));
 
             /**
              * Generate a temporary file name consisting of about 25 random
@@ -864,13 +950,19 @@ public class Regression extends AbstractResource {
                 if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
                     representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
                     svm_train.main(options);
+
+                    /**
+                     * TODO: check if the model was really created!!!
+                     * If not, return a status code 500.
+                     */
+                    String pmml = PmmlFromDsD(new File(Directories.svmModel + "/" + key));
+                    representation = new StringRepresentation(pmml,MediaType.TEXT_XML);
                 }
 
             } catch (IOException ex) {
                 OpenToxApplication.opentoxLogger.log(Level.SEVERE,
                         "Error while tryning to save the dataset as LibSVM file : ", ex);
             }
-
             
 
             /**

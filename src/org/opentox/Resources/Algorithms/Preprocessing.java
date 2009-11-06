@@ -27,7 +27,7 @@ public class Preprocessing {
         Normalize filter = new Normalize();
         try {
             filter.setInputFormat(scaledData);
-            String[] scaleOptions = {"-S","2","-T","-1"};
+            String[] scaleOptions = {"-S","2","-T","-1","-unset-class-temporarily"};
             filter.setOptions(scaleOptions);
             scaledData=Normalize.useFilter(scaledData, filter);
         } catch (Exception ex) {
@@ -50,6 +50,8 @@ public class Preprocessing {
         Instances mydata = new Instances(
                 new BufferedReader(
                 new FileReader(System.getProperty("user.home")+"/Documents/RESTfulWebServices/uploads/data/arff/dataSet-8")));
+        mydata.setClassIndex(10);
+        removeStringAtts(mydata);
         mydata = scale(mydata);
         System.out.println(mydata);
     }

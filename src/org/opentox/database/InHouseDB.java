@@ -34,6 +34,11 @@ public class InHouseDB {
     private final static String MODELS_STACK_TABLE = "MODELS_STACK";
     private final static String MODEL_INFO_TABLE = "MODELS";
     private final static String USER_ACCOUNTS_TABLE = "USERS";
+
+    private final static String COL_MODEL_ID = "MODEL_ID";
+    private final static String COL_MODEL_URI = "MODEL_URI";
+    private final static String COL_ALGORITHM_ID = "ALGORITHM_ID";
+
     private static Driver myDriver = null;
     private static Connection connection = null;
 
@@ -193,9 +198,9 @@ public class InHouseDB {
     private static void createModelInfoTable() {
         OpenToxApplication.opentoxLogger.info("Creating table: " + MODEL_INFO_TABLE);
         String CreateTable = "create table " + MODEL_INFO_TABLE + "(" +
-                "MODEL_ID INTEGER, " +
-                "ALGORITHM_ID VARCHAR(150)," +
-                "MODEL_URI VARCHAR(150))";
+                COL_MODEL_ID+" INTEGER, " +
+                COL_ALGORITHM_ID+" VARCHAR(150)," +
+                COL_MODEL_URI+" VARCHAR(150))";
 
         try {
             Statement stmt = connection.createStatement();
@@ -346,7 +351,7 @@ public class InHouseDB {
      * @param ID
      */
     public void removeModel(String ID){
-        String removeModel = "DELETE FROM "+MODEL_INFO_TABLE+" WHERE MODEL_ID="+ID;
+        String removeModel = "DELETE FROM "+MODEL_INFO_TABLE+" WHERE "+COL_MODEL_ID+"="+ID;
         Statement stmt;
         try {
             stmt = connection.createStatement();
@@ -354,6 +359,31 @@ public class InHouseDB {
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }       
+    }
+
+
+    /**
+     * Checks if a model was built with a given algorithm. e.g. isModel(10,"svm")
+     * returns true if the model with ID = 10 is an SVM model.
+     * @param ID the id of the model.
+     * @param Model
+     * @return
+     */
+    public static boolean isModel(String ID, String Model){
+        boolean result = false;
+        String searchMLR = "SELECT * FROM "+MODEL_INFO_TABLE+
+                " WHERE "+COL_MODEL_ID+"="+ID+
+                " AND "+COL_ALGORITHM_ID+" LIKE '%"+Model+"%'";
+        Statement stmt;
+        ResultSet rs = null;
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(searchMLR);
+            result=rs.next();
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+        return result;
     }
 
     /**
@@ -371,7 +401,7 @@ public class InHouseDB {
             stmt = connection.createStatement();
             rs = stmt.executeQuery(SelectAllModels);
             while (rs.next()) {
-                list.add(rs.getString("MODEL_URI"));
+                list.add(rs.getString(COL_MODEL_URI));
             }
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE,null,ex);
@@ -397,7 +427,7 @@ public class InHouseDB {
      */
     public ReferenceList getReferenceListFromAlgId(String algorithmId) {
         String SelectAllSvc = "SELECT * FROM " + MODEL_INFO_TABLE +
-                " WHERE ALGORITHM_ID LIKE '%" + algorithmId + "%'";
+                " WHERE "+COL_ALGORITHM_ID+" LIKE '%" + algorithmId + "%'";
         ResultSet rs = null;
         ReferenceList list = new ReferenceList();
 
@@ -406,7 +436,7 @@ public class InHouseDB {
             stmt = connection.createStatement();
             rs = stmt.executeQuery(SelectAllSvc);
             while (rs.next()) {
-                list.add(rs.getString("MODEL_URI"));
+                list.add(rs.getString(COL_MODEL_URI));
             }
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
@@ -420,9 +450,8 @@ public class InHouseDB {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-
         OpenToxApplication a = new OpenToxApplication();
-
-        
+        System.out.println(InHouseDB.isModel("11","svc"));
     }
+
 }

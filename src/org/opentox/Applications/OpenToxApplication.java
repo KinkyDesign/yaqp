@@ -90,8 +90,7 @@ import org.restlet.security.Guard;
         opentoxLogger.addHandler(fileHand);
         opentoxLogger.setLevel(Level.INFO);
         dbcon = new InHouseDB();
-        AbstractResource.Directories.checkDirs();
-        System.out.println(dbcon.verifyCredentials("chung", "nakgl6443".toCharArray(), Priviledges.ADMIN));
+        AbstractResource.Directories.checkDirs();        
         }
      
      /**
@@ -136,6 +135,7 @@ import org.restlet.security.Guard;
              @Override
              public int authenticate(Request req){
                 if (req.getMethod().equals(org.restlet.data.Method.GET)) return AUTHENTICATION_VALID;
+                if (req.getMethod().equals(org.restlet.data.Method.POST)) return AUTHENTICATION_VALID;
                 return super.authenticate(req);
              }
           };

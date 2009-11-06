@@ -175,35 +175,31 @@ public abstract class AbstractResource extends ServerResource {
 
             }
 
-
-
-
-
-
-
         }
     }
+
     /**
      * The first line of every XML file.
      */
-    protected static final String xmlIntro = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
+    protected static final String xmlIntro = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
     /**
      * Head of HTML files
      */
     protected String htmlHEAD = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" +
-            "\"http://www.w3.org/TR/html4/loose.dtd\">" +
-            "<html><head><title>NTUA - RESTful Web Services</title></head><body>";
+            "\"http://www.w3.org/TR/html4/loose.dtd\">\n" +
+            "<html>\n<head>\n<title>NTUA - RESTful Web Services</title></head><body>";
     /**
      * End of HTML files
      */
-    protected static final String htmlEND = "</body></html>";
+    protected static final String htmlEND = "</body>\n</html>";
     /**
      * Head of PMML files
      */
     protected static final String PMMLIntro = "<PMML version=\"3.2\" " +
             " xmlns=\"http://www.dmg.org/PMML-3_2\"  " +
-            " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> " +
-            " <Header copyright=\"http://www.opentox.org\" />";
+            " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+            " <Header copyright=\"Copyleft (c) OpenTox - An Open Source Predictive Toxicology Framework, http://www.opentox.org, 2009\" />\n";
+
     private static final String baseDir = System.getProperty("user.home") + "/Documents/RESTfulWebServices";
     /**
      * Log
