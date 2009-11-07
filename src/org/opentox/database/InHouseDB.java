@@ -263,6 +263,22 @@ public class InHouseDB {
         }
     }
 
+    public static Priviledges getAuthorizationForUser(String username){
+        Priviledges priviledges = Priviledges.GUEST;
+        String dbQuery = "SELECT * FROM "+USER_ACCOUNTS_TABLE+" WHERE USER_NAME = '"+username+"'";
+        ResultSet rs = null;
+        try {
+            Statement stmt = connection.createStatement();            
+            rs = stmt.executeQuery(dbQuery);
+            if (rs.next())
+            priviledges = new Priviledges(rs.getString("AUTH"));
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+
+        return priviledges;
+    }
+
 
     /**
      * Verify if a given pair of user name and password are registered in the
@@ -279,9 +295,23 @@ public class InHouseDB {
      * @param priviledges User authorization level.
      * @return true/false.
      */
-    public static boolean verifyCredentials(String userName, char[] password, Priviledges priviledges){
-        HashMap<String, char[]> map = (HashMap<String, char[]>) getCredentialsAsMap(priviledges);
-        return Arrays.equals(map.get(userName),  password);
+    public static boolean verifyCredentials(String userName, String password){
+        String dbQuery = "SELECT * FROM "+USER_ACCOUNTS_TABLE+ " WHERE USER_NAME='"+userName+
+                "' AND USER_PASSWORD ='"+password+"'";
+        System.out.println(dbQuery);
+        ResultSet rs = null;
+        boolean verify = false;
+        try {
+            Statement stmt = connection.createStatement();
+            rs = stmt.executeQuery(dbQuery);
+            if (rs.next())
+                    verify = true;
+
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+        return verify;
+
     }
 
 
@@ -451,7 +481,7 @@ public class InHouseDB {
      */
     public static void main(String[] args) throws IOException {
         OpenToxApplication a = new OpenToxApplication();
-        System.out.println(InHouseDB.isModel("11","svc"));
+        System.out.println(InHouseDB.verifyCredentials("chung", "nakgl6443"));
     }
 
 }

@@ -81,7 +81,6 @@ public class Model extends AbstractResource {
      */
     @Override
     public Representation get(Variant variant) {
-
         File modelXmlFile = new File(Directories.modelXmlDir + "/" + model_id);
         System.out.println("Requested Model id: " + model_id);
         if (modelXmlFile.exists()) {

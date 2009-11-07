@@ -102,9 +102,6 @@ public abstract class AbstractResource extends ServerResource {
 
         /**
          * Checks if the necessary directories already exist.
-         * @param createFolders specifies whether folders that do not exist will
-         * be created.
-         * @return true if the directories exist.
          */
         public static void checkDirs() {
             if (!(new File(baseDir)).exists()) {
@@ -357,23 +354,6 @@ public abstract class AbstractResource extends ServerResource {
         System.gc();
     }
 
-    /**
-     * Class Constructor.
-     * @param context
-     * @param request
-     * @param response
-     */
-//    public AbstractResource(Context context, Request request,
-//            Response response)
-//    {
-//        super(context, request, response);
-//
-//        logger=Logger.getLogger(getClass().getName());
-//        logger.setUseParentHandlers(false);
-//        ConsoleHandler ch = new ConsoleHandler();
-//        logger.addHandler(ch);
-//        System.gc();
-//    }
     protected String getBaseDirectory() {
         return baseDir;
     }

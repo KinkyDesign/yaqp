@@ -4,7 +4,7 @@
  */
 package org.opentox.database;
 
-import sun.awt.SunToolkit.InfiniteLoop;
+
 
 /**
  * Defines different three levels of authorization. These are user/simple,
@@ -20,7 +20,7 @@ public final class Priviledges implements AuthorizationHierarchy{
      * Private Constructor.
      * @param level
      */
-    private Priviledges(String level) {
+    protected Priviledges(String level) {
         this.level = level;        
     }
 

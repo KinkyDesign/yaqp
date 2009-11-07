@@ -256,7 +256,8 @@ public class Classification extends AbstractResource{
      * if the parameters are acceptable, otherwise a representation in Plain Text
      * format explaining the problem.
      * @param form the form containing the posted parameters
-     * @return
+     * @return A representation that is not null only when some
+     * posted parameters are unacceptable.
      */
     private Representation checkSvcParameters(Form form){
         Representation rep = null;
