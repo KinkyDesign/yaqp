@@ -481,7 +481,6 @@ public class InHouseDB {
      */
     public static void main(String[] args) throws IOException {
         OpenToxApplication a = new OpenToxApplication();
-        System.out.println(InHouseDB.verifyCredentials("chung", "nakgl6443"));
     }
 
 }
