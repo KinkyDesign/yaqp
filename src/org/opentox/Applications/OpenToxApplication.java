@@ -38,6 +38,8 @@ import org.restlet.security.ChallengeGuard;
 import org.restlet.security.Enroler;
 import org.restlet.security.Guard;
 import org.restlet.security.MethodAuthorizer;
+import org.restlet.security.Role;
+import org.restlet.security.RoleAuthorizer;
 import org.restlet.security.UniformGuard;
 import org.restlet.security.Verifier;
 
@@ -98,6 +100,20 @@ public class OpenToxApplication extends Application {
         AbstractResource.Directories.checkDirs();
     }
 
+
+
+    protected UniformGuard createGuard(
+            Priviledges get,
+            Priviledges post,
+            Priviledges put,
+            Priviledges delete,
+            boolean optional)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+
     protected UniformGuard createGuard(Verifier verifier, boolean optional) {
 
 
@@ -109,32 +125,39 @@ public class OpenToxApplication extends Application {
         };
 
         /*
-         * Simple authorizer
+         * Simple authorizer: Not completed yet...
          */
-        MethodAuthorizer authorizer = new MethodAuthorizer();
-        Collection<Method> anonymousMethods = new ArrayList<Method>();
-        Collection<Method> authenticatedMethods = new ArrayList<Method>();
-        anonymousMethods.add(Method.GET);
-        anonymousMethods.add(Method.HEAD);
-        anonymousMethods.add(Method.OPTIONS);
-        authenticatedMethods.add(Method.POST);
-        anonymousMethods.add(Method.DELETE);
-        authorizer.getAnonymousMethods().addAll(anonymousMethods);
-        authorizer.getAuthenticatedMethods().addAll(authenticatedMethods);
+        MethodAuthorizer authorizer = new MethodAuthorizer("authorizer"){
+            @Override
+            public boolean authorize(Request request, Response response) {                                
+                    return super.authorize(request, response);                
+            }
+        };
+        authorizer.getAuthenticatedMethods().add(Method.DELETE);
+        authorizer.getAuthenticatedMethods().add(Method.GET);
         
+
+                
         // Create a Guard
         ChallengeGuard guard = new ChallengeGuard(getContext(),
                 ChallengeScheme.HTTP_BASIC, "realm");
+
         ChallengeAuthenticator authenticator = new ChallengeAuthenticator(
                 getContext(), optional, ChallengeScheme.HTTP_BASIC, "realm") {
+
             @Override
             protected boolean authenticate(Request request, Response response) {
-                return super.authenticate(request, response);
+                if (Method.GET.equals(request.getMethod())){
+                    return true;
+                }else{
+                    return super.authenticate(request, response);
+                }
             }
         };
-        guard.setAuthenticator(authenticator);
-        guard.getAuthenticator().setVerifier(verifier);
-        guard.getAuthenticator().setEnroler(enroler);
+         guard.setContext(getContext());
+         guard.setAuthenticator(authenticator);
+         guard.getAuthenticator().setVerifier(verifier);
+         guard.getAuthenticator().setEnroler(enroler);
         guard.setAuthorizer(authorizer);
         return guard;
     }
@@ -169,12 +192,11 @@ public class OpenToxApplication extends Application {
     public final synchronized Restlet createRoot() {
 
 
-
         /**
          * Authenticate authorized users.
          */
         CredentialsVerifier verifier = new CredentialsVerifier(this,Priviledges.USER);
-        UniformGuard modelKerberos = createGuard(verifier, true);
+        UniformGuard modelKerberos = createGuard(verifier, false);
         modelKerberos.setNext(Model.class);
 
 
@@ -226,7 +248,6 @@ public class OpenToxApplication extends Application {
                 "/model", ListAllModels.class);
         router.attach(
                 "/model/{model_id}", modelKerberos);// The deletion of models is guarded!!!
-
 
 
         return router;
