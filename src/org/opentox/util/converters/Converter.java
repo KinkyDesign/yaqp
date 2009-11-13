@@ -13,6 +13,7 @@ import weka.core.Instances;
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @author Kolotouros Dimitris
  */
 public class Converter extends AbstractConverter{
 

@@ -90,9 +90,11 @@ public abstract class AbstractResource extends ServerResource {
          */
         public static final String logDir = baseDir + "/log";
         private static final String tempDir = baseDir + "/.temp";
+        public static final String tempDSDDir = tempDir + "/.dsd";
         public static final String tempScaledDir = tempDir +"/.scaled";
         private static final String modelDir = baseDir + "/model";
         public static final String trash = modelDir+"/.trash";
+                public static final String rangesDir = modelDir + "/ranges";
         public static final String modelXmlDir = modelDir + "/xml";
         private static final String classificationModel = modelDir + "/classification";
         private static final String regressionModel = modelDir + "/regression";

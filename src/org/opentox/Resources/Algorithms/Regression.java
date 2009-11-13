@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.*;
 
 import org.opentox.client.opentoxClient;
+import org.opentox.util.libSVM.svm_scale;
 import org.opentox.util.libSVM.svm_train;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -965,8 +967,147 @@ public class Regression extends AbstractResource {
         pmml.append("</SupportVectorMachineModel>\n");
         pmml.append("</PMML>");
         return pmml.toString();
+
     }
 
+    private String CreateARandomFilename(){
+        String key = new String();
+        int flag = (int) (Math.random() * 10) + 20;
+
+        int rand = 0;
+        for (int x = 0; x < flag; x++) {
+            rand = ((int) (Math.random() * 10)) % 3;
+            if ((rand == 0)) {
+                key += (int) (Math.random() * 10);
+            } else if ((rand == 1)) {
+                key += (char) (Math.random() * 26 + 65);
+            } else {
+                key += (char) (Math.random() * 26 + 97);
+            }
+        }
+        return key;
+    }
+
+    private Representation SvmTrain(Form form) {
+        Representation representation = checkSvmParameters(form);
+        /**
+         * Preprocess the data (The instances object has already been created
+         * - see checkSvmParameters). Now remove all string attributes and
+         * scale the data. Then Save the instances as a libSvm file in
+         * /temp/scaled
+         */
+        Preprocessing.removeStringAtts(dataInstances);
+
+        //Save data in a temp file (dsd format)
+        weka.core.converters.LibSVMSaver saver = new weka.core.converters.LibSVMSaver();
+
+        saver.setInstances(new Instances(dataInstances));
+
+        String key = CreateARandomFilename();
+        File tempDsdFile = new File(Directories.tempDSDDir + "/" + key);
+        while(tempDsdFile.exists()){
+            key = CreateARandomFilename();
+            tempDsdFile = new File(Directories.tempDSDDir + "/" + key);
+        }
+
+        try {
+            saver.setFile(tempDsdFile);
+            saver.writeBatch();
+
+            //Scaling data and saving a temp scaled data file (dsd format)
+            svm_scale scaler = new svm_scale();
+            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s", Directories.rangesDir + "/" + model_id, tempDsdFile.getPath()};
+            key = CreateARandomFilename();
+            File tempScaledFile = new File(Directories.tempScaledDir + "/" + key);
+            while(tempScaledFile.exists()){
+                key = CreateARandomFilename();
+                tempScaledFile = new File(Directories.tempScaledDir + "/" + key);
+            }
+            try {
+                scaler.scale(scalingOptions, tempScaledFile.toString());
+            } catch (IOException ex) {
+                Logger.getLogger(Regression.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            String[] options = getSvmOptions(tempDsdFile.toString(), Directories.svmModel + "/" + model_id);
+            if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
+
+                representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
+                svm_train.main(options);
+                representation = new StringRepresentation(ModelURI + "/" + model_id + "\n\n", MediaType.TEXT_PLAIN);
+
+                /*Creating the xml*/
+                StringBuilder xmlstr = new StringBuilder();
+                xmlstr.append(xmlIntro);
+                xmlstr.append("<ot:Model xmlns:ot=\"http://opentox.org/1.0/\" " +
+                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                        "xsi:schemaLocation=\"http://opentox.org/1.0/Algorithm.xsd\" " +
+                        "ID=\"" + model_id + "\" Name=\"SVM Classification Model\">\n");
+                xmlstr.append("<ot:link href=\"" + URIs.modelURI + "/" + model_id + "\" />\n");
+                xmlstr.append("<ot:AlgorithmID href=\"" + URIs.svmAlgorithmURI + "\"/>\n");
+                xmlstr.append("<DatasetID href=\"\"/>\n");
+                xmlstr.append("<AlgorithmParameters>\n");
+                xmlstr.append("<param name=\"kernel\"  type=\"string\">" + kernel + "</param>\n");
+                xmlstr.append("<param name=\"cost\"  type=\"double\">" + cost + "</param>\n");
+                xmlstr.append("<param name=\"gamma\"  type=\"double\">" + gamma + "</param>\n");
+                xmlstr.append("<param name=\"coeff0\"  type=\"double\">" + coeff0 + "</param>\n");
+                xmlstr.append("<param name=\"degree\"  type=\"int\">" + degree + "</param>\n");
+                xmlstr.append("<param name=\"tolerance\"  type=\"double\">" + tolerance + "</param>\n");
+                xmlstr.append("<param name=\"cacheSize\"  type=\"double\">" + cacheSize + "</param>\n");
+                xmlstr.append("</AlgorithmParameters>\n");
+                xmlstr.append("<FeatureDefinitions>\n");
+                xmlstr.append("</FeatureDefinitions>\n");
+                xmlstr.append("<User>Guest</User>\n");
+                xmlstr.append("<Timestamp>" + java.util.GregorianCalendar.getInstance().getTime() + "</Timestamp>\n");
+                xmlstr.append("</ot:Model>\n");
+
+                /*Writing the xml to file*/
+                try {
+
+                    FileWriter fstream = new FileWriter(Directories.modelXmlDir + "/" + model_id);
+                    BufferedWriter out = new BufferedWriter(fstream);
+                    out.write(xmlstr.toString());
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    System.err.println("Error: " + e.getMessage());
+                }
+
+                //check if model was succesfully created
+                File modelFile = new File(Directories.modelXmlDir + "/" + model_id);
+                boolean modelCreated = modelFile.exists();
+                if (!(modelCreated)) {
+                    representation = new StringRepresentation(
+                            "Error 400: Client Error, Bad Requset\n" +
+                            "The server encountered an unexpected condition " +
+                            "which prevented it from fulfilling the request." +
+                            "Details: Unexpected Error while trying to train the model." + "\n\n",
+                            MediaType.TEXT_PLAIN);
+                    setInternalStatus(Status.SERVER_ERROR_INTERNAL);
+                } else {
+                    org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(baseURI + "/algorithm/learning/classification/svc");
+                    setInternalStatus(Status.SUCCESS_OK);
+                }
+
+                /**
+                 * If the model was successfully created, that is the
+                 * status is 200, return a report to the user in
+                 * HTML form. This is for testing reasons only as according to
+                 * the OpenTox API specification, the URI of the trained model
+                 * should be returned
+                 */
+                if (internalStatus.equals(Status.SUCCESS_OK)) {
+                }
+
+            }
+
+
+        } catch (IOException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE,
+                    "Error while tryning to save the dataset as LibSVM file : ", ex);
+        }
+        return representation;
+    }
 
     /**
      * POST Method
@@ -1056,75 +1197,10 @@ public class Regression extends AbstractResource {
          * Implementation of the SVM algorithm...
          */
         else if (algorithmId.equalsIgnoreCase("svm")) {            
-
             Form form = new Form(entity);
-            representation = checkSvmParameters(form);
-            /**
-             * Preprocess the data (The instances object has already been created
-             * - see checkSvmParameters). Now remove all string attributes and
-             * scale the data. Then Save the instances as a libSvm file in
-             * /temp/scaled
-             */
-            Preprocessing.removeStringAtts(dataInstances);
-            dataInstances = Preprocessing.scale(dataInstances);
-            
-            
-            weka.core.converters.LibSVMSaver saver = new weka.core.converters.LibSVMSaver();
-            
-            saver.setInstances(new Instances(dataInstances));
-
-            /**
-             * Generate a temporary file name consisting of about 25 random
-             * characters (random length). Then create a java.io.File object
-             * pointing to the file containing the scaled data.
-             */
-            String key = new String();
-            int flag = (int) (Math.random() * 10) + 20;
-
-            int rand = 0;
-            for (int x = 0; x < flag; x++) {
-                rand = ((int) (Math.random() * 10)) % 3;
-                if ((rand == 0)) {
-                    key += (int) (Math.random() * 10);
-                } else if ((rand == 1)) {
-                    key += (char) (Math.random() * 26 + 65);
-                } else {
-                    key += (char) (Math.random() * 26 + 97);
-                }
-            }
-            File tempScaledFile = new File(Directories.tempScaledDir + "/" + key);
-            try {
-                saver.setFile(tempScaledFile);
-                saver.writeBatch();
-                /**
-                 * Now the scaled data are availabel in DSD (libsvm) format.
-                 * Now get the options for svmtrain.
-                 */
-                String[] options = getSvmOptions(tempScaledFile.toString(), Directories.svmModel + "/" + key);
-                if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
-                    representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
-                    svm_train.main(options);
-
-                    /**
-                     * TODO: check if the model was really created!!!
-                     * If not, return a status code 500.
-                     */
-                    String pmml = PmmlFromDsD(new File(Directories.svmModel + "/" + key));
-                    representation = new StringRepresentation(pmml,MediaType.TEXT_XML);
-                }
-
-            } catch (IOException ex) {
-                OpenToxApplication.opentoxLogger.log(Level.SEVERE,
-                        "Error while tryning to save the dataset as LibSVM file : ", ex);
-            }
-            
-
-            /**
-             * If all the posted parameters (kernel type, cost, gamma, etc)
-             * are acceptable the the status is 202.
-             */
+            representation = SvmTrain(form);
             return representation;
-        } /** end of svm implementation **/
+        }
         /**
          * In case the user asks for other algorithms...
          */
