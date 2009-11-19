@@ -26,6 +26,7 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.1 (Last Update: Aug 26, 2009)
  */
+@Deprecated
 public class ListClassificationAlgorithms extends AbstractResource {
 
     private static final long serialVersionUID = 10012190006004001L;

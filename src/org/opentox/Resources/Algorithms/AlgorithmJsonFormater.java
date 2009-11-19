@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.opentox.Resources.Algorithms;
+
+import org.restlet.representation.StringRepresentation;
 
 /**
  *
@@ -11,6 +8,13 @@ package org.opentox.Resources.Algorithms;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmJsonFormater {
+public class AlgorithmJsonFormater extends AbstractAlgorithmFormater{
+
+    @Override
+    public StringRepresentation getStringRepresentation() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+   
 
 }
