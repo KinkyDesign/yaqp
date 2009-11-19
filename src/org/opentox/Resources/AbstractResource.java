@@ -52,15 +52,15 @@ public abstract class AbstractResource extends ServerResource {
         /**
          * URI for all learning algorithms.
          */
-        private static final String learningAlgorithmURI = algorithmURI + "/learning";
+        public static final String learningAlgorithmURI = algorithmURI + "/learning";
         /**
          * URI for all classification algorithms.
          */
-        private static final String classificationAlgorithmURI = learningAlgorithmURI + "/classification";
+        public static final String classificationAlgorithmURI = learningAlgorithmURI + "/classification";
         /**
          * URI for all regression algorithms.
          */
-        private static final String regressionAlgorithmURI = learningAlgorithmURI + "/regression";
+        public static final String regressionAlgorithmURI = learningAlgorithmURI + "/regression";
 
         /*
          * URI for Support vector classifier.
@@ -74,6 +74,8 @@ public abstract class AbstractResource extends ServerResource {
          * URI for Multiple Linear Regression Algorithm.
          */
         public static final String mlrAlgorithmURI = regressionAlgorithmURI + "/mlr";
+
+        public static final String licenceUri = "http://www.gnu.org/licenses/gpl.txt";
     }
 
     /**
@@ -180,7 +182,7 @@ public abstract class AbstractResource extends ServerResource {
     /**
      * The first line of every XML file.
      */
-    protected static final String xmlIntro = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+    public static final String xmlIntro = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
     /**
      * Head of HTML files
      */
