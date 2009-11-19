@@ -6,6 +6,7 @@
 package org.opentox.Resources.Algorithms;
 
 import java.util.ArrayList;
+import org.restlet.representation.StringRepresentation;
 
 /**
  *
@@ -94,6 +95,8 @@ public abstract class AbstractAlgorithmFormater {
         this.statisticsSupported=statisticsSupported;
         this.Parameters=Parameters;
     }
+
+    public abstract StringRepresentation getStringRepresentation();
 
 
 }

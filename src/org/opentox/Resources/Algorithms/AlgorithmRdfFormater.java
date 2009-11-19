@@ -1,7 +1,9 @@
 package org.opentox.Resources.Algorithms;
 
-import java.util.ArrayList;
+
 import org.opentox.Resources.AbstractResource;
+import org.restlet.data.MediaType;
+import org.restlet.representation.StringRepresentation;
 
 /**
  * Build an RDF representation for an Algorithm or a Model.
@@ -305,7 +307,9 @@ public class AlgorithmRdfFormater extends AbstractAlgorithmFormater{
         return builder.toString();
     }
 
-    public String rdfXmlRepresentation() {
+
+    @Override
+    public StringRepresentation getStringRepresentation() {
         StringBuilder builder = new StringBuilder();
         builder.append(AbstractResource.xmlIntro);
 
@@ -334,6 +338,9 @@ public class AlgorithmRdfFormater extends AbstractAlgorithmFormater{
         builder.append(opentoxAlgoritmElement());
         builder.append("</rdf:Description>\n");
         builder.append("</rdf:RDF>\n\n");
-        return builder.toString();
+        return new StringRepresentation(builder.toString(),MediaType.APPLICATION_RDF_XML);
     }
+
+
+
 }

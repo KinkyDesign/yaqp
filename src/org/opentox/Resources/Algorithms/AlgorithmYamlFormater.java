@@ -5,6 +5,8 @@
 package org.opentox.Resources.Algorithms;
 
 import java.util.ArrayList;
+import org.opentox.MediaTypes.OpenToxMediaType;
+import org.restlet.representation.StringRepresentation;
 
 /**
  *
@@ -12,25 +14,10 @@ import java.util.ArrayList;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmYamlFormater {
+public class AlgorithmYamlFormater extends AbstractAlgorithmFormater{
 
-    private ArrayList<String> statisticsSupported;
-    private String[][] Parameters;
-    private String title, identifier, algorithmType;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    public void setAlgorithmType(String AlgorithmType) {
-        this.algorithmType = AlgorithmType;
-    }
-
-    public String getYaml() {
+    public StringRepresentation getStringRepresentation() {
         StringBuilder builder = new StringBuilder();
         builder.append("---\nAlgorithm:\n");
         builder.append("    name : " + title + "\n");
@@ -52,6 +39,7 @@ public class AlgorithmYamlFormater {
                 builder.append("            -" + statisticsSupported.get(i) + "\n");
             }
         }
-        return builder.toString();
+        return new StringRepresentation(builder.toString(), OpenToxMediaType.APPLICATION_YAML);
     }
+
 }

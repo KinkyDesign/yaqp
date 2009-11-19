@@ -2,6 +2,8 @@ package org.opentox.Resources.Algorithms;
 
 
 import org.opentox.Resources.AbstractResource;
+import org.restlet.data.MediaType;
+import org.restlet.representation.StringRepresentation;
 
 /**
  *
@@ -11,7 +13,7 @@ import org.opentox.Resources.AbstractResource;
  */
 public class AlgorithmXmlFormater extends AbstractAlgorithmFormater{
 
-    public String getXml() {
+    public StringRepresentation getStringRepresentation() {
         StringBuilder builder = new StringBuilder();
         builder.append(AbstractResource.xmlIntro);
         builder.append("<algorithm name=\"" + title + "\" id=\"" + identifier + "\">\n");
@@ -39,6 +41,6 @@ public class AlgorithmXmlFormater extends AbstractAlgorithmFormater{
             builder.append("</statisticsSupported>\n");
         }
         builder.append("</algorithm>\n");
-        return builder.toString();
+        return new StringRepresentation(builder.toString(), MediaType.TEXT_XML);
     }
 }

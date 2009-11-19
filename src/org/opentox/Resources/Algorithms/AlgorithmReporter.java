@@ -144,6 +144,8 @@ public class AlgorithmReporter {
     
     public static class RDF_XML {
 
+        
+
         public static String mlrRdf() {
             AlgorithmRdfFormater mlrRdf = new AlgorithmRdfFormater(AbstractResource.URIs.mlrAlgorithmURI);
             mlrRdf.setTitle("Multiple Linear Regression");

@@ -91,18 +91,6 @@ public class OpenToxApplication extends Application {
 
 
 
-    protected UniformGuard createGuard(
-            Priviledges get,
-            Priviledges post,
-            Priviledges put,
-            Priviledges delete,
-            boolean optional)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-
     protected UniformGuard createGuard(Verifier verifier, boolean optional) {
 
 
@@ -136,6 +124,7 @@ public class OpenToxApplication extends Application {
 
             @Override
             protected boolean authenticate(Request request, Response response) {
+                /** Allow everyone to GET but only Admins to apply DELETE!**/
                 if (Method.GET.equals(request.getMethod())){
                     return true;
                 }else{
@@ -186,22 +175,18 @@ public class OpenToxApplication extends Application {
         UniformGuard modelKerberos = createGuard(verifier, false);
         modelKerberos.setNext(Model.class);
 
-
-
         Router router = new Router(getContext());
-
 
         /**
          * We set Retry Delay to 1sec
          */
         router.setRetryDelay(1L);
 
-
+        
         /**
          * We set maximum attempts to 5
          */
-        router.setMaxAttempts(
-                20);
+        router.setMaxAttempts(20);
 
         /**
          * Index Resource and stylesheet
@@ -228,4 +213,3 @@ public class OpenToxApplication extends Application {
         return router;
     }
 }
- 
