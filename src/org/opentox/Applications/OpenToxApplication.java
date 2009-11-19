@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import javax.security.auth.Subject;
 import org.opentox.Resources.AbstractResource;
+import org.opentox.Resources.Algorithms.Algorithm;
 import org.opentox.Resources.Models.Model;
 import org.opentox.Resources.List.ListAllModels;
 import org.opentox.Resources.List.ListAlgorithms;
@@ -154,25 +155,23 @@ public class OpenToxApplication extends Application {
      * Creates a root Restlet that will receive all incoming calls.
      * <p>Brief list of services:
      * <ul>
-     * <li><tt>GET /algorithm/learning</tt>
-     *     List of all available learning algorithms</li>
-     * <li><tt>GET /algorithm/learning/regression</tt>
-     *     List of all available regression algorithms</li>
-     * <li><tt>GET /algorithm/learning/regression/{id}</tt>
-     *     XML representation of a regression algorithm.</li>
-     * <li><tt>POST /algorithm/learning/regression/{id}</tt>
-     *     Train a new regression model.</li>
-     * <li><tt>GET /algorithm/learning/classification</tt>
-     *     List of classification algorithm (URIs)</li>
-     * <li><tt>GET /algorithm/learning/classification/{id}</tt>
-     *     XML representation of classification algorithm</li>
-     * <li><tt>POST /algorithm/learning/classification/svm/{id}</tt>
-     *     Train a new classification model.</li>
+     * <li><tt>GET /algorithm</tt>
+     *     List of all available algorithms</li>
+     * <li><tt>GET /algorithm/{id}</tt>
+     *     Representation of an algorithm.</li>
+     * <li><tt>POST /algorithm/{id}</tt>
+     *     Run the algorithm.</li>
      * <li><tt>GET /model?searchAlgorithm=keyword</tt>
-     *     List (in text/uri-list format) of all available models. You can also
-     * use the optional query ?searchAlgorithm=keyword to search for model URIs
-     * that were built using an algorithm relevant to a keyword. For example, this
-     * keyword could be 'classificataion' or 'regression' or 'svc' etc...</li>
+     *      List (in text/uri-list format) of all available models. You can also
+     *      use the optional query ?searchAlgorithm=keyword to search for model URIs
+     *      that were built using an algorithm relevant to a keyword. For example, this
+     *      keyword could be 'classificataion' or 'regression' or 'svc' etc...</li>
+     * <li><tt>GET /model/{id}</tt>
+     *      Representation of a model.
+     * </li>
+     * <li><tt>POST /model/{id}</tt>
+     *      Perform a prediction.
+     * </li>
      * </ul>
      * </p>
      */
@@ -219,24 +218,11 @@ public class OpenToxApplication extends Application {
          * Resources compliant to the
          * OpenTox API specifications:
          */
-        router.attach(
-                "/algorithm", ListAlgorithms.class);
+        router.attach("/algorithm", ListAlgorithms.class);
+        router.attach("/algorithm/{id}", Algorithm.class);
 
-//        router.attach(
-//                "/algorithm/learning", ListLearningAlgorithms.class);
-//        router.attach(
-//                "/algorithm/learning/regression", ListRegressionAlgorithms.class);
-//        router.attach(
-//                "/algorithm/learning/regression/{id}", Regression.class);// {id} stands for the algoritm's id
-//        router.attach(
-//                "/algorithm/learning/classification", ListClassificationAlgorithms.class);
-//        router.attach(
-//                "/algorithm/learning/classification/{id}", Classification.class);// {id} stands for the algoritm's id
-
-        router.attach(
-                "/model", ListAllModels.class);
-        router.attach(
-                "/model/{model_id}", modelKerberos);// The deletion of models is guarded!!!
+        router.attach("/model", ListAllModels.class);
+        router.attach("/model/{model_id}", modelKerberos);// The deletion of models is guarded!!!
 
 
         return router;

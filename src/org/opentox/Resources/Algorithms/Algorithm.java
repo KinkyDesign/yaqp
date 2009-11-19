@@ -11,7 +11,10 @@ import org.opentox.Resources.Algorithms.AlgorithmReporter.*;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
+import org.restlet.data.ReferenceList;
 import org.restlet.data.Status;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import weka.core.Instances;
@@ -138,7 +141,83 @@ public class Algorithm extends AbstractResource {
 
         /** The algorithm id can be one of {svm, mlr, svc} **/
         this.algorithmId = Reference.decode(getRequest().getAttributes().get("id").toString());
-
     }
+
+
+
+    /**
+     * Implementation of the GET method.
+     * Returns XML representations for the supported regression algorithms
+     * @param variant
+     * @return XML representation of algorithm
+     */
+    @Override
+    public Representation get(Variant variant) {
+
+        if (MediaType.TEXT_XML.equals(variant.getMediaType()))  {
+            if (algorithmId.equalsIgnoreCase("svm")) {
+                return new StringRepresentation(XML.svmXml(), MediaType.TEXT_XML);
+            } else if (algorithmId.equalsIgnoreCase("mlr")) {
+                return new StringRepresentation(XML.mlrXml(), MediaType.TEXT_XML);
+            } else //Not Found!
+            {
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+                return new StringRepresentation("Algorithm Not Found!\n", MediaType.TEXT_PLAIN);
+            }
+        }else if (MediaType.TEXT_URI_LIST.equals(variant.getMediaType())) {
+            ReferenceList list = new ReferenceList();
+            list.add(getOriginalRef());
+            return list.getTextRepresentation();
+        }else if (MediaType.APPLICATION_JSON.equals(variant.getMediaType())){
+            if (algorithmId.equalsIgnoreCase("mlr")) {
+                return new StringRepresentation(JSON.mlrJson(), MediaType.TEXT_XML);
+            }else if (algorithmId.equalsIgnoreCase("svm")){
+                return new StringRepresentation(JSON.svmJson(), MediaType.TEXT_XML);
+            }else{
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+                return new StringRepresentation("Algorithm Not Found!\n");
+            }
+        }else if (OpenToxMediaType.TEXT_YAML.equals(variant.getMediaType())){
+            if (algorithmId.equalsIgnoreCase("mlr")) {
+                return new StringRepresentation(YAML.mlrYaml(), MediaType.TEXT_XML);
+            }else if (algorithmId.equalsIgnoreCase("svm")){
+                return new StringRepresentation(YAML.svmYaml(), MediaType.TEXT_XML);
+            }else if (algorithmId.equalsIgnoreCase("svc")){
+                return new StringRepresentation(YAML.svmYaml(), MediaType.TEXT_XML);
+            }
+            else{
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+                return new StringRepresentation("Algorithm Not Found!\n");
+            }
+        }else if (
+                (MediaType.APPLICATION_RDF_XML.equals(variant.getMediaType()))
+        ||
+                (MediaType.TEXT_HTML.equals(variant.getMediaType())) ){
+            if (algorithmId.equalsIgnoreCase("mlr")) {
+                return new StringRepresentation(RDF_XML.mlrRdf(), MediaType.APPLICATION_RDF_XML);
+            }else if (algorithmId.equalsIgnoreCase("svm")) {
+                return new StringRepresentation(RDF_XML.svmRdf(), MediaType.APPLICATION_RDF_XML);
+            }
+            else {
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+                return new StringRepresentation(variant.getMediaType() + " is Not a supported media type!", MediaType.TEXT_PLAIN);
+            }
+        }else if (MediaType.APPLICATION_RDF_TURTLE.equals(variant.getMediaType())){
+            if (algorithmId.equalsIgnoreCase("mlr")) {
+                return new StringRepresentation(TURTLE.mlrTurtle(), MediaType.APPLICATION_RDF_TURTLE);
+            }else if (algorithmId.equalsIgnoreCase("svm")) {
+                return new StringRepresentation(TURTLE.svmTurtle(), MediaType.APPLICATION_RDF_TURTLE);
+            }
+            else {
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+                return new StringRepresentation(variant.getMediaType() + " is Not a supported media type!", MediaType.TEXT_PLAIN);
+            }
+        }
+        else {
+            getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+            return new StringRepresentation(variant.getMediaType() + " is Not a supported media type!", MediaType.TEXT_PLAIN);
+        }
+    }
+
 
 }

@@ -8,9 +8,9 @@ import java.util.ArrayList;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmTurtleFormater {
+public class AlgorithmTurtleFormater extends AbstractAlgorithmFormater{
 
-    private String title,
+    private String 
             description,
             subject,
             type,
@@ -21,16 +21,10 @@ public class AlgorithmTurtleFormater {
             contributor,
             rights,
             date,
-            format,
-            identifier,
+            format,            
             language,
             audience,
             provenance,
-            about,
-            rdfNamespace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            dcNamespace = "http://purl.org/dc/elements/1.1/",
-            opentoxNamespace = "http://opentox.org/api.1-1/algorithm",
-            algorithmType;
-    private ArrayList<String> statisticsSupported;
-    private String[][] Parameters;
+            about;
+    
 }

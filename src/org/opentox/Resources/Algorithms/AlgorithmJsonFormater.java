@@ -11,6 +11,6 @@ package org.opentox.Resources.Algorithms;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmJsonFormater {
+public class AlgorithmJsonFormater extends AbstractAlgorithmFormater{
 
 }
