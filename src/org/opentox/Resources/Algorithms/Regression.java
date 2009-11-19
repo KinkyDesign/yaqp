@@ -167,16 +167,19 @@ public class Regression extends AbstractResource {
         allowedMethods.add(Method.POST);
         getAllowedMethods().addAll(allowedMethods);
 
+        
+        
         List<Variant> variants = new ArrayList<Variant>();
+        variants.add(new Variant(MediaType.APPLICATION_RDF_XML));  //-- (application/rdf+xml)
         variants.add(new Variant(MediaType.TEXT_PLAIN ));
         variants.add(new Variant(MediaType.TEXT_URI_LIST ));
         variants.add(new Variant(MediaType.TEXT_XML));
         variants.add(new Variant(MediaType.TEXT_HTML));
         variants.add(new Variant(OpenToxMediaType.TEXT_YAML));
-        variants.add(new Variant(MediaType.APPLICATION_JSON));
-        variants.add(new Variant(MediaType.APPLICATION_RDF_XML));  //-- (application/rdf+xml)
+        variants.add(new Variant(MediaType.APPLICATION_JSON));        
         variants.add(new Variant(MediaType.APPLICATION_RDF_TURTLE));  //-- (application/x-turtle)
         getVariants().put(Method.GET, variants);
+        
 
         /** The algorithm id can be one of {svm, mlr} **/
         this.algorithmId = Reference.decode(getRequest().getAttributes().get("id").toString());
@@ -207,7 +210,6 @@ public class Regression extends AbstractResource {
      */
     @Override
     public Representation get(Variant variant) {
-
         if ((MediaType.TEXT_XML.equals(variant.getMediaType())) ||
                 (MediaType.TEXT_HTML.equals(variant.getMediaType()))) {
             if (algorithmId.equalsIgnoreCase("svm")) {
@@ -250,6 +252,16 @@ public class Regression extends AbstractResource {
                 return new StringRepresentation(RDF_XML.mlrRdf(), MediaType.APPLICATION_RDF_XML);
             }else if (algorithmId.equalsIgnoreCase("svm")) {
                 return new StringRepresentation(RDF_XML.svmRdf(), MediaType.APPLICATION_RDF_XML);
+            }
+            else {
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+                return new StringRepresentation(variant.getMediaType() + " is Not a supported media type!", MediaType.TEXT_PLAIN);
+            }
+        }else if (MediaType.APPLICATION_RDF_TURTLE.equals(variant.getMediaType())){
+            if (algorithmId.equalsIgnoreCase("mlr")) {
+                return new StringRepresentation(TURTLE.mlrTurtle(), MediaType.APPLICATION_RDF_TURTLE);
+            }else if (algorithmId.equalsIgnoreCase("svm")) {
+                return new StringRepresentation(TURTLE.svmTurtle(), MediaType.APPLICATION_RDF_TURTLE);
             }
             else {
                 getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);

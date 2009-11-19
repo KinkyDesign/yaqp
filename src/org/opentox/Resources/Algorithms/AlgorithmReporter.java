@@ -1,10 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.opentox.Resources.Algorithms;
 
+import java.util.ArrayList;
 import org.opentox.Resources.AbstractResource;
+import org.restlet.data.MediaType;
 
 /**
  *
@@ -14,10 +12,13 @@ import org.opentox.Resources.AbstractResource;
  */
 public class AlgorithmReporter {
 
+
     /**
      * XML representation of algorithms.
      */
     public static class XML {
+
+
 
         private static String xmlIntro = org.opentox.Resources.AbstractResource.xmlIntro;
 
@@ -140,102 +141,79 @@ public class AlgorithmReporter {
         }
     }
 
+    
     public static class RDF_XML {
 
         public static String mlrRdf() {
-            StringBuilder builder = new StringBuilder();
-            builder.append(AbstractResource.xmlIntro);
-
-            builder.append("<rdf:RDF " +
-                    "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
-                    "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " +
-                    "xmlns:ot=\"http://opentox.org/api.1-1/algorithm\">\n");
-
-            builder.append("<rdf:Description rdf:about=\"" + AbstractResource.URIs.mlrAlgorithmURI + "\">\n");
-            builder.append("<dc:title>Multiple Linear Regression</dc:title>\n");
-            builder.append("<dc:subject>MLR, regression, training algorithm</dc:subject>\n");
-            builder.append("<dc:description>Algorithm for the training of " +
-                    "Multiple Linear Regression Models</dc:description>\n");
-            builder.append("<dc:type>http://purl.org/dc/dcmitype/Service</dc:type>\n");
-            builder.append("<dc:source>" + AbstractResource.URIs.learningAlgorithmURI + "</dc:source>\n");
-            builder.append("<dc:relation>" + AbstractResource.URIs.regressionAlgorithmURI + "</dc:relation>\n");
-            builder.append("<dc:rights>" + AbstractResource.URIs.licenceUri + "</dc:rights>\n");
-            builder.append("<dc:creator>" + AbstractResource.URIs.baseURI + "</dc:creator>\n");
-            builder.append("<dc:publisher>" + AbstractResource.URIs.baseURI + "</dc:publisher>\n");
-            builder.append("<dc:contributor>http://opentox.org</dc:contributor>\n");
-            builder.append("<dc:date>2009-11-18</dc:date>\n");
-            builder.append("<dc:format>text/xml</dc:format>\n");
-            builder.append("<dc:identifier>" + AbstractResource.URIs.mlrAlgorithmURI + "</dc:identifier>\n");
-            builder.append("<dc:audience></dc:audience>\n");
-            builder.append("<dc:provenance></dc:provenance>\n");
-            builder.append("<ot:algorithm name=\"Multiple Linear Regression\" ot:id=\"" + AbstractResource.URIs.mlrAlgorithmURI + "\">\n");
-            builder.append("<ot:algorithmType>learning:regression</ot:algorithmType>\n");
-            builder.append("<ot:Parameters>\n");
-            builder.append("<ot:param ot:type=\"String\" ot:defaultvalue=\"null\">dataset</ot:param>\n");
-            builder.append("<ot:param ot:type=\"String\" defaultvalue=\"null\">target</ot:param>\n");
-            builder.append("</ot:Parameters>\n");
-            builder.append("<ot:statisticsSupported>\n");
-            builder.append("<ot:statistic>RootMeanSquaredError</ot:statistic>\n");
-            builder.append("<ot:statistic>RelativeAbsoluteError</ot:statistic>\n");
-            builder.append("<ot:statistic>RootRelativeSquaredError</ot:statistic>\n");
-            builder.append("<ot:statistic>MeanAbsolutError</ot:statistic>\n");
-            builder.append("</ot:statisticsSupported>\n");
-            builder.append("</ot:algorithm>\n");
-            builder.append("</rdf:Description>\n");
-            builder.append("</rdf:RDF>\n\n");
-            return builder.toString();
+            AlgorithmRdfFormater mlrRdf = new AlgorithmRdfFormater(AbstractResource.URIs.mlrAlgorithmURI);
+            mlrRdf.setTitle("Multiple Linear Regression");
+            mlrRdf.setSubject("MLR, regression, training algorithm");
+            mlrRdf.setDescription("Algorithm for the training of Multiple Linear Regression Models");
+            mlrRdf.setType("http://purl.org/dc/dcmitype/Service");
+            mlrRdf.setSource(AbstractResource.URIs.learningAlgorithmURI);
+            mlrRdf.setRelation(AbstractResource.URIs.regressionAlgorithmURI);
+            mlrRdf.setRights(AbstractResource.URIs.licenceUri);
+            mlrRdf.setLanguage("en");
+            mlrRdf.setCreator(AbstractResource.URIs.baseURI);
+            mlrRdf.setPublisher(AbstractResource.URIs.baseURI);
+            mlrRdf.setContributor("http://opentox.org/");
+            mlrRdf.setDate("2009-11-18");
+            mlrRdf.setFormat(MediaType.TEXT_XML.toString());
+            mlrRdf.setIdentifier(AbstractResource.URIs.mlrAlgorithmURI);
+            mlrRdf.setAudience("");
+            mlrRdf.setProvenance("");
+            ArrayList<String> statisticsSupported = new ArrayList<String>();
+            statisticsSupported.add("RootMeanSquaredError");
+            statisticsSupported.add("RelativeAbsoluteError");
+            statisticsSupported.add("RootRelativeSquaredError");
+            statisticsSupported.add("MeanAbsoluteError");
+            String[][] Parameters = {
+                {"dataset", "String","null"},
+                {"target",  "String","null"}
+            };
+            mlrRdf.setAlgorithm(statisticsSupported, Parameters);
+            return mlrRdf.rdfXmlRepresentation();
+            
         }
 
         public static String svmRdf() {
-            StringBuilder builder = new StringBuilder();
-            builder.append(AbstractResource.xmlIntro);
-
-            builder.append("<rdf:RDF " +
-                    "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
-                    "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " +
-                    "xmlns:ot=\"http://opentox.org/api.1-1/algorithm\">\n");
-
-            builder.append("<rdf:Description rdf:about=\"" + AbstractResource.URIs.svmAlgorithmURI + "\">\n");
-            builder.append("<dc:title>Support Vector Machine Regression</dc:title>\n");
-            builder.append("<dc:subject>SVM, support vector machine, training algorithm, machine learning</dc:subject>\n");
-            builder.append("<dc:description>Algorithm for the training of " +
-                    "SVM Regression Models</dc:description>\n");
-            builder.append("<dc:type>http://purl.org/dc/dcmitype/Service</dc:type>\n");
-            builder.append("<dc:source>" + AbstractResource.URIs.learningAlgorithmURI + "</dc:source>\n");
-            builder.append("<dc:relation>" + AbstractResource.URIs.regressionAlgorithmURI + "</dc:relation>\n");
-            builder.append("<dc:rights>" + AbstractResource.URIs.licenceUri + "</dc:rights>\n");
-            builder.append("<dc:creator>" + AbstractResource.URIs.baseURI + "</dc:creator>\n");
-            builder.append("<dc:publisher>" + AbstractResource.URIs.baseURI + "</dc:publisher>\n");
-            builder.append("<dc:contributor>http://opentox.org</dc:contributor>\n");
-            builder.append("<dc:date>2009-11-18</dc:date>\n");
-            builder.append("<dc:format>text/xml</dc:format>\n");
-            builder.append("<dc:identifier>" + AbstractResource.URIs.svmAlgorithmURI + "</dc:identifier>\n");
-            builder.append("<dc:audience></dc:audience>\n");
-            builder.append("<dc:provenance></dc:provenance>\n");
-            builder.append("<ot:algorithm name=\"Support Vector Machine Regression\" ot:id=\"" + AbstractResource.URIs.svmAlgorithmURI + "\">\n");
-            builder.append("<ot:algorithmType>learning:regression</ot:algorithmType>\n");
-            builder.append("<ot:Parameters>\n");
-            builder.append("<ot:param type=\"String\" ot:defaultvalue=\"null\">dataset</ot:param>\n");
-            builder.append("<ot:param type=\"String\" ot:defaultvalue=\"null\">target</ot:param>\n");
-            builder.append("<ot:param type=\"String\" ot:defaultvalue=\"RBF\">kernel</ot:param>\n");
-            builder.append("<ot:param type=\"Double\" ot:defaultvalue=\"10\">cost</ot:param>\n");
-            builder.append("<ot:param type=\"Double\" ot:defaultvalue=\"0.1\">epsilon</ot:param>\n");
-            builder.append("<ot:param type=\"Double\" ot:defaultvalue=\"1\">gamma</ot:param>\n");
-            builder.append("<ot:param type=\"Double\" ot:defaultvalue=\"0\">coeff0</ot:param>\n");
-            builder.append("<ot:param type=\"Integer\" ot:defaultvalue=\"3\">degree</ot:param>\n");
-            builder.append("<ot:param type=\"Double\" ot:defaultvalue=\"1E-4\">tolerance</ot:param>\n");
-            builder.append("<ot:param type=\"Integer\" ot:defaultvalue=\"50\">cacheSize</ot:param>\n");
-            builder.append("</ot:Parameters>\n");
-            builder.append("<ot:statisticsSupported>\n");
-            builder.append("<ot:statistic>RootMeanSquaredError</ot:statistic>\n");
-            builder.append("<ot:statistic>RelativeAbsoluteError</ot:statistic>\n");
-            builder.append("<ot:statistic>RootRelativeSquaredError</ot:statistic>\n");
-            builder.append("<ot:statistic>MeanAbsolutError</ot:statistic>\n");
-            builder.append("</ot:statisticsSupported>\n");
-            builder.append("</ot:algorithm>\n");
-            builder.append("</rdf:Description>\n");
-            builder.append("</rdf:RDF>\n\n");
-            return builder.toString();
+            AlgorithmRdfFormater svmRdf = new AlgorithmRdfFormater(AbstractResource.URIs.mlrAlgorithmURI);
+            svmRdf.setTitle("Support Vector Machine Regression");
+            svmRdf.setSubject("SVM, support vector machine, training algorithm, machine learning");
+            svmRdf.setDescription("Algorithm for the training of SVM Regression Models");
+            svmRdf.setType("http://purl.org/dc/dcmitype/Service");
+            svmRdf.setSource(AbstractResource.URIs.learningAlgorithmURI);
+            svmRdf.setRelation(AbstractResource.URIs.regressionAlgorithmURI);
+            svmRdf.setRights(AbstractResource.URIs.licenceUri);
+            svmRdf.setLanguage("en");
+            svmRdf.setCreator(AbstractResource.URIs.baseURI);
+            svmRdf.setPublisher(AbstractResource.URIs.baseURI);
+            svmRdf.setContributor("http://opentox.org/");
+            svmRdf.setDate("2009-11-18");
+            svmRdf.setFormat(MediaType.TEXT_XML.toString());
+            svmRdf.setIdentifier(AbstractResource.URIs.svmAlgorithmURI);
+            svmRdf.setAudience("");
+            svmRdf.setProvenance("");
+            ArrayList<String> statisticsSupported = new ArrayList<String>();
+            statisticsSupported.add("RootMeanSquaredError");
+            statisticsSupported.add("RelativeAbsoluteError");
+            statisticsSupported.add("RootRelativeSquaredError");
+            statisticsSupported.add("MeanAbsoluteError");
+            String[][] Parameters = {
+                {"dataset", "String","null"},
+                {"target",  "String","null"},
+                {"kernel",  "List:{rbf,linear,sigmoid,polynomial}"  , "rbf"},
+                {"cost",    "Double", "10"},
+                {"epsilon", "Double", "0.1"},
+                {"gamma", "Double", "1"},
+                {"coeff0", "Double", "0"},
+                {"Degree", "Integer", "3"},
+                {"tolerance", "Double", "1E-4"},
+                {"cacheSize", "Integer", "50"}
+            };
+            svmRdf.setAlgorithm(statisticsSupported, Parameters);
+            return svmRdf.rdfXmlRepresentation();
+            
         }
     }
 
@@ -311,6 +289,8 @@ public class AlgorithmReporter {
     public static class TURTLE{
 
         public static String mlrTurtle(){
+
+
             return null;
         }
 
