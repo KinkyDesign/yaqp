@@ -11,6 +11,8 @@ import org.opentox.Resources.AbstractResource;
  */
 public class AlgorithmRdfFormater {
 
+    private static final long serialVersionUID = 52795861750765264L;
+
     private String title,
             description,
             subject,

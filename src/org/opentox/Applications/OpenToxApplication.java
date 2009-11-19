@@ -2,8 +2,6 @@ package org.opentox.Applications;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -13,15 +11,9 @@ import javax.security.auth.Subject;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.Models.Model;
 import org.opentox.Resources.List.ListAllModels;
-import org.opentox.Resources.List.ListLearningAlgorithms;
-import org.opentox.Resources.Algorithms.Classification;
 import org.opentox.Resources.List.ListAlgorithms;
-import org.opentox.Resources.Algorithms.Regression;
-import org.opentox.Resources.List.ListClassificationAlgorithms;
-import org.opentox.Resources.List.ListRegressionAlgorithms;
 import org.opentox.Resources.IndexResource;
 import org.opentox.Resources.StyleSheetResource;
-import org.opentox.Resources.fileupload.UploadArff;
 import org.opentox.database.CredentialsVerifier;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -31,15 +23,11 @@ import org.opentox.database.InHouseDB;
 import org.opentox.database.Priviledges;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.ChallengeGuard;
 import org.restlet.security.Enroler;
-import org.restlet.security.Guard;
 import org.restlet.security.MethodAuthorizer;
-import org.restlet.security.Role;
-import org.restlet.security.RoleAuthorizer;
 import org.restlet.security.UniformGuard;
 import org.restlet.security.Verifier;
 
@@ -225,8 +213,7 @@ public class OpenToxApplication extends Application {
                 "", IndexResource.class);
         router.attach(
                 "/styles/style1.css", StyleSheetResource.class);
-        router.attach(
-                "/up", UploadArff.class);
+        
 
         /**
          * Resources compliant to the
@@ -234,16 +221,18 @@ public class OpenToxApplication extends Application {
          */
         router.attach(
                 "/algorithm", ListAlgorithms.class);
-        router.attach(
-                "/algorithm/learning", ListLearningAlgorithms.class);
-        router.attach(
-                "/algorithm/learning/regression", ListRegressionAlgorithms.class);
-        router.attach(
-                "/algorithm/learning/regression/{id}", Regression.class);// {id} stands for the algoritm's id
-        router.attach(
-                "/algorithm/learning/classification", ListClassificationAlgorithms.class);
-        router.attach(
-                "/algorithm/learning/classification/{id}", Classification.class);// {id} stands for the algoritm's id
+
+//        router.attach(
+//                "/algorithm/learning", ListLearningAlgorithms.class);
+//        router.attach(
+//                "/algorithm/learning/regression", ListRegressionAlgorithms.class);
+//        router.attach(
+//                "/algorithm/learning/regression/{id}", Regression.class);// {id} stands for the algoritm's id
+//        router.attach(
+//                "/algorithm/learning/classification", ListClassificationAlgorithms.class);
+//        router.attach(
+//                "/algorithm/learning/classification/{id}", Classification.class);// {id} stands for the algoritm's id
+
         router.attach(
                 "/model", ListAllModels.class);
         router.attach(

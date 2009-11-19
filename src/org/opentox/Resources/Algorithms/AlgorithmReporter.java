@@ -162,6 +162,7 @@ public class AlgorithmReporter {
             mlrRdf.setIdentifier(AbstractResource.URIs.mlrAlgorithmURI);
             mlrRdf.setAudience("");
             mlrRdf.setProvenance("");
+            mlrRdf.setAlgorithmType("Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable:mlr");
             ArrayList<String> statisticsSupported = new ArrayList<String>();
             statisticsSupported.add("RootMeanSquaredError");
             statisticsSupported.add("RelativeAbsoluteError");
@@ -194,6 +195,7 @@ public class AlgorithmReporter {
             svmRdf.setIdentifier(AbstractResource.URIs.svmAlgorithmURI);
             svmRdf.setAudience("");
             svmRdf.setProvenance("");
+            svmRdf.setAlgorithmType("Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable:svm");
             ArrayList<String> statisticsSupported = new ArrayList<String>();
             statisticsSupported.add("RootMeanSquaredError");
             statisticsSupported.add("RelativeAbsoluteError");
