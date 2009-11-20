@@ -49,31 +49,21 @@ public abstract class AbstractResource extends ServerResource {
          * URI for all algorithms.
          */
         private static final String algorithmURI = baseURI + "/algorithm";
-        /**
-         * URI for all learning algorithms.
-         */
-        public static final String learningAlgorithmURI = algorithmURI + "/learning";
-        /**
-         * URI for all classification algorithms.
-         */
-        public static final String classificationAlgorithmURI = learningAlgorithmURI + "/classification";
-        /**
-         * URI for all regression algorithms.
-         */
-        public static final String regressionAlgorithmURI = learningAlgorithmURI + "/regression";
-
+        
+        
+        
         /*
          * URI for Support vector classifier.
          */
-        public static final String svcAlgorithmURI = classificationAlgorithmURI + "/svc";
+        public static final String svcAlgorithmURI = algorithmURI + "/svc";
         /**
          * URI for Support vector machine regression algorithm.
          */
-        public static final String svmAlgorithmURI = regressionAlgorithmURI + "/svm";
+        public static final String svmAlgorithmURI = algorithmURI + "/svm";
         /**
          * URI for Multiple Linear Regression Algorithm.
          */
-        public static final String mlrAlgorithmURI = regressionAlgorithmURI + "/mlr";
+        public static final String mlrAlgorithmURI = algorithmURI + "/mlr";
 
         public static final String licenceUri = "http://www.gnu.org/licenses/gpl.txt";
     }
@@ -196,7 +186,7 @@ public abstract class AbstractResource extends ServerResource {
     /**
      * Head of PMML files
      */
-    protected static final String PMMLIntro = "<PMML version=\"3.2\" " +
+    public static final String PMMLIntro = "<PMML version=\"3.2\" " +
             " xmlns=\"http://www.dmg.org/PMML-3_2\"  " +
             " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
             " <Header copyright=\"Copyleft (c) OpenTox - An Open Source Predictive Toxicology Framework, http://www.opentox.org, 2009\" />\n";

@@ -22,7 +22,7 @@ public class AlgorithmReporter {
     private static final String
             RegressionOntology = "Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable";
 
-    private static ArrayList<String> statisticsSupported(long model) {
+    private static ArrayList<String> statisticsSupported(long algorithm) {
         ArrayList<String> statisticsSupported = new ArrayList<String>();
         statisticsSupported.add("RootMeanSquaredError");
         statisticsSupported.add("RelativeAbsoluteError");
@@ -31,9 +31,9 @@ public class AlgorithmReporter {
         return statisticsSupported;
     }
 
-    private static String[][] Parameters(long model) {
+    private static String[][] Parameters(long algorithm) {
         String[][] Parameters = null;
-        if (model == SVM) {
+        if (algorithm == SVM) {
             Parameters = new String[][]{
                         {"dataset", "String", "null"},
                         {"target", "String", "null"},
@@ -46,7 +46,7 @@ public class AlgorithmReporter {
                         {"tolerance", "Double", "1E-4"},
                         {"cacheSize", "Integer", "50"}
                     };
-        } else if (model == SVC) {
+        } else if (algorithm == SVC) {
             Parameters = new String[][]{
                         {"dataset", "String", "null"},
                         {"target", "String", "null"},
@@ -58,7 +58,7 @@ public class AlgorithmReporter {
                         {"tolerance", "Double", "1E-4"},
                         {"cacheSize", "Integer", "50"}
                     };
-        } else if (model == MLR) {
+        } else if (algorithm == MLR) {
             Parameters = new String[][]{
                         {"dataset", "String", "null"},
                         {"target", "String", "null"}
@@ -106,8 +106,10 @@ public class AlgorithmReporter {
         genericMetaInf.setContributor("http://opentox.org/");
         genericMetaInf.setDate("2009-11-18");
         genericMetaInf.setFormat(MediaType.TEXT_XML.toString());
-        genericMetaInf.setAudience("");
+        genericMetaInf.setAudience("QSAR Experts, Biologists, Toxicologists");
         genericMetaInf.setProvenance("");
+        genericMetaInf.setSource(AbstractResource.baseURI);
+        genericMetaInf.setRelation("http://opentox.org");
 
        
         if (algorithm == MLR) {
@@ -116,6 +118,7 @@ public class AlgorithmReporter {
             MlrMetaInf.setTitle("Multiple Linear Regression");
             MlrMetaInf.setAlgorithmType(RegressionOntology+":mlr");
             MlrMetaInf.setDescription("Multiple Linear Regression Training Algorithm");
+            MlrMetaInf.setIdentifier(AbstractResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.setAlgorithm(statisticsSupported(MLR), Parameters(MLR));
 
             representation = getStringRepresentationForMetaInf(MlrMetaInf, media);
@@ -128,6 +131,7 @@ public class AlgorithmReporter {
             SvmMetaInf.setDescription("Training Algorithm for Support Vector" +
                     "Machine Regression Models");
             SvmMetaInf.setAlgorithm(statisticsSupported(SVM), Parameters(SVM));
+            SvmMetaInf.setIdentifier(AbstractResource.URIs.svmAlgorithmURI);
 
             representation = getStringRepresentationForMetaInf(SvmMetaInf, media);
 
@@ -139,6 +143,7 @@ public class AlgorithmReporter {
             SvcMetaInf.setDescription("Training Algorithm for Support Vector" +
                     "Machine Classification Models");
             SvcMetaInf.setAlgorithm(statisticsSupported(SVC), Parameters(SVC));
+            SvcMetaInf.setIdentifier(AbstractResource.URIs.svcAlgorithmURI);
 
             representation = getStringRepresentationForMetaInf(SvcMetaInf, media);       
         }
