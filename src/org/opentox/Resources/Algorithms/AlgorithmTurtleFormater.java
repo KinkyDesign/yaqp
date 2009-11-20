@@ -1,6 +1,6 @@
 package org.opentox.Resources.Algorithms;
 
-import java.util.ArrayList;
+
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
@@ -12,23 +12,10 @@ import org.restlet.representation.StringRepresentation;
  */
 public class AlgorithmTurtleFormater extends AbstractAlgorithmFormater{
 
-    private String 
-            description,
-            subject,
-            type,
-            source,
-            relation,
-            creator,
-            publisher,
-            contributor,
-            rights,
-            date,
-            format,            
-            language,
-            audience,
-            provenance,
-            about;
-
+    public AlgorithmTurtleFormater(AlgorithmMetaInf metainf){
+        super.metainf = metainf;
+    }
+    
     @Override
     public StringRepresentation getStringRepresentation() {
         StringBuilder builder = new StringBuilder();

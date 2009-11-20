@@ -1,8 +1,10 @@
 package org.opentox.Resources.Algorithms;
 
 import java.util.ArrayList;
+import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.AbstractResource;
 import org.restlet.data.MediaType;
+import org.restlet.representation.StringRepresentation;
 
 /**
  *
@@ -12,295 +14,134 @@ import org.restlet.data.MediaType;
  */
 public class AlgorithmReporter {
 
+    public static final long
+            SVM = 32847182479542L,
+            SVC = 7734871623000153L,
+            MLR = -87319812475327L;
 
-    /**
-     * XML representation of algorithms.
-     */
-    public static class XML {
+    private static final String
+            RegressionOntology = "Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable";
 
-
-
-        private static String xmlIntro = org.opentox.Resources.AbstractResource.xmlIntro;
-
-        public static String svmXml() {
-            StringBuilder builder = new StringBuilder();
-            builder.append(xmlIntro);
-            builder.append("<algorithm name=\"Support Vector Machine\" id=\"svm\">\n");
-            builder.append("<AlgorithmType>regression</AlgorithmType>\n");
-            builder.append("<Parameters>\n");
-            builder.append("<!-- \n" +
-                    "The id of the dataset used for the training\n" +
-                    "of the model\n" +
-                    "-->\n");
-            builder.append("<param type=\"String\" defaultvalue=\"0\">dataset</param>\n");
-            builder.append("<param type=\"String\" defaultvalue=\"0\">target</param>\n");
-            builder.append("<param type=\"String\" defaultvalue=\"RBF\">kernel</param>\n");
-            builder.append("<param type=\"Double\" defaultvalue=\"10\">cost</param>\n");
-            builder.append("<param type=\"Double\" defaultvalue=\"0.1\">epsilon</param>\n");
-            builder.append("<param type=\"Double\" defaultvalue=\"1\">gamma</param>\n");
-            builder.append("<param type=\"Double\" defaultvalue=\"0\">coeff0</param>\n");
-            builder.append("<param type=\"Integer\" defaultvalue=\"3\">degree</param>\n");
-            builder.append("<param type=\"Double\" defaultvalue=\"1E-4\">tolerance</param>\n");
-            builder.append("<param type=\"Integer\" defaultvalue=\"50\">cacheSize</param>\n");
-            builder.append("</Parameters>\n");
-            builder.append("<statisticsSupported>\n");
-            builder.append("<statistic>RMSE</statistic>\n");
-            builder.append("<statistic>MSE</statistic>\n");
-            builder.append("</statisticsSupported>\n");
-            builder.append("</algorithm>\n\n");
-            return builder.toString();
-        }
-
-        public static String plsrXml() {
-            StringBuilder builder = new StringBuilder();
-            builder.append(xmlIntro);
-            builder.append("<algorithm name=\"Partial Least Squares\" id=\"pls\">\n");
-            builder.append("<AlgorithmType>regression</AlgorithmType>\n");
-            builder.append("<Parameters>\n");
-            builder.append("<param type=\"String\" defaultvalue=\"0\">dataset</param>\n");
-            builder.append("<param type=\"String\" defaultvalue=\"0\">target</param>\n");
-            builder.append("<param type=\"Integer\" defaultvalue=\"1\">nComp</param>\n");
-            builder.append("</Parameters>\n");
-            builder.append("<statisticsSupported>\n");
-            builder.append("<statistic>x</statistic>\n");
-            builder.append("</statisticsSupported>\n");
-            builder.append("</algorithm>\n\n");
-            return builder.toString();
-        }
-
-        public static String mlrXml() {
-            StringBuilder builder = new StringBuilder();
-            builder.append(xmlIntro);
-            builder.append("<algorithm name=\"Multiple Linear Regression\" id=\"mlr\">\n");
-            builder.append("<AlgorithmType>regression</AlgorithmType>\n");
-            builder.append("<Parameters>\n");
-            builder.append("<!-- \n" +
-                    "The id of the dataset used for the training\n" +
-                    "of the model\n" +
-                    "-->\n");
-            builder.append("<param type=\"String\" defaultvalue=\"0\">dataset</param>\n");
-            builder.append("<param type=\"String\" defaultvalue=\"0\">target</param>\n");
-            builder.append("</Parameters>\n");
-            builder.append("<statisticsSupported>\n");
-            builder.append("<statistic>RootMeanSquaredError</statistic>\n");
-            builder.append("<statistic>RelativeAbsoluteError</statistic>\n");
-            builder.append("<statistic>RootRelativeSquaredError</statistic>\n");
-            builder.append("<statistic>MeanAbsolutError</statistic>\n");
-            builder.append("</statisticsSupported>\n");
-            builder.append("</algorithm>\n\n");
-            return builder.toString();
-        }
+    private static ArrayList<String> statisticsSupported(long model) {
+        ArrayList<String> statisticsSupported = new ArrayList<String>();
+        statisticsSupported.add("RootMeanSquaredError");
+        statisticsSupported.add("RelativeAbsoluteError");
+        statisticsSupported.add("RootRelativeSquaredError");
+        statisticsSupported.add("MeanAbsoluteError");
+        return statisticsSupported;
     }
 
-    public static class JSON {
-
-        public static String mlrJson() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("\"Algorithm\": \n{\n");
-            builder.append("\"name\" : \"Multiple Linear Regression\",\n");
-            builder.append("\"id\" : \"mlr\",\n");
-            builder.append("\"AlgorithmType\" : \"regression\",\n");
-            builder.append("\"Parameters\" : {\n" +
-                    "\"dataset\" : {\"type\" : \"URI\", \"defaultValue\"  : \"\"},\n" +
-                    "\"target\"  : {\"type\" : \"URI\",  \"defaultValue\" : \"\"}\n" +
-                    "},\n");
-            builder.append("\"statisticsSupported\" : {\n");
-            builder.append("\"statistic\" : \"RootMeanSquaredError\",\n");
-            builder.append("\"statistic\" : \"RelativeAbsoluteError\",\n");
-            builder.append("\"statistic\" : \"RootRelativeSquaredError\",\n");
-            builder.append("\"statistic\" : \"MeanAbsolutError\"\n");
-            builder.append("}\n");
-            return builder.toString();
+    private static String[][] Parameters(long model) {
+        String[][] Parameters = null;
+        if (model == SVM) {
+            Parameters = new String[][]{
+                        {"dataset", "String", "null"},
+                        {"target", "String", "null"},
+                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf"},
+                        {"cost", "Double", "10"},
+                        {"epsilon", "Double", "0.1"},
+                        {"gamma", "Double", "1"},
+                        {"coeff0", "Double", "0"},
+                        {"Degree", "Integer", "3"},
+                        {"tolerance", "Double", "1E-4"},
+                        {"cacheSize", "Integer", "50"}
+                    };
+        } else if (model == SVC) {
+            Parameters = new String[][]{
+                        {"dataset", "String", "null"},
+                        {"target", "String", "null"},
+                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf"},
+                        {"cost", "Double", "10"},
+                        {"gamma", "Double", "1"},
+                        {"coeff0", "Double", "0"},
+                        {"Degree", "Integer", "3"},
+                        {"tolerance", "Double", "1E-4"},
+                        {"cacheSize", "Integer", "50"}
+                    };
+        } else if (model == MLR) {
+            Parameters = new String[][]{
+                        {"dataset", "String", "null"},
+                        {"target", "String", "null"}
+                    };
         }
-
-        public static String svmJson() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("\"Algorithm\": \n{\n");
-            builder.append("\"name\" : \"Support Vector Machine\",\n");
-            builder.append("\"id\" : \"svm\",\n");
-            builder.append("\"AlgorithmType\" : \"regression\",\n");
-            builder.append("\"Parameters\" : {\n" +
-                    "\"dataset\" : {\"type\" : \"URI\", \"defaultValue\"  : \"\"},\n" +
-                    "\"target\"  : {\"type\" : \"URI\",  \"defaultValue\" : \"\"},\n" +
-                    "\"kernel\"  : {\"type\" : \"String\",  \"defaultValue\" : \"rbf\"},\n" +
-                    "\"cost\"    : {\"type\" : \"Double\",  \"defaultValue\" : \"10\"},\n" +
-                    "\"epsilon\" : {\"type\" : \"Double\",  \"defaultValue\" : \"0.1\"},\n" +
-                    "\"gamma\"   : {\"type\" : \"Double\",  \"defaultValue\" : \"1\"},\n" +
-                    "\"coeff0\"  : {\"type\" : \"Double\",  \"defaultValue\" : \"0\"},\n" +
-                    "\"degree\"  : {\"type\" : \"Integer\",  \"defaultValue\" : \"3\"},\n" +
-                    "\"tolerance\"  : {\"type\" : \"Double\",  \"defaultValue\" : \"1E-4\"},\n" +
-                    "\"cacheSize\"  : {\"type\" : \"Integer\",  \"defaultValue\" : \"50\"}\n" +
-                    "},\n");
-            builder.append("\"statisticsSupported\" : {\n");
-            builder.append("\"statistic\" : \"RootMeanSquaredError\",\n");
-            builder.append("\"statistic\" : \"RelativeAbsoluteError\",\n");
-            builder.append("\"statistic\" : \"RootRelativeSquaredError\",\n");
-            builder.append("\"statistic\" : \"MeanAbsolutError\"\n");
-            builder.append("}\n");
-            return builder.toString();
-        }
+        return Parameters;
     }
 
-    
-    public static class RDF_XML {
 
-        
 
-        public static String mlrRdf() {
-            AlgorithmRdfFormater mlrRdf = new AlgorithmRdfFormater(AbstractResource.URIs.mlrAlgorithmURI);
-            mlrRdf.setTitle("Multiple Linear Regression");
-            mlrRdf.setSubject("MLR, regression, training algorithm");
-            mlrRdf.setDescription("Algorithm for the training of Multiple Linear Regression Models");
-            mlrRdf.setType("http://purl.org/dc/dcmitype/Service");
-            mlrRdf.setSource(AbstractResource.URIs.learningAlgorithmURI);
-            mlrRdf.setRelation(AbstractResource.URIs.regressionAlgorithmURI);
-            mlrRdf.setRights(AbstractResource.URIs.licenceUri);
-            mlrRdf.setLanguage("en");
-            mlrRdf.setCreator(AbstractResource.URIs.baseURI);
-            mlrRdf.setPublisher(AbstractResource.URIs.baseURI);
-            mlrRdf.setContributor("http://opentox.org/");
-            mlrRdf.setDate("2009-11-18");
-            mlrRdf.setFormat(MediaType.TEXT_XML.toString());
-            mlrRdf.setIdentifier(AbstractResource.URIs.mlrAlgorithmURI);
-            mlrRdf.setAudience("");
-            mlrRdf.setProvenance("");
-            mlrRdf.setAlgorithmType("Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable:mlr");
-            ArrayList<String> statisticsSupported = new ArrayList<String>();
-            statisticsSupported.add("RootMeanSquaredError");
-            statisticsSupported.add("RelativeAbsoluteError");
-            statisticsSupported.add("RootRelativeSquaredError");
-            statisticsSupported.add("MeanAbsoluteError");
-            String[][] Parameters = {
-                {"dataset", "String","null"},
-                {"target",  "String","null"}
-            };
-            mlrRdf.setAlgorithm(statisticsSupported, Parameters);
-            return mlrRdf.rdfXmlRepresentation();
+    private StringRepresentation getStringRepresentationForMetaInf(AlgorithmMetaInf metainf, MediaType media){
+        StringRepresentation representation = null;
+        if (MediaType.APPLICATION_RDF_XML.equals(media)) {
+                AlgorithmRdfFormater formater = new AlgorithmRdfFormater(metainf);
+                representation = formater.getStringRepresentation();
+            } else if (MediaType.APPLICATION_JSON.equals(media)) {
+                AlgorithmJsonFormater formater = new AlgorithmJsonFormater(metainf);
+                representation = formater.getStringRepresentation();
+            } else if (MediaType.APPLICATION_RDF_TURTLE.equals(media)) {
+                AlgorithmTurtleFormater formater = new AlgorithmTurtleFormater(metainf);
+                representation = formater.getStringRepresentation();
+            } else if (MediaType.TEXT_XML.equals(media)) {
+                AlgorithmXmlFormater formater = new AlgorithmXmlFormater(metainf);
+                representation = formater.getStringRepresentation();
+            } else if (OpenToxMediaType.TEXT_YAML.equals(media)) {
+                AlgorithmYamlFormater formater = new AlgorithmYamlFormater(metainf);
+                representation = formater.getStringRepresentation();
+            } else {
+            }
+        return representation;
+    }
+
+
+
+    public StringRepresentation FormatedRepresntation(MediaType media, long algorithm) {
+
+        StringRepresentation representation = null;
+
+        AlgorithmMetaInf genericMetaInf = new AlgorithmMetaInf();
+        genericMetaInf.setType("http://purl.org/dc/dcmitype/Service");
+        genericMetaInf.setRights(AbstractResource.URIs.licenceUri);
+        genericMetaInf.setLanguage("en");
+        genericMetaInf.setCreator(AbstractResource.URIs.baseURI);
+        genericMetaInf.setPublisher(AbstractResource.URIs.baseURI);
+        genericMetaInf.setContributor("http://opentox.org/");
+        genericMetaInf.setDate("2009-11-18");
+        genericMetaInf.setFormat(MediaType.TEXT_XML.toString());
+        genericMetaInf.setAudience("");
+        genericMetaInf.setProvenance("");
+
+       
+        if (algorithm == MLR) {
+            AlgorithmMetaInf MlrMetaInf = genericMetaInf;
+            MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
+            MlrMetaInf.setTitle("Multiple Linear Regression");
+            MlrMetaInf.setAlgorithmType(RegressionOntology+":mlr");
+            MlrMetaInf.setDescription("Multiple Linear Regression Training Algorithm");
+            MlrMetaInf.setAlgorithm(statisticsSupported(MLR), Parameters(MLR));
+
+            representation = getStringRepresentationForMetaInf(MlrMetaInf, media);
             
+        } else if (algorithm == SVM) {
+            AlgorithmMetaInf SvmMetaInf = genericMetaInf;
+            SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
+            SvmMetaInf.setTitle("Support Vector Machine Regression");
+            SvmMetaInf.setAlgorithmType(RegressionOntology+":svm");
+            SvmMetaInf.setDescription("Training Algorithm for Support Vector" +
+                    "Machine Regression Models");
+            SvmMetaInf.setAlgorithm(statisticsSupported(SVM), Parameters(SVM));
+
+            representation = getStringRepresentationForMetaInf(SvmMetaInf, media);
+
+        } else if (algorithm == SVC) {
+            AlgorithmMetaInf SvcMetaInf = genericMetaInf;
+            SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
+            SvcMetaInf.setTitle("Support Vector Machine Classification");
+            SvcMetaInf.setAlgorithmType(RegressionOntology+":svc");
+            SvcMetaInf.setDescription("Training Algorithm for Support Vector" +
+                    "Machine Classification Models");
+            SvcMetaInf.setAlgorithm(statisticsSupported(SVC), Parameters(SVC));
+
+            representation = getStringRepresentationForMetaInf(SvcMetaInf, media);       
         }
-
-        public static String svmRdf() {
-            AlgorithmRdfFormater svmRdf = new AlgorithmRdfFormater(AbstractResource.URIs.mlrAlgorithmURI);
-            svmRdf.setTitle("Support Vector Machine Regression");
-            svmRdf.setSubject("SVM, support vector machine, training algorithm, machine learning");
-            svmRdf.setDescription("Algorithm for the training of SVM Regression Models");
-            svmRdf.setType("http://purl.org/dc/dcmitype/Service");
-            svmRdf.setSource(AbstractResource.URIs.learningAlgorithmURI);
-            svmRdf.setRelation(AbstractResource.URIs.regressionAlgorithmURI);
-            svmRdf.setRights(AbstractResource.URIs.licenceUri);
-            svmRdf.setLanguage("en");
-            svmRdf.setCreator(AbstractResource.URIs.baseURI);
-            svmRdf.setPublisher(AbstractResource.URIs.baseURI);
-            svmRdf.setContributor("http://opentox.org/");
-            svmRdf.setDate("2009-11-18");
-            svmRdf.setFormat(MediaType.TEXT_XML.toString());
-            svmRdf.setIdentifier(AbstractResource.URIs.svmAlgorithmURI);
-            svmRdf.setAudience("");
-            svmRdf.setProvenance("");
-            svmRdf.setAlgorithmType("Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable:svm");
-            ArrayList<String> statisticsSupported = new ArrayList<String>();
-            statisticsSupported.add("RootMeanSquaredError");
-            statisticsSupported.add("RelativeAbsoluteError");
-            statisticsSupported.add("RootRelativeSquaredError");
-            statisticsSupported.add("MeanAbsoluteError");
-            String[][] Parameters = {
-                {"dataset", "String","null"},
-                {"target",  "String","null"},
-                {"kernel",  "List:{rbf,linear,sigmoid,polynomial}"  , "rbf"},
-                {"cost",    "Double", "10"},
-                {"epsilon", "Double", "0.1"},
-                {"gamma", "Double", "1"},
-                {"coeff0", "Double", "0"},
-                {"Degree", "Integer", "3"},
-                {"tolerance", "Double", "1E-4"},
-                {"cacheSize", "Integer", "50"}
-            };
-            svmRdf.setAlgorithm(statisticsSupported, Parameters);
-            return svmRdf.rdfXmlRepresentation();
-            
-        }
-    }
-
-    public static class YAML {
-
-        public static String mlrYaml() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("---\nAlgorithm:\n");
-            builder.append("    name : Multiple Linear Regression\n");
-            builder.append("    id : mlr\n");
-            builder.append("    AlgorithmType : regression\n");
-            builder.append("    Parameters:\n");
-            builder.append("        -dataset:\n");
-            builder.append("            type:URI\n");
-            builder.append("            defaultValue:none\n");
-            builder.append("        -target:\n");
-            builder.append("            type:URI\n");
-            builder.append("            defaultValue:none\n");
-            builder.append("    statisticsSupported:\n");
-            builder.append("            -RootMeanSquaredError\n");
-            builder.append("            -RelativeAbsoluteError\n");
-            builder.append("            -RootRelativeSquaredError\n");
-            builder.append("            -MeanAbsolutError\n");
-            return builder.toString();
-        }
-
-        public static String svmYaml() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("---\nAlgorithm:\n");
-            builder.append("    name : Support Vector Machine\n");
-            builder.append("    id : mlr\n");
-            builder.append("    AlgorithmType : regression\n");
-            builder.append("    Parameters:\n");
-            builder.append("        -dataset:\n");
-            builder.append("            type:URI\n");
-            builder.append("            defaultValue:none\n");
-            builder.append("        -target:\n");
-            builder.append("            type:URI\n");
-            builder.append("            defaultValue:none\n");
-            builder.append("        -kernel:\n");
-            builder.append("            type:String\n");
-            builder.append("            defaultValue:rbf\n");
-            builder.append("        -cost:\n");
-            builder.append("            type:Double\n");
-            builder.append("            defaultValue:10\n");
-            builder.append("        -epsilon:\n");
-            builder.append("            type:Double\n");
-            builder.append("            defaultValue:0.1\n");
-            builder.append("        -gamma:\n");
-            builder.append("            type:Double\n");
-            builder.append("            defaultValue:1\n");
-            builder.append("        -coeff0:\n");
-            builder.append("            type:Double\n");
-            builder.append("            defaultValue:0\n");
-            builder.append("        -degree:\n");
-            builder.append("            type:Integer\n");
-            builder.append("            defaultValue:3\n");
-            builder.append("        -tolerance:\n");
-            builder.append("            type:Double\n");
-            builder.append("            defaultValue:0.1\n");
-            builder.append("        -cacheSize:\n");
-            builder.append("            type:Integer\n");
-            builder.append("            defaultValue:50\n");
-            builder.append("    statisticsSupported:\n");
-            builder.append("            -RootMeanSquaredError\n");
-            builder.append("            -RelativeAbsoluteError\n");
-            builder.append("            -RootRelativeSquaredError\n");
-            builder.append("            -MeanAbsolutError\n");
-            return builder.toString();
-        }
-    }
-
-    public static class TURTLE{
-
-        public static String mlrTurtle(){
-
-
-            return null;
-        }
-
-        public static String svmTurtle(){
-            return null;
-        }
-
+        return representation;
     }
 }

@@ -47,6 +47,7 @@ import org.opentox.Applications.OpenToxApplication;
  * @version 1.5 (Last Updated: Aug 20, 2009)
  * @since 1.0
  */
+@Deprecated
 public class Classification extends AbstractResource{
 
     private static final long serialVersionUID = 7323625622428712L;

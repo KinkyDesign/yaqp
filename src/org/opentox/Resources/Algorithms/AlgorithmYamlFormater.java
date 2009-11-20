@@ -6,6 +6,7 @@ package org.opentox.Resources.Algorithms;
 
 import java.util.ArrayList;
 import org.opentox.MediaTypes.OpenToxMediaType;
+import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
 /**
@@ -16,30 +17,38 @@ import org.restlet.representation.StringRepresentation;
  */
 public class AlgorithmYamlFormater extends AbstractAlgorithmFormater{
 
+    private static final MediaType mime = OpenToxMediaType.APPLICATION_YAML;
+
+
+   public AlgorithmYamlFormater(AlgorithmMetaInf metainf){
+       super();
+       super.metainf = metainf;
+   }
+
 
     public StringRepresentation getStringRepresentation() {
         StringBuilder builder = new StringBuilder();
         builder.append("---\nAlgorithm:\n");
-        builder.append("    name : " + title + "\n");
-        builder.append("    id : " + identifier + "\n");
-        builder.append("    AlgorithmType : " + algorithmType + "\n");
+        builder.append("    name : " + metainf.getTitle() + "\n");
+        builder.append("    id : " + metainf.getIdentifier() + "\n");
+        builder.append("    AlgorithmType : " + metainf.getAlgorithmType() + "\n");
         builder.append("    Parameters:\n");
-        if (Parameters[0].length != 3) {
+        if (metainf.getParameters()[0].length != 3) {
             System.err.println("ERROR!!! Invalid Parameters Element!");
         } else {
-            for (int i = 0; i < Parameters.length; i++) {
-                builder.append("        -" + Parameters[i][0] + ":\n");
-                builder.append("            type:" + Parameters[i][1]);
-                builder.append("            defaultValue:" + Parameters[i][2]);
+            for (int i = 0; i < metainf.getParameters().length; i++) {
+                builder.append("        -" + metainf.getParameters()[i][0] + ":\n");
+                builder.append("            type:" + metainf.getParameters()[i][1]+"\n");
+                builder.append("            defaultValue:" + metainf.getParameters()[i][2]+"\n");
             }
         }
         builder.append("    statisticsSupported:\n");
-        if (!statisticsSupported.isEmpty()) {
-            for (int i = 0; i < statisticsSupported.size(); i++) {
-                builder.append("            -" + statisticsSupported.get(i) + "\n");
+        if (!metainf.getStatisticsSupported().isEmpty()) {
+            for (int i = 0; i < metainf.getStatisticsSupported().size(); i++) {
+                builder.append("            -" + metainf.getStatisticsSupported().get(i) + "\n");
             }
         }
-        return new StringRepresentation(builder.toString(), OpenToxMediaType.APPLICATION_YAML);
+        return new StringRepresentation(builder.toString(), mime);
     }
 
 }

@@ -80,7 +80,6 @@ public class OpenToxApplication extends Application {
             System.out.println("x");
         }
         opentoxLogger = Logger.getLogger("org.restlet");
-
         FileHandler fileHand = new FileHandler(AbstractResource.Directories.logDir + "/" + new Date());
         fileHand.setFormatter(new SimpleFormatter());
         opentoxLogger.addHandler(fileHand);
