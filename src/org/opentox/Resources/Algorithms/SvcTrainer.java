@@ -6,6 +6,7 @@
 package org.opentox.Resources.Algorithms;
 
 
+import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 
 /**
@@ -15,6 +16,11 @@ import org.restlet.representation.Representation;
  * @author Sarimveis Harry
  */
 public class SvcTrainer extends AbstractTrainer{
+
+    public SvcTrainer(Form form){
+        super(form);
+        super.form = form;
+    }
 
     @Override
     public Representation train() {

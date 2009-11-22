@@ -23,10 +23,7 @@ public abstract class AbstractTrainer {
     protected Form form;
 
 
-    public AbstractTrainer(){
-        
-    }
-
+    
     /**
      * Constructor.
      * @param form The set of posted parameters.

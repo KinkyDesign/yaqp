@@ -19,10 +19,7 @@ public class MlrTrainer extends AbstractTrainer {
 
     protected Instances data;
 
-    public MlrTrainer() {
-        super();
-    }
-
+    
     
     public MlrTrainer(Form form) {
         super(form);

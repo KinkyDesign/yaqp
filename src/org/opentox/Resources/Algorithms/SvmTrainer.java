@@ -16,6 +16,11 @@ import org.restlet.representation.Representation;
  */
 public class SvmTrainer extends AbstractTrainer{
 
+    public SvmTrainer(Form form){
+        super(form);
+        super.form = form;
+    }
+
     @Override
     public Representation train() {
         throw new UnsupportedOperationException("Not supported yet.");
