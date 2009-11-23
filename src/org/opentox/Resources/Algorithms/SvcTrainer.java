@@ -19,10 +19,7 @@ import org.restlet.data.Status;
 import org.opentox.client.opentoxClient;
 import org.opentox.util.libSVM.svm_train;
 import org.opentox.util.libSVM.svm_scale;
-<<<<<<< HEAD:src/org/opentox/Resources/Algorithms/SvcTrainer.java
 import org.restlet.data.Form;
-=======
->>>>>>> 2abb1d8bc2b8ce4e508ed9b1a4e059f8166ab921:src/org/opentox/Resources/Algorithms/SvcTrainer.java
 import weka.core.Instances;
 
 /**
@@ -32,10 +29,7 @@ import weka.core.Instances;
  * @author Sarimveis Harry
  */
 public class SvcTrainer extends AbstractTrainer{
-<<<<<<< HEAD:src/org/opentox/Resources/Algorithms/SvcTrainer.java
 
-=======
->>>>>>> 2abb1d8bc2b8ce4e508ed9b1a4e059f8166ab921:src/org/opentox/Resources/Algorithms/SvcTrainer.java
     private String kernel;
     private String cost;
     private String gamma;
@@ -48,7 +42,6 @@ public class SvcTrainer extends AbstractTrainer{
     private double d;
     private int i;
     private Instances dataInstances;
-<<<<<<< HEAD:src/org/opentox/Resources/Algorithms/SvcTrainer.java
 
      public SvcTrainer(Form form){
         super(form);
@@ -58,11 +51,6 @@ public class SvcTrainer extends AbstractTrainer{
     @Override
     public Representation train() {
         
-=======
-
-    @Override
-    public Representation train() {
->>>>>>> 2abb1d8bc2b8ce4e508ed9b1a4e059f8166ab921:src/org/opentox/Resources/Algorithms/SvcTrainer.java
         model_id = org.opentox.Applications.OpenToxApplication.dbcon.getModelsStack() + 1;
 
         Representation representation = checkParameters();
@@ -189,10 +177,7 @@ public class SvcTrainer extends AbstractTrainer{
         xmlstr.append("</ot:Model>\n");
         return xmlstr.toString();
     }
-<<<<<<< HEAD:src/org/opentox/Resources/Algorithms/SvcTrainer.java
 
-=======
->>>>>>> 2abb1d8bc2b8ce4e508ed9b1a4e059f8166ab921:src/org/opentox/Resources/Algorithms/SvcTrainer.java
     private String CreateARandomFilename(){
         String key = new String();
         int flag = (int) (Math.random() * 10) + 20;
@@ -370,7 +355,6 @@ public class SvcTrainer extends AbstractTrainer{
             setInternalStatus(clientPostedWrongParametersStatus);
         }
 
-<<<<<<< HEAD:src/org/opentox/Resources/Algorithms/SvcTrainer.java
 
         /**
          * Epsilon should be convertible to Double and strictly
@@ -388,25 +372,6 @@ public class SvcTrainer extends AbstractTrainer{
         }
 
 
-=======
-
-        /**
-         * Epsilon should be convertible to Double and strictly
-         * positive.
-         */
-        try {
-            d = Double.parseDouble(epsilon);
-            if (d <= 0) {
-                errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsinlon must be strictly positive!\n";
-                setInternalStatus(clientPostedWrongParametersStatus);
-            }
-        } catch (NumberFormatException e) {
-            errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
-            setInternalStatus(clientPostedWrongParametersStatus);
-        }
-
-
->>>>>>> 2abb1d8bc2b8ce4e508ed9b1a4e059f8166ab921:src/org/opentox/Resources/Algorithms/SvcTrainer.java
         /**
          * Degree should be a strictly positive integer
          */
