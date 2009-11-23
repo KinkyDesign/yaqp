@@ -111,6 +111,7 @@ public class AlgorithmReporter {
             AlgorithmMetaInf MlrMetaInf = genericMetaInf;
             MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.setTitle("Multiple Linear Regression");
+            MlrMetaInf.setSubject("MLR, Multiple Linear Regression");
             MlrMetaInf.setAlgorithmType(RegressionOntology+":mlr");
             MlrMetaInf.setDescription("Multiple Linear Regression Training Algorithm");
             MlrMetaInf.setIdentifier(AbstractResource.URIs.mlrAlgorithmURI);
@@ -123,6 +124,7 @@ public class AlgorithmReporter {
             AlgorithmMetaInf SvmMetaInf = genericMetaInf;
             SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
             SvmMetaInf.setTitle("Support Vector Machine Regression");
+            SvmMetaInf.setSubject("SVM Regression");
             SvmMetaInf.setAlgorithmType(RegressionOntology+":svm");
             SvmMetaInf.setDescription("Training Algorithm for Support Vector" +
                     "Machine Regression Models");
@@ -136,6 +138,7 @@ public class AlgorithmReporter {
             AlgorithmMetaInf SvcMetaInf = genericMetaInf;
             SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
             SvcMetaInf.setTitle("Support Vector Machine Classification");
+            SvcMetaInf.setSubject("SVC Classification");
             SvcMetaInf.setAlgorithmType(RegressionOntology+":svc");
             SvcMetaInf.setDescription("Training Algorithm for Support Vector" +
                     "Machine Classification Models");

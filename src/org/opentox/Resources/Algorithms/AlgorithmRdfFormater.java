@@ -4,6 +4,7 @@ import org.opentox.Resources.AbstractResource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
+
 /**
  * Build an RDF representation for an Algorithm.
  * @author OpenTox - http://www.opentox.org
@@ -13,68 +14,98 @@ import org.restlet.representation.StringRepresentation;
 public class AlgorithmRdfFormater extends AbstractAlgorithmFormater {
 
     private static final MediaType mime = MediaType.APPLICATION_RDF_XML;
+
     private static final long serialVersionUID = 52795861750765264L;
-    
 
-    public AlgorithmRdfFormater(AlgorithmMetaInf metainf) {
-        super.metainf = metainf;
+
+    private static class Elements{
+
+        static class RDF{
+            static String description = "rdf:Description",
+                    about = "rdf:about",
+                    datatype="rdf:datatype",
+                    RDF="rdf:RDF";
+        }
+
+        static class DC{
+            static String title="dc:title",
+                    subject="dc:subject",
+                    type="dc:type",
+                    source="dc:source",
+                    relation="dc:relation",
+                    rights="dc:rights",
+                    creator="dc:creator",
+                    publisher="dc:publisher",
+                    contributor="dc:contributor",
+                    description="dc:description",
+                    date="dc:date",
+                    format="dc:format",
+                    identifier="dc:identifier",
+                    audience="dc:audience",
+                    provenance="dc:provenance",
+                    language="dc:language";
+        }
+
+        static class OT{
+            static String
+                    alg="ot:Algorithmalgorithm",
+                    algType="ot:AlgorithmalgorithmType",
+                    algParameters="ot:AlgorithmParameters",
+                    algParam="ot:AlgorithmParam",
+                    algParamName="ot:AlgorithmParamName",
+                    algParamDefaultValue="ot:AlgorithmParamDefaultValue",
+                    algstatisticsSupported="ot:AlgorithmstatisticsSupported",
+                    algstatistic="ot:Algorithmstatistic";
+        }
+
     }
-
-    
-    /**
-     * Redefine the RDF namespace which by default is set to
-     * http://www.w3.org/1999/02/22-rdf-syntax-ns#
-     * @param rdfns A new namespace for RDF
-     */
-    public void setRdfNamespace(String rdfns) {
-        this.rdfNamespace = rdfns;
-    }
-
-    /**
-     * Update the namespace for OpenTox Models and Algorithms.
-     * @param otns
-     */
-    public void setOpentoxNamespace(String otns) {
-        this.opentoxNamespace = otns;
-    }
-
-    /**
-     * Update the Dublin Core namespace.
-     * @param dcns new DCNS
-     */
-    public void setDcNamespace(String dcns) {
-        this.dcNamespace = dcns;
-    }
-
 
 
     private String opentoxAlgoritmElement() {
         StringBuilder builder = new StringBuilder();
-        builder.append("<ot:algorithm name=\"" + metainf.getTitle() + "\" ot:id=\"" + metainf.getIdentifier() + "\">\n");
-        builder.append("<ot:algorithmType>" + metainf.getAlgorithmType() + "</ot:algorithmType>\n");
 
-        builder.append("<ot:Parameters>\n");
+        builder.append("<"+Elements.OT.alg+">");
+        builder.append("<"+Elements.RDF.description+">");
+        builder.append("<"+Elements.OT.algType+">" +
+                metainf.getAlgorithmType() +
+                "</"+Elements.OT.algType+">\n");
+        builder.append("<"+Elements.OT.algParameters+">\n");
+        builder.append("<"+Elements.RDF.description+">");
         if (metainf.getParameters()[0].length != 3) {
             System.err.println("ERROR!!! Invalid Parameters Element!");
         } else {
             for (int i = 0; i < metainf.getParameters().length; i++) {
-                builder.append("<ot:param ot:type=\"" + metainf.getParameters()[i][1] + "\" " +
-                        "ot:defaultvalue=\"" + metainf.getParameters()[i][2] + "\">" +
-                        metainf.getParameters()[i][0] + "</ot:param>\n");
+                builder.append("<"+Elements.OT.algParam+">");
+                builder.append("<"+Elements.OT.algParamName+">"+
+                        metainf.getParameters()[i][0]+
+                        "</"+Elements.OT.algParamName+">");
+                builder.append("<"+Elements.OT.algParamDefaultValue+" "+
+                        Elements.RDF.datatype+"=\""+super.xsd+metainf.getParameters()[i][1]+
+                        "\" >");
+                builder.append(metainf.getParameters()[i][2]);
+                builder.append("</"+Elements.OT.algParamDefaultValue+">");
+                builder.append("</"+Elements.OT.algParam+">");
             }
         }
-        builder.append("</ot:Parameters>\n");
+        builder.append("</"+Elements.RDF.description+">");
+        builder.append("</"+Elements.OT.algParameters+">\n");
 
         if (metainf.getStatisticsSupported().isEmpty()) {
-            builder.append("<ot:statisticsSupported/>\n");
+            builder.append("<"+Elements.OT.algstatisticsSupported+"/>\n");
         } else {
-            builder.append("<ot:statisticsSupported>\n");
+            builder.append("<"+Elements.OT.algstatisticsSupported+">\n");
+            builder.append("<"+Elements.RDF.description+">");
             for (int i = 0; i < metainf.getStatisticsSupported().size(); i++) {
-                builder.append("<ot:statistic>" + metainf.getStatisticsSupported().get(i) + "</ot:statistic>\n");
+                builder.append("<"+Elements.OT.algstatistic+">" +
+                        metainf.getStatisticsSupported().get(i) +
+                        "</"+Elements.OT.algstatistic+">\n");
             }
-            builder.append("</ot:statisticsSupported>\n");
+            builder.append("</"+Elements.RDF.description+">");
+            builder.append("</"+Elements.OT.algstatisticsSupported+">\n");
         }
-        builder.append("</ot:algorithm>\n");
+        builder.append("</"+Elements.RDF.description+">");
+        builder.append("</"+Elements.OT.alg+">");
+        
         return builder.toString();
     }
 
@@ -84,32 +115,97 @@ public class AlgorithmRdfFormater extends AbstractAlgorithmFormater {
         StringBuilder builder = new StringBuilder();
         builder.append(AbstractResource.xmlIntro);
 
-        builder.append("<rdf:RDF " +
-                "xmlns:rdf=\"" + rdfNamespace + "\" " +
-                "xmlns:dc=\"" + dcNamespace + "\" " +
-                "xmlns:ot=\"" + opentoxNamespace + "\">\n");
-
-        builder.append("<rdf:Description rdf:about=\"" + metainf.getAbout() + "\">\n");
-        builder.append("<dc:title>" + metainf.getTitle() + "</dc:title>\n");
-        builder.append("<dc:subject>" + metainf.getSubject() + "</dc:subject>\n");
-        builder.append("<dc:description>" + metainf.getDescription() + "</dc:description>\n");
-        builder.append("<dc:type>" + metainf.getType() + "</dc:type>\n");
-        builder.append("<dc:source>" + metainf.getSource() + "</dc:source>\n");
-        builder.append("<dc:relation>" + metainf.getRelation() + "</dc:relation>\n");
-        builder.append("<dc:rights>" + metainf.getRights() + "</dc:rights>\n");
-        builder.append("<dc:creator>" + metainf.getCreator() + "</dc:creator>\n");
-        builder.append("<dc:publisher>" + metainf.getPublisher() + "</dc:publisher>\n");
-        builder.append("<dc:contributor>" + metainf.getContributor() + "</dc:contributor>\n");
-        builder.append("<dc:date>" + metainf.getDate() + "</dc:date>\n");
-        builder.append("<dc:format>" + metainf.getFormat() + "</dc:format>\n");
-        builder.append("<dc:identifier>" + metainf.getIdentifier() + "</dc:identifier>\n");
-        builder.append("<dc:audience>" + metainf.getAudience() + "</dc:audience>\n");
-        builder.append("<dc:provenance>" + metainf.getProvenance() + "</dc:provenance>\n");
-        builder.append("<dc:language>" + metainf.getLanguage() + "</dc:language>\n");
+        builder.append("<"+Elements.RDF.RDF+" " +
+                "xmlns:rdf=\"" + rdf + "\" " +
+                "xmlns:dc=\"" + dc + "\" " +
+                "xmlns:ot=\"" + ot + "\" " +
+                "xmlns:xsd=\"" + xsd + "\""+
+                ">\n");
+        builder.append("<"+Elements.RDF.description+" "+
+                Elements.RDF.about+"=\"" +
+                metainf.getAbout() + "\">\n");
+        builder.append("<"+Elements.DC.title+">" +
+                metainf.getTitle() +
+                "</"+Elements.DC.title+">\n");
+        builder.append("<"+Elements.DC.subject+">" +
+                metainf.getSubject() +
+                "</"+Elements.DC.subject+">\n");
+        builder.append("<"+Elements.DC.description+">" +
+                metainf.getDescription() +
+                "</"+Elements.DC.description+">\n");
+        builder.append("<"+Elements.DC.type+">" +
+                metainf.getType() +
+                "</"+Elements.DC.type+">\n");
+        builder.append("<"+Elements.DC.source+">" +
+                metainf.getSource() +
+                "</"+Elements.DC.source+">\n");
+        builder.append("<"+Elements.DC.relation+">" +
+                metainf.getRelation() +
+                "</"+Elements.DC.relation+">\n");
+        builder.append("<"+Elements.DC.rights+">" +
+                metainf.getRights() +
+                "</"+Elements.DC.rights+">\n");
+        builder.append("<"+Elements.DC.creator+">" +
+                metainf.getCreator() +
+                "</"+Elements.DC.creator+">\n");
+        builder.append("<"+Elements.DC.publisher+">" +
+                metainf.getPublisher() +
+                "</"+Elements.DC.publisher+">\n");
+        builder.append("<"+Elements.DC.contributor +">" +
+                metainf.getContributor() +
+                "</"+Elements.DC.contributor+">\n");
+        builder.append("<"+Elements.DC.date+">" +
+                metainf.getDate() +
+                "</"+Elements.DC.date+">\n");
+        builder.append("<"+Elements.DC.format+">" +
+                metainf.getFormat() +
+                "</"+Elements.DC.format+">\n");
+        builder.append("<"+Elements.DC.identifier+">" +
+                metainf.getIdentifier() +
+                "</"+Elements.DC.identifier+">\n");
+        builder.append("<"+Elements.DC.audience+">" +
+                metainf.getAudience() +
+                "</"+Elements.DC.audience+">\n");
+        builder.append("<"+Elements.DC.provenance+">" +
+                metainf.getProvenance() + "</dc:provenance>\n");
+        builder.append("<"+Elements.DC.language+">" +
+                metainf.getLanguage() +
+                "</"+Elements.DC.language+">\n");
         builder.append(opentoxAlgoritmElement());
-        builder.append("</rdf:Description>\n");
-        builder.append("</rdf:RDF>\n\n");
+        builder.append("</"+Elements.RDF.description+">\n");
+        builder.append("</"+Elements.RDF.RDF+">\n\n");
         return new StringRepresentation(builder.toString(), mime);
     }
 
+    
+
+    public AlgorithmRdfFormater(AlgorithmMetaInf metainf) {
+        super.metainf = metainf;
+    }
+
+    
+    /**
+     * @param rdfns A new namespace for RDF
+     */
+    public void setRdfNamespace(String rdfns) {
+        this.rdf = rdfns;
+    }
+
+    /**
+     * Update the namespace for OpenTox Models and Algorithms.
+     * @param otns
+     */
+    public void setOpentoxNamespace(String otns) {
+        this.ot = otns;
+    }
+
+    /**
+     * Update the Dublin Core namespace.
+     * @param dcns new DCNS
+     */
+    public void setDcNamespace(String dcns) {
+        this.dc = dcns;
+    }
+
+   
 }

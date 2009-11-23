@@ -74,8 +74,6 @@ public class Algorithm extends AbstractResource {
         /** The algorithm id can be one of {svm, mlr, svc} **/
         String alg = Reference.decode(getRequest().getAttributes().get("id").toString());
         algorithm = AlgorithmEnum.getAlgorithmEnum(alg);
-        System.out.println(alg);
-        System.out.println(algorithm.getAlgorithmName());
         
     }
 
