@@ -1,6 +1,5 @@
 package org.opentox.Resources.Algorithms;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,16 +26,12 @@ import org.restlet.resource.ResourceException;
  */
 public class Algorithm extends AbstractResource {
 
-    
-
-
-    private static final long serialVersionUID = -7058628823461230L;
+    private static final long serialVersionUID = 8992374761250990L;
     /**
      * The id of the regression algorithm.
      * This can be either mlr or svm.
      */
     private volatile AlgorithmEnum algorithm;
-    private volatile String algorithmId;
 
     /**
      * Initialize the resource. Supported Variants are:
@@ -78,15 +73,10 @@ public class Algorithm extends AbstractResource {
 
         /** The algorithm id can be one of {svm, mlr, svc} **/
         String alg = Reference.decode(getRequest().getAttributes().get("id").toString());
-        if (alg.equalsIgnoreCase("svm")){
-            algorithm = AlgorithmEnum.SVM;
-        }else if (alg.equalsIgnoreCase("svc")){
-            algorithm = AlgorithmEnum.SVC;
-        }else if (alg.equalsIgnoreCase("mlr")){
-            algorithm = AlgorithmEnum.MLR;
-        }else{
-            algorithm = AlgorithmEnum.UNKNOWN;
-        }
+        algorithm = AlgorithmEnum.getAlgorithmEnum(alg);
+        System.out.println(alg);
+        System.out.println(algorithm.getAlgorithmName());
+        
     }
 
     /**
@@ -107,16 +97,17 @@ public class Algorithm extends AbstractResource {
             list.add(getReference());
             representation = list.getTextRepresentation();
         } else {
-            switch (algorithm){
-                case SVM:
-                case MLR:
-                case SVC:
-                    representation = new AlgorithmReporter().FormatedRepresntation(variant.getMediaType(), algorithm);
+            switch (algorithm) {
+                case svm:
+                case mlr:
+                case svc:
+                    representation = new AlgorithmReporter().FormatedRepresntation(
+                            variant.getMediaType(), algorithm);
                     break;
                 default:
                     getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                representation = new StringRepresentation("Algorithm Not Found!\n", MediaType.TEXT_PLAIN);
-                break;
+                    representation = new StringRepresentation("Algorithm Not Found!\n", MediaType.TEXT_PLAIN);
+                    break;
             }
         }
 
@@ -133,29 +124,31 @@ public class Algorithm extends AbstractResource {
     protected Representation post(Representation entity)
             throws ResourceException {
         Representation representation = null;
-        Form form = new Form(entity);
         Status status = Status.SUCCESS_ACCEPTED;
 
-        
+        AbstractTrainer trainer = null;
+
+
+
         switch (algorithm) {
-            case MLR:
-                MlrTrainer mlrtrainer = new MlrTrainer(new Form(entity));
-                representation = mlrtrainer.train();
-                status = mlrtrainer.getInternalStatus();
+            case mlr:
+                trainer = new MlrTrainer(new Form(entity));
+                representation = trainer.train();
+                status = trainer.getInternalStatus();
                 break;
-            case SVM:
-                SvmTrainer svmtrainer = new SvmTrainer(new Form(entity));
-                representation = svmtrainer.train();
-                status = svmtrainer.getInternalStatus();
-            break;
-            case SVC:
-                SvcTrainer svctrainer = new SvcTrainer(new Form(entity));
-                representation = svctrainer.train();
-                status = svctrainer.getInternalStatus();
-            break;
+            case svm:
+                trainer = new SvmTrainer(new Form(entity));
+                representation = trainer.train();
+                status = trainer.getInternalStatus();
+                break;
+            case svc:
+                trainer = new SvcTrainer(new Form(entity));
+                representation = trainer.train();
+                status = trainer.getInternalStatus();
+                break;
             default:
                 representation = new StringRepresentation("Unknown Algorithm (404)!\n",
-                    MediaType.TEXT_PLAIN);
+                        MediaType.TEXT_PLAIN);
                 status = Status.CLIENT_ERROR_NOT_FOUND;
         }
 

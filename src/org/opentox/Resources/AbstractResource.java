@@ -15,7 +15,7 @@ import org.opentox.Applications.OpenToxApplication;
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.4 (Last Update: Aug 26, 2009)
+ * @version 1.5 (Last Update: Nov 23, 2009)
  */
 public abstract class AbstractResource extends ServerResource {
 
@@ -49,9 +49,6 @@ public abstract class AbstractResource extends ServerResource {
          * URI for all algorithms.
          */
         private static final String algorithmURI = baseURI + "/algorithm";
-        
-        
-        
         /*
          * URI for Support vector classifier.
          */
@@ -64,7 +61,6 @@ public abstract class AbstractResource extends ServerResource {
          * URI for Multiple Linear Regression Algorithm.
          */
         public static final String mlrAlgorithmURI = algorithmURI + "/mlr";
-
         public static final String licenceUri = "http://www.gnu.org/licenses/gpl.txt";
     }
 
@@ -83,11 +79,16 @@ public abstract class AbstractResource extends ServerResource {
         public static final String logDir = baseDir + "/log";
         private static final String tempDir = baseDir + "/.temp";
         public static final String tempDSDDir = tempDir + "/.dsd";
-        public static final String tempScaledDir = tempDir +"/.scaled";
+        public static final String tempScaledDir = tempDir + "/.scaled";
         private static final String modelDir = baseDir + "/model";
-        public static final String trash = modelDir+"/.trash";
-                public static final String rangesDir = modelDir + "/ranges";
+        public static final String trash = modelDir + "/.trash";
+        public static final String rangesDir = modelDir + "/ranges";
+        
+        /**
+         * The folder where all xml representations of models are stored.
+         */
         public static final String modelXmlDir = modelDir + "/xml";
+
         private static final String classificationModel = modelDir + "/classification";
         private static final String regressionModel = modelDir + "/regression";
         public static final String svcModel = classificationModel + "/svc";
@@ -162,7 +163,7 @@ public abstract class AbstractResource extends ServerResource {
                     }
 
                 }
-                
+
 
             }
 
@@ -173,16 +174,19 @@ public abstract class AbstractResource extends ServerResource {
      * The first line of every XML file.
      */
     public static final String xmlIntro = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+
     /**
      * Head of HTML files
      */
     protected String htmlHEAD = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" +
             "\"http://www.w3.org/TR/html4/loose.dtd\">\n" +
             "<html>\n<head>\n<title>NTUA - RESTful Web Services</title></head><body>";
+
     /**
      * End of HTML files
      */
     protected static final String htmlEND = "</body>\n</html>";
+
     /**
      * Head of PMML files
      */
@@ -190,100 +194,119 @@ public abstract class AbstractResource extends ServerResource {
             " xmlns=\"http://www.dmg.org/PMML-3_2\"  " +
             " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
             " <Header copyright=\"Copyleft (c) OpenTox - An Open Source Predictive Toxicology Framework, http://www.opentox.org, 2009\" />\n";
-
     private static final String baseDir = System.getProperty("user.home") + "/Documents/RESTfulWebServices";
+
     /**
      * Log
      */
     public static final String logDir = baseDir + "/log";
+
     /**
      * Data directory.
      * Directory where users have permission to upload data files.
      */
     protected static final String uploadDir = baseDir + "/uploads/data";
+
     /**
      * Repository for arff files uploaded by the users.
      */
     protected static final String arffDir = uploadDir + "/arff";
+
     /**
      * Repository for xrff files
      */
     protected static final String xrffDir = uploadDir + "/xrff";
+
     /**
      * Repository for the generated DSD files which are automatically
      * generated each time a user uploads an ARFF file.
      */
     protected static final String dsdDir = uploadDir + "/dsd";
+
     /**
      * Repository for the generated meta-inf XML files which are automatically
      * generated each time a user uploads an ARFF file.
      */
     protected static final String metaDir = uploadDir + "/meta";
+
     /**
      * Repository for the generated scaled-DSD files which are automatically
      * generated each time a user uploads an ARFF file.
      */
     protected static final String scaledDir = uploadDir + "/scaled";
+
     /**
      * Repository for the generated range files which are automatically
      * generated each time a user uploads an ARFF file.
      */
     protected static final String rangeDir = uploadDir + "/range";
+
     /**
      * Repository for classification and regression models.
      */
     private static final String modelsDir = baseDir + "/models";
+
     /**
      * Repository for xml representations of models
      *
      */
     public static final String modelsXmlDir = modelsDir + "/xml";
+
     /**
      * Repository for classification models.
      */
     @Deprecated
     private static final String CLS_modelsDir = modelsDir + "/classification";
+
     /**
      * Repository for regreesion models.
      */
     @Deprecated
     private static final String REG_modelsDir = modelsDir + "/regression";
+
     /**
      * Repository for svc (classification models).
      */
     @Deprecated
     protected static final String CLS_SVM_modelsDir = CLS_modelsDir + "/svc";
+
     /**
      * Repository for svm regression models
      */
     @Deprecated
     protected static final String REG_SVM_modelsDir = REG_modelsDir + "/svm";
+
     /**
      * Repository for MLR regression models. The MLR models generated by the
      * users are stored in this directory.
      */
     @Deprecated
     protected static final String REG_MLR_modelsDir = REG_modelsDir + "/mlr";
+
     /**
      * Prefix of uploaded arff files
      */
     @Deprecated
     protected static final String dataSetPrefix = "dataSet-";
+
     /**
      * Prefix of all models.
      */
     @Deprecated
     protected static final String modelPrefix = "model-";
+
     /**
      * General Prefix.
      */
     @Deprecated
     protected static final String OpenToxPrefix = "OpenTox-";
+
     /**
      * Prefix of validation results.
      */
     @Deprecated
     protected static final String validationResultPrefix = "validation-";
+
     /**
      * Port used by the web services. This variable has to be overriden if the
      * services are deployed on another domain.

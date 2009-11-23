@@ -28,7 +28,7 @@ public class AlgorithmReporter {
 
     private static String[][] Parameters(AlgorithmEnum algorithm) {
         String[][] Parameters = null;
-        if (algorithm == AlgorithmEnum.SVM) {
+        if (algorithm == AlgorithmEnum.svm) {
             Parameters = new String[][]{
                         {"dataset", "String", "null"},
                         {"target", "String", "null"},
@@ -41,7 +41,7 @@ public class AlgorithmReporter {
                         {"tolerance", "Double", "1E-4"},
                         {"cacheSize", "Integer", "50"}
                     };
-        } else if (algorithm == AlgorithmEnum.SVC) {
+        } else if (algorithm == AlgorithmEnum.svc) {
             Parameters = new String[][]{
                         {"dataset", "String", "null"},
                         {"target", "String", "null"},
@@ -53,7 +53,7 @@ public class AlgorithmReporter {
                         {"tolerance", "Double", "1E-4"},
                         {"cacheSize", "Integer", "50"}
                     };
-        } else if (algorithm == AlgorithmEnum.MLR) {
+        } else if (algorithm == AlgorithmEnum.mlr) {
             Parameters = new String[][]{
                         {"dataset", "String", "null"},
                         {"target", "String", "null"}
@@ -107,40 +107,40 @@ public class AlgorithmReporter {
         genericMetaInf.setRelation("http://opentox.org");
 
        
-        if (algorithm == AlgorithmEnum.MLR) {
+        if (algorithm == AlgorithmEnum.mlr) {
             AlgorithmMetaInf MlrMetaInf = genericMetaInf;
             MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.setTitle("Multiple Linear Regression");
             MlrMetaInf.setAlgorithmType(RegressionOntology+":mlr");
             MlrMetaInf.setDescription("Multiple Linear Regression Training Algorithm");
             MlrMetaInf.setIdentifier(AbstractResource.URIs.mlrAlgorithmURI);
-            MlrMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.MLR),
-                    Parameters(AlgorithmEnum.MLR));
+            MlrMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.mlr),
+                    Parameters(AlgorithmEnum.mlr));
 
             representation = getStringRepresentationForMetaInf(MlrMetaInf, media);
             
-        } else if (algorithm == AlgorithmEnum.SVM) {
+        } else if (algorithm == AlgorithmEnum.svm) {
             AlgorithmMetaInf SvmMetaInf = genericMetaInf;
             SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
             SvmMetaInf.setTitle("Support Vector Machine Regression");
             SvmMetaInf.setAlgorithmType(RegressionOntology+":svm");
             SvmMetaInf.setDescription("Training Algorithm for Support Vector" +
                     "Machine Regression Models");
-            SvmMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.SVM),
-                    Parameters(AlgorithmEnum.SVM));
+            SvmMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svm),
+                    Parameters(AlgorithmEnum.svm));
             SvmMetaInf.setIdentifier(AbstractResource.URIs.svmAlgorithmURI);
 
             representation = getStringRepresentationForMetaInf(SvmMetaInf, media);
 
-        } else if (algorithm == AlgorithmEnum.SVC) {
+        } else if (algorithm == AlgorithmEnum.svc) {
             AlgorithmMetaInf SvcMetaInf = genericMetaInf;
             SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
             SvcMetaInf.setTitle("Support Vector Machine Classification");
             SvcMetaInf.setAlgorithmType(RegressionOntology+":svc");
             SvcMetaInf.setDescription("Training Algorithm for Support Vector" +
                     "Machine Classification Models");
-            SvcMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.SVC),
-                    Parameters(AlgorithmEnum.SVC));
+            SvcMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svc),
+                    Parameters(AlgorithmEnum.svc));
             SvcMetaInf.setIdentifier(AbstractResource.URIs.svcAlgorithmURI);
 
             representation = getStringRepresentationForMetaInf(SvcMetaInf, media);       

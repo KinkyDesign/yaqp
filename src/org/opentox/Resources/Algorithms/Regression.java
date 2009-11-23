@@ -441,8 +441,8 @@ public class Regression extends AbstractResource {
      * @param data the weka.core.Instances object containing the data.
      * @return xml representation for the trained mlr model
      */
-    private String MlrTrain(Instances data) {
-        StringBuilder builder = new StringBuilder();
+    private  String MlrTrain(Instances data) {
+        StringBuilder pmml = new StringBuilder();
 
 
         LinearRegression linreg = new LinearRegression();
@@ -466,75 +466,75 @@ public class Regression extends AbstractResource {
 
         double[] coeffs = linreg.coefficients();
 
-        builder.append(xmlIntro);
+        pmml.append(xmlIntro);
 
 
 
         //beginning of PMML element
-        builder.append(PMMLIntro);
-        builder.append("<Model ID=\"" + model_id + "\" Name=\"MLR Model\">\n");
-        builder.append("<link href=\"" + ModelURI + "/" + model_id + "\" />\n");
-        builder.append("<AlgorithmID href=\"" + URIs.mlrAlgorithmURI + "\"/>\n");
-        builder.append("<DatasetID href=\"" + datasetURI.toString() + "\"/>\n");
-        builder.append("<AlgorithmParameters />\n");
-        builder.append("<FeatureDefinitions>\n");
+        pmml.append(PMMLIntro);
+        pmml.append("<Model ID=\"" + model_id + "\" Name=\"MLR Model\">\n");
+        pmml.append("<link href=\"" + ModelURI + "/" + model_id + "\" />\n");
+        pmml.append("<AlgorithmID href=\"" + URIs.mlrAlgorithmURI + "\"/>\n");
+        pmml.append("<DatasetID href=\"" + datasetURI.toString() + "\"/>\n");
+        pmml.append("<AlgorithmParameters />\n");
+        pmml.append("<FeatureDefinitions>\n");
         for (int k = 1; k <= data.numAttributes(); k++) {
-            builder.append("<link href=\"" + data.attribute(k - 1).name() + "\"/>\n");
+            pmml.append("<link href=\"" + data.attribute(k - 1).name() + "\"/>\n");
         }
-        builder.append("<target index=\"" + data.attribute(targetAttribute).index() + "\" name=\"" +
+        pmml.append("<target index=\"" + data.attribute(targetAttribute).index() + "\" name=\"" +
                 targetAttribute + "\"/>\n");
-        builder.append("</FeatureDefinitions>\n");
-        builder.append("<User>Guest</User>\n");
-        builder.append("<Timestamp>" + java.util.GregorianCalendar.getInstance().getTime() + "</Timestamp>\n");
-        builder.append("</Model>\n");
+        pmml.append("</FeatureDefinitions>\n");
+        pmml.append("<User>Guest</User>\n");
+        pmml.append("<Timestamp>" + java.util.GregorianCalendar.getInstance().getTime() + "</Timestamp>\n");
+        pmml.append("</Model>\n");
 
-        builder.append("<DataDictionary numberOfFields=\"" + data.numAttributes() + "\" >\n");
+        pmml.append("<DataDictionary numberOfFields=\"" + data.numAttributes() + "\" >\n");
         for (int k = 0; k <=
                 data.numAttributes() - 1; k++) {
-            builder.append("<DataField name=\"" + data.attribute(k).name() + "\" optype=\"continuous\" dataType=\"double\" />\n");
+            pmml.append("<DataField name=\"" + data.attribute(k).name() + "\" optype=\"continuous\" dataType=\"double\" />\n");
         }
 
-        builder.append("</DataDictionary>\n");
+        pmml.append("</DataDictionary>\n");
         // RegressionModel
-        builder.append("<RegressionModel modelName=\"" + URIs.modelURI+"/"+model_id + "\"" +
+        pmml.append("<RegressionModel modelName=\"" + URIs.modelURI+"/"+model_id + "\"" +
                 " functionName=\"regression\"" +
                 " modelType=\"linearRegression\"" +
                 " algorithmName=\"linearRegression\"" +
                 " targetFieldName=\"" + data.attribute(data.numAttributes() - 1).name() + "\"" +
                 ">\n");
         // RegressionModel::MiningSchema
-        builder.append("<MiningSchema>\n");
+        pmml.append("<MiningSchema>\n");
         for (int k = 0; k <= data.numAttributes() - 1; k++) {
             if (k!=dataInstances.classIndex())
-                builder.append("<MiningField name=\"" +
+                pmml.append("<MiningField name=\"" +
                     data.attribute(k).name() + "\" />\n");
             
         }
-                 builder.append("<MiningField name=\"" +
+                 pmml.append("<MiningField name=\"" +
                 data.attribute(dataInstances.classIndex()).name() + "\" " +
                 "usageType=\"predicted\"/>\n");
 
 
 
-        builder.append("</MiningSchema>\n");
+        pmml.append("</MiningSchema>\n");
 
         // RegressionModel::RegressionTable
-        builder.append("<RegressionTable intercept=\"" + coeffs[coeffs.length - 1] + "\">\n");
+        pmml.append("<RegressionTable intercept=\"" + coeffs[coeffs.length - 1] + "\">\n");
         for (int k = 0; k <=
                 data.numAttributes() - 2; k++) {
-            builder.append("<NumericPredictor name=\"" +
+            pmml.append("<NumericPredictor name=\"" +
                     data.attribute(k).name() + "\" " +
                     " exponent=\"1\" " +
                     "coefficient=\"" + coeffs[k] + "\"/>\n");
         }
 
-        builder.append("</RegressionTable>\n");
+        pmml.append("</RegressionTable>\n");
 
-        builder.append("</RegressionModel>\n");
-        builder.append("</PMML>\n\n");
+        pmml.append("</RegressionModel>\n");
+        pmml.append("</PMML>\n\n");
 
 
-        return builder.toString();
+        return pmml.toString();
     }
 
     /**
