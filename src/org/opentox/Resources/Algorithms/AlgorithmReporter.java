@@ -1,5 +1,10 @@
 package org.opentox.Resources.Algorithms;
 
+import org.opentox.formatters.AlgorithmYamlFormatter;
+import org.opentox.formatters.AlgorithmXmlFormatter;
+import org.opentox.formatters.AlgorithmTurtleFormatter;
+import org.opentox.formatters.AlgorithmRdfFormatter;
+import org.opentox.formatters.AlgorithmJsonFormatter;
 import java.util.ArrayList;
 import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.AbstractResource;
@@ -67,19 +72,19 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
     private StringRepresentation getStringRepresentationForMetaInf(AlgorithmMetaInf metainf, MediaType media){
         StringRepresentation representation = null;
         if (MediaType.APPLICATION_RDF_XML.equals(media)) {
-                AlgorithmRdfFormater formater = new AlgorithmRdfFormater(metainf);
+                AlgorithmRdfFormatter formater = new AlgorithmRdfFormatter(metainf);
                 representation = formater.getStringRepresentation();
             } else if (MediaType.APPLICATION_JSON.equals(media)) {
-                AlgorithmJsonFormater formater = new AlgorithmJsonFormater(metainf);
+                AlgorithmJsonFormatter formater = new AlgorithmJsonFormatter(metainf);
                 representation = formater.getStringRepresentation();
             } else if (MediaType.APPLICATION_RDF_TURTLE.equals(media)) {
-                AlgorithmTurtleFormater formater = new AlgorithmTurtleFormater(metainf);
+                AlgorithmTurtleFormatter formater = new AlgorithmTurtleFormatter(metainf);
                 representation = formater.getStringRepresentation();
             } else if (MediaType.TEXT_XML.equals(media)) {
-                AlgorithmXmlFormater formater = new AlgorithmXmlFormater(metainf);
+                AlgorithmXmlFormatter formater = new AlgorithmXmlFormatter(metainf);
                 representation = formater.getStringRepresentation();
             } else if (OpenToxMediaType.TEXT_YAML.equals(media)) {
-                AlgorithmYamlFormater formater = new AlgorithmYamlFormater(metainf);
+                AlgorithmYamlFormatter formater = new AlgorithmYamlFormatter(metainf);
                 representation = formater.getStringRepresentation();
             } else {
             }
@@ -93,28 +98,28 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         StringRepresentation representation = null;
 
         AlgorithmMetaInf genericMetaInf = new AlgorithmMetaInf();
-        genericMetaInf.setType("http://purl.org/dc/dcmitype/Service");
-        genericMetaInf.setRights(AbstractResource.URIs.licenceUri);
-        genericMetaInf.setLanguage("en");
-        genericMetaInf.setCreator(AbstractResource.URIs.baseURI);
-        genericMetaInf.setPublisher(AbstractResource.URIs.baseURI);
-        genericMetaInf.setContributor("http://opentox.org/");
-        genericMetaInf.setDate("2009-11-18");
-        genericMetaInf.setFormat(MediaType.TEXT_XML.toString());
-        genericMetaInf.setAudience("QSAR Experts, Biologists, Toxicologists");
-        genericMetaInf.setProvenance("");
-        genericMetaInf.setSource(AbstractResource.baseURI);
-        genericMetaInf.setRelation("http://opentox.org");
+        genericMetaInf.type=("http://purl.org/dc/dcmitype/Service");
+        genericMetaInf.rights=(AbstractResource.URIs.licenceUri);
+        genericMetaInf.language=("en");
+        genericMetaInf.creator=(AbstractResource.URIs.baseURI);
+        genericMetaInf.publisher=(AbstractResource.URIs.baseURI);
+        genericMetaInf.contributor=("http://opentox.org/");
+        genericMetaInf.date=("2009-11-18");
+        genericMetaInf.format=(MediaType.TEXT_XML.toString());
+        genericMetaInf.audience=("QSAR Experts, Biologists, Toxicologists");
+        genericMetaInf.provenance=("");
+        genericMetaInf.source=(AbstractResource.baseURI);
+        genericMetaInf.relation=("http://opentox.org");
 
        
         if (algorithm == AlgorithmEnum.mlr) {
             AlgorithmMetaInf MlrMetaInf = genericMetaInf;
             MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
-            MlrMetaInf.setTitle("mlr");
-            MlrMetaInf.setSubject("MLR, Multiple Linear Regression");
-            MlrMetaInf.setAlgorithmType(RegressionOntology+":mlr");
-            MlrMetaInf.setDescription("Multiple Linear Regression Training Algorithm");
-            MlrMetaInf.setIdentifier(AbstractResource.URIs.mlrAlgorithmURI);
+            MlrMetaInf.title=("mlr");
+            MlrMetaInf.subject=("MLR, Multiple Linear Regression");
+            MlrMetaInf.algorithmType=(RegressionOntology+":mlr");
+            MlrMetaInf.description=("Multiple Linear Regression Training Algorithm");
+            MlrMetaInf.identifier=(AbstractResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.mlr),
                     Parameters(AlgorithmEnum.mlr));
 
@@ -123,28 +128,28 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         } else if (algorithm == AlgorithmEnum.svm) {
             AlgorithmMetaInf SvmMetaInf = genericMetaInf;
             SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
-            SvmMetaInf.setTitle("svm");
-            SvmMetaInf.setSubject("SVM Regression");
-            SvmMetaInf.setAlgorithmType(RegressionOntology+":svm");
-            SvmMetaInf.setDescription("Training Algorithm for Support Vector" +
+            SvmMetaInf.title=("svm");
+            SvmMetaInf.subject=("SVM Regression");
+            SvmMetaInf.algorithmType=(RegressionOntology+":svm");
+            SvmMetaInf.description=("Training Algorithm for Support Vector" +
                     "Machine Regression Models");
             SvmMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svm),
                     Parameters(AlgorithmEnum.svm));
-            SvmMetaInf.setIdentifier(AbstractResource.URIs.svmAlgorithmURI);
+            SvmMetaInf.identifier=(AbstractResource.URIs.svmAlgorithmURI);
 
             representation = getStringRepresentationForMetaInf(SvmMetaInf, media);
 
         } else if (algorithm == AlgorithmEnum.svc) {
             AlgorithmMetaInf SvcMetaInf = genericMetaInf;
             SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
-            SvcMetaInf.setTitle("svc");
-            SvcMetaInf.setSubject("SVC Classification");
-            SvcMetaInf.setAlgorithmType(RegressionOntology+":svc");
-            SvcMetaInf.setDescription("Training Algorithm for Support Vector" +
+            SvcMetaInf.title=("svc");
+            SvcMetaInf.subject=("SVC Classification");
+            SvcMetaInf.algorithmType=(RegressionOntology+":svc");
+            SvcMetaInf.description=("Training Algorithm for Support Vector" +
                     "Machine Classification Models");
             SvcMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svc),
                     Parameters(AlgorithmEnum.svc));
-            SvcMetaInf.setIdentifier(AbstractResource.URIs.svcAlgorithmURI);
+            SvcMetaInf.identifier=(AbstractResource.URIs.svcAlgorithmURI);
 
             representation = getStringRepresentationForMetaInf(SvcMetaInf, media);       
         }

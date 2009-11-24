@@ -1,5 +1,6 @@
-package org.opentox.Resources.Algorithms;
+package org.opentox.formatters;
 
+import org.opentox.Resources.Algorithms.*;
 import java.util.ArrayList;
 import org.restlet.representation.StringRepresentation;
 
@@ -9,7 +10,7 @@ import org.restlet.representation.StringRepresentation;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class AbstractAlgorithmFormater{
+public abstract class AbstractAlgorithmFormatter{
 
     
     public AlgorithmMetaInf metainf;
@@ -27,7 +28,7 @@ public abstract class AbstractAlgorithmFormater{
     /**
      * Constructor of the Abstract Formater.
      */
-    public AbstractAlgorithmFormater() {}
+    public AbstractAlgorithmFormatter() {}
 
     /**
      * Returns the Corresponding Representation.
