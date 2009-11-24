@@ -13,18 +13,6 @@ import org.restlet.representation.StringRepresentation;
  * @author Sarimveis Harry
  */
 public class AlgorithmTurtleFormatter extends AbstractAlgorithmFormatter{
-    
-//      _:b1  rdf:type ot:Parameter ;
-//       dc:title "Pruning"^^xsd:string ;
-//       ot:paramScope "mandatory"^^xsd:string ;
-//       ot:paramValue "-P"^^xsd:string .
-//
-//	_:b2  rdf:type ot:Parameter ;
-//	      dc:title "Max number of instances in a node"^^xsd:string ;
-//	      ot:paramScope "optional"^^xsd:string ;
-//	      ot:paramValue "-M 10"^^xsd:string .
-//
-
 
     private static final MediaType mime = MediaType.APPLICATION_RDF_TURTLE;
 

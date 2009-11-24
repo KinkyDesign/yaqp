@@ -1,7 +1,6 @@
 package org.opentox.formatters;
 
 import org.opentox.Resources.Algorithms.*;
-import org.opentox.formatters.AbstractAlgorithmFormatter;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 

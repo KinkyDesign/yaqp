@@ -69,8 +69,8 @@ public class SvcTrainer extends AbstractTrainer{
 
             //Scaling data and saving a temp scaled data file (dsd format)
             svm_scale scaler = new svm_scale();
-
-            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s", Directories.rangesDir + "/" + model_id, tempDsdFile.getPath()};
+            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s",
+             Directories.rangesDir + "/" + model_id, tempDsdFile.getPath()};
 
             File tempScaledFile = new File(Directories.tempScaledDir + "/" + CreateARandomFilename());
             while (tempScaledFile.exists()) {
@@ -92,9 +92,12 @@ public class SvcTrainer extends AbstractTrainer{
             if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
                 try {
 
-                    representation = new StringRepresentation(internalStatus.toString(), MediaType.TEXT_PLAIN);
+                    representation = new StringRepresentation(internalStatus.toString(),
+                            MediaType.TEXT_PLAIN);
                     svm_train.main(options);
-                    representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/" + model_id + "\n\n", MediaType.TEXT_PLAIN);
+                    representation = new StringRepresentation(
+                            AbstractResource.URIs.modelURI + "/" + model_id +
+                            "\n\n", MediaType.TEXT_PLAIN);
 
                     /**
                      * Check if the model was created.
@@ -113,7 +116,8 @@ public class SvcTrainer extends AbstractTrainer{
                         setInternalStatus(Status.SERVER_ERROR_INTERNAL);
                     } else {
                         /** if the model was successfully created... **/
-                        org.opentox.Applications.OpenToxApplication.dbcon.registerNewModel(AbstractResource.URIs.svcAlgorithmURI);
+                        org.opentox.Applications.OpenToxApplication.dbcon.
+                                registerNewModel(AbstractResource.URIs.svcAlgorithmURI);
                         setInternalStatus(Status.SUCCESS_OK);
                     }
 
@@ -126,7 +130,9 @@ public class SvcTrainer extends AbstractTrainer{
                      */
                     if (internalStatus.equals(Status.SUCCESS_OK)) {
 
-                        representation = new StringRepresentation(AbstractResource.URIs.svcAlgorithmURI + "/" + model_id + "\n\n", MediaType.TEXT_PLAIN);
+                        representation = new StringRepresentation(
+                                AbstractResource.URIs.mlrAlgorithmURI + "/" +
+                                model_id + "\n\n", MediaType.TEXT_PLAIN);
                         String xmlstr = xmlString();
                         try {
                             FileWriter fstream = new FileWriter(Directories.modelXmlDir + "/" + model_id);
@@ -143,16 +149,8 @@ public class SvcTrainer extends AbstractTrainer{
                 }
             }
 
-            if (tempScaledFile.exists()){
-                tempScaledFile.delete();
-            }
-
         } catch (IOException ex) {
             Logger.getLogger(SvcTrainer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (tempDsdFile.exists()){
-            tempDsdFile.delete();
         }
 
 
@@ -354,7 +352,8 @@ public class SvcTrainer extends AbstractTrainer{
         try {
             d = Double.parseDouble(cost);
             if (d <= 0) {
-                errorDetails = errorDetails + "* [Inacceptable Parameter Value] The cost should be strictly positive\n";
+                errorDetails = errorDetails +
+                        "* [Inacceptable Parameter Value] The cost should be strictly positive\n";
                 setInternalStatus(clientPostedWrongParametersStatus);
             }
         } catch (NumberFormatException e) {
@@ -372,11 +371,13 @@ public class SvcTrainer extends AbstractTrainer{
         try {
             d = Double.parseDouble(epsilon);
             if (d <= 0) {
-                errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsinlon must be strictly positive!\n";
+                errorDetails = errorDetails +
+                        "* [Inacceptable Parameter Value] Epsinlon must be strictly positive!\n";
                 setInternalStatus(clientPostedWrongParametersStatus);
             }
         } catch (NumberFormatException e) {
-            errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
+            errorDetails = errorDetails +
+                    "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
         }
 
@@ -387,11 +388,13 @@ public class SvcTrainer extends AbstractTrainer{
         try {
             i = Integer.parseInt(degree);
             if (i <= 0) {
-                errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
+                errorDetails = errorDetails +
+                        "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
                 setInternalStatus(clientPostedWrongParametersStatus);
             }
         } catch (NumberFormatException e) {
-            errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
+            errorDetails = errorDetails +
+                    "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
         }
 
@@ -404,11 +407,13 @@ public class SvcTrainer extends AbstractTrainer{
         try {
             d = Double.parseDouble(gamma);
             if (d <= 0) {
-                errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
+                errorDetails = errorDetails +
+                        "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
                 setInternalStatus(clientPostedWrongParametersStatus);
             }
         } catch (NumberFormatException e) {
-            errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
+            errorDetails = errorDetails +
+                    "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
         }
 
