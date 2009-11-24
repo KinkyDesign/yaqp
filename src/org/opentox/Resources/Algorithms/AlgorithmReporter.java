@@ -30,33 +30,33 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         String[][] Parameters = null;
         if (algorithm == AlgorithmEnum.svm) {
             Parameters = new String[][]{
-                        {"dataset", "String", "null"},
-                        {"target", "String", "null"},
-                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf"},
-                        {"cost", "Double", "10"},
-                        {"epsilon", "Double", "0.1"},
-                        {"gamma", "Double", "1"},
-                        {"coeff0", "Double", "0"},
-                        {"Degree", "Integer", "3"},
-                        {"tolerance", "Double", "1E-4"},
-                        {"cacheSize", "Integer", "50"}
+                        {"dataset", "String", "null", "mandatory"},
+                        {"target", "String", "null", "mandatory"},
+                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf", "optional"},
+                        {"cost", "Double", "10", "optional"},
+                        {"epsilon", "Double", "0.1", "optional"},
+                        {"gamma", "Double", "1", "optional"},
+                        {"coeff0", "Double", "0", "optional"},
+                        {"Degree", "Integer", "3", "optional"},
+                        {"tolerance", "Double", "1E-4", "optional"},
+                        {"cacheSize", "Integer", "50", "optional"}
                     };
         } else if (algorithm == AlgorithmEnum.svc) {
             Parameters = new String[][]{
-                        {"dataset", "String", "null"},
-                        {"target", "String", "null"},
-                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf"},
-                        {"cost", "Double", "10"},
-                        {"gamma", "Double", "1"},
-                        {"coeff0", "Double", "0"},
-                        {"Degree", "Integer", "3"},
-                        {"tolerance", "Double", "1E-4"},
-                        {"cacheSize", "Integer", "50"}
+                        {"dataset", "String", "null", "mandatory"},
+                        {"target", "String", "null", "mandatory"},
+                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf", "optional"},
+                        {"cost", "Double", "10", "optional"},
+                        {"gamma", "Double", "1", "optional"},
+                        {"coeff0", "Double", "0", "optional"},
+                        {"Degree", "Integer", "3", "optional"},
+                        {"tolerance", "Double", "1E-4", "optional"},
+                        {"cacheSize", "Integer", "50", "optional"}
                     };
         } else if (algorithm == AlgorithmEnum.mlr) {
             Parameters = new String[][]{
-                        {"dataset", "String", "null"},
-                        {"target", "String", "null"}
+                        {"dataset", "String", "null", "mandatory"},
+                        {"target", "String", "null", "mandatory"}
                     };
         }
         return Parameters;
@@ -110,7 +110,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         if (algorithm == AlgorithmEnum.mlr) {
             AlgorithmMetaInf MlrMetaInf = genericMetaInf;
             MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
-            MlrMetaInf.setTitle("Multiple Linear Regression");
+            MlrMetaInf.setTitle("mlr");
             MlrMetaInf.setSubject("MLR, Multiple Linear Regression");
             MlrMetaInf.setAlgorithmType(RegressionOntology+":mlr");
             MlrMetaInf.setDescription("Multiple Linear Regression Training Algorithm");
@@ -123,7 +123,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         } else if (algorithm == AlgorithmEnum.svm) {
             AlgorithmMetaInf SvmMetaInf = genericMetaInf;
             SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
-            SvmMetaInf.setTitle("Support Vector Machine Regression");
+            SvmMetaInf.setTitle("svm");
             SvmMetaInf.setSubject("SVM Regression");
             SvmMetaInf.setAlgorithmType(RegressionOntology+":svm");
             SvmMetaInf.setDescription("Training Algorithm for Support Vector" +
@@ -137,7 +137,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         } else if (algorithm == AlgorithmEnum.svc) {
             AlgorithmMetaInf SvcMetaInf = genericMetaInf;
             SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
-            SvcMetaInf.setTitle("Support Vector Machine Classification");
+            SvcMetaInf.setTitle("svc");
             SvcMetaInf.setSubject("SVC Classification");
             SvcMetaInf.setAlgorithmType(RegressionOntology+":svc");
             SvcMetaInf.setDescription("Training Algorithm for Support Vector" +

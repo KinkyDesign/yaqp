@@ -20,7 +20,9 @@ public abstract class AbstractAlgorithmFormater{
             ot="http://www.opentox.org/api/1.1#",
             xsd="http://www.w3.org/2001/XMLSchema#",
             rdfs="http://www.w3.org/2000/01/rdf-schema#",
-            owl="http://www.w3.org/2002/07/owl#";
+            owl="http://www.w3.org/2002/07/owl#",
+            defaultNs="http://opentox.org/example/1.1/#",
+            protege="http://protege.stanford.edu/plugins/owl/protege#";
 
     /**
      * Constructor of the Abstract Formater.

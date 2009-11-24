@@ -28,7 +28,7 @@ import java.util.*;
  *       };<br/>
  * <br/>
  *   // Create an svm_scale object using the default constructor:<br/>
- *   svm_scale a = new svm_scale("");<br/>
+ *   svm_scale a = new svm_scale();<br/>
  *   <br/>
  * <br/>
  *   // Perform the scaling:    <br/>
