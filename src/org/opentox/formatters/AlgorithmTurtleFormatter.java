@@ -2,7 +2,7 @@ package org.opentox.formatters;
 
 
 import org.opentox.Resources.Algorithms.*;
-import org.opentox.formatters.AbstractAlgorithmFormatter;
+import org.opentox.formatters.Elements.*;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
@@ -31,28 +31,43 @@ public class AlgorithmTurtleFormatter extends AbstractAlgorithmFormatter{
         builder.append("@prefix rdf: <"+rdf  +"> .\n");
         builder.append("@prefix rdfs: <"+rdfs +"> .\n");
         builder.append("@prefix protege: <"+protege +"> .\n");
-        builder.append("@prefix xsd: <"+xsd+"> .\n");
+        builder.append("@prefix xsd: <"+xsd+"> .\n\n");
+
         for (int i=0;i<metainf.Parameters.length;i++){
             builder.append("_:prmnode"+i+ " rdf:type ot:Parameter ;\n");
-            builder.append("dc:title \""+metainf.Parameters[i][0]+"\" ; \n");
-            builder.append("ot:paramScope \""+metainf.Parameters[i][3]+"\"^^xsd:"+
-                    metainf.Parameters[i][1]+" ; \n");
-            builder.append("ot:paramValue \""+metainf.Parameters[i][2]+"\""+"^^xsd:"+
-                    metainf.Parameters[i][1]+" . \n");
+            builder.append(DC.title+" \""+metainf.Parameters[i][0]+"\" ; \n");
+            builder.append(OT.paramScope+" \""+metainf.Parameters[i][3]+"\"^^xsd:string ; \n");
+            builder.append(OT.paramValue+" \""+metainf.Parameters[i][2]+"\""+"^^xsd:"+
+                    metainf.Parameters[i][1]+" . \n\n");
+        }
+        builder.append("\n\n");
+
+          for (int j = 0; j < metainf.statisticsSupported.size(); j++) {
+            builder.append("_:stat" + j + " rdf:type ot:statistic;\n");
+            builder.append("dc:title \"" + metainf.statisticsSupported.get(j) +
+                    "\"^^xsd:string .\n\n");
         }
 
         builder.append("default:"+metainf.title+"\n");
-        builder.append("rdf:type ot:Algorithm;\n");
-        builder.append("rdfs:comment \"\"^^xsd:string ;\n");
-        builder.append("dc:identifier \""+metainf.identifier+"\" ;\n");
-        builder.append("dc:title \""+metainf.title+"\" ;\n");
-        builder.append("dc:source \""+metainf.source+"\" ;\n");
-        builder.append("dc:rights \""+metainf.rights+"\" ;\n");
+        builder.append(RDF.type+" ot:Algorithm;\n");
+        builder.append(RDFS.comment+" \"\"^^xsd:string ;\n");
+        builder.append(DC.identifier+" \""+metainf.identifier+"\" ;\n");
+        builder.append(DC.title+" \""+metainf.title+"\" ;\n");
+        builder.append(DC.source+" \""+metainf.source+"\" ;\n");
+        builder.append(DC.rights+" \""+metainf.rights+"\" ;\n");
+
+        builder.append("ot:statisticsSupported :");
+        for (int i = 0; i < metainf.statisticsSupported.size() - 1; i++) {
+            builder.append("_:stat" + i + " , ");
+        }
+        builder.append("_:stat" + (metainf.statisticsSupported.size() - 1)+";\n");
+
         builder.append("ot:parameters: ");
         for (int i=0;i<metainf.Parameters.length-1;i++){
             builder.append("_:prmnode"+i+" , ");
         }
-        builder.append("_:prmnode"+metainf.Parameters.length);
+        builder.append("_:prmnode"+(metainf.Parameters.length-1));
+
         builder.append(" .\n");
 
 

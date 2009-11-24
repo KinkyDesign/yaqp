@@ -1,7 +1,6 @@
 package org.opentox.formatters;
 
 import org.opentox.Resources.Algorithms.*;
-import org.opentox.formatters.AbstractAlgorithmFormatter;
 import org.opentox.Resources.AbstractResource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
@@ -32,47 +31,6 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
     }
 
 
-    private static class Elements{
-
-        static class RDF{
-            static String description = "rdf:Description",
-                    about = "rdf:about",
-                    datatype="rdf:datatype",
-                    RDF="rdf:RDF";
-        }
-
-        static class DC{
-            static String title="dc:title",
-                    subject="dc:subject",
-                    type="dc:type",
-                    source="dc:source",
-                    relation="dc:relation",
-                    rights="dc:rights",
-                    creator="dc:creator",
-                    publisher="dc:publisher",
-                    contributor="dc:contributor",
-                    description="dc:description",
-                    date="dc:date",
-                    format="dc:format",
-                    identifier="dc:identifier",
-                    audience="dc:audience",
-                    provenance="dc:provenance",
-                    language="dc:language";
-        }
-
-        static class OT{
-            static String
-                    alg="ot:Algorithmalgorithm",
-                    algType="ot:AlgorithmalgorithmType",
-                    algParameters="ot:AlgorithmParameters",
-                    algParam="ot:AlgorithmParam",
-                    algParamName="ot:AlgorithmParamName",
-                    algParamDefaultValue="ot:AlgorithmParamDefaultValue",
-                    algstatisticsSupported="ot:AlgorithmstatisticsSupported",
-                    algstatistic="ot:Algorithmstatistic";
-        }
-
-    }
 
 
     @Override

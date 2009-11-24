@@ -35,33 +35,33 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         String[][] Parameters = null;
         if (algorithm == AlgorithmEnum.svm) {
             Parameters = new String[][]{
-                        {"dataset", "String", "null", "mandatory"},
-                        {"target", "String", "null", "mandatory"},
-                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf", "optional"},
-                        {"cost", "Double", "10", "optional"},
-                        {"epsilon", "Double", "0.1", "optional"},
-                        {"gamma", "Double", "1", "optional"},
-                        {"coeff0", "Double", "0", "optional"},
-                        {"Degree", "Integer", "3", "optional"},
-                        {"tolerance", "Double", "1E-4", "optional"},
-                        {"cacheSize", "Integer", "50", "optional"}
+                        {"dataset", "string", "null", "mandatory"},
+                        {"target", "string", "null", "mandatory"},
+                        {"kernel", "string", "rbf", "optional"},
+                        {"cost", "double", "10", "optional"},
+                        {"epsilon", "double", "0.1", "optional"},
+                        {"gamma", "double", "1", "optional"},
+                        {"coeff0", "double", "0", "optional"},
+                        {"Degree", "int", "3", "optional"},
+                        {"tolerance", "double", "1E-4", "optional"},
+                        {"cacheSize", "int", "50", "optional"}
                     };
         } else if (algorithm == AlgorithmEnum.svc) {
             Parameters = new String[][]{
-                        {"dataset", "String", "null", "mandatory"},
-                        {"target", "String", "null", "mandatory"},
-                        {"kernel", "List:{rbf,linear,sigmoid,polynomial}", "rbf", "optional"},
-                        {"cost", "Double", "10", "optional"},
-                        {"gamma", "Double", "1", "optional"},
-                        {"coeff0", "Double", "0", "optional"},
-                        {"Degree", "Integer", "3", "optional"},
-                        {"tolerance", "Double", "1E-4", "optional"},
-                        {"cacheSize", "Integer", "50", "optional"}
+                        {"dataset", "string", "null", "mandatory"},
+                        {"target", "string", "null", "mandatory"},
+                        {"kernel", "string", "rbf", "optional"},
+                        {"cost", "double", "10", "optional"},
+                        {"gamma", "double", "1", "optional"},
+                        {"coeff0", "double", "0", "optional"},
+                        {"Degree", "int", "3", "optional"},
+                        {"tolerance", "double", "1E-4", "optional"},
+                        {"cacheSize", "int", "50", "optional"}
                     };
         } else if (algorithm == AlgorithmEnum.mlr) {
             Parameters = new String[][]{
-                        {"dataset", "String", "null", "mandatory"},
-                        {"target", "String", "null", "mandatory"}
+                        {"dataset", "string", "null", "mandatory"},
+                        {"target", "string", "null", "mandatory"}
                     };
         }
         return Parameters;
