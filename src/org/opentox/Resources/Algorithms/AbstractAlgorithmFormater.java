@@ -27,6 +27,10 @@ public abstract class AbstractAlgorithmFormater{
      */
     public AbstractAlgorithmFormater() {}
 
+    /**
+     * Returns the Corresponding Representation.
+     * @return
+     */
     public abstract StringRepresentation getStringRepresentation();
     
 }

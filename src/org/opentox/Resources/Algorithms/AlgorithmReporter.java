@@ -12,9 +12,9 @@ import org.restlet.representation.StringRepresentation;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmReporter {
+public class AlgorithmReporter extends AbstractAlgorithmReporter{
 
-        private static final String
+    private static final String
             RegressionOntology = "Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable";
 
     private static ArrayList<String> statisticsSupported(AlgorithmEnum algorithm) {
@@ -87,7 +87,7 @@ public class AlgorithmReporter {
     }
 
 
-
+    @Override
     public StringRepresentation FormatedRepresntation(MediaType media, AlgorithmEnum algorithm) {
 
         StringRepresentation representation = null;

@@ -7,8 +7,11 @@ import org.restlet.representation.StringRepresentation;
 
 /**
  * Build an RDF representation for an Algorithm.
+ * Validated at <a href="http://www.rdfabout.com/demo/validator/">
+ * http://www.rdfabout.com/demo/validator/</a> !
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
+ * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
 public class AlgorithmRdfFormater extends AbstractAlgorithmFormater {
@@ -16,6 +19,15 @@ public class AlgorithmRdfFormater extends AbstractAlgorithmFormater {
     private static final MediaType mime = MediaType.APPLICATION_RDF_XML;
 
     private static final long serialVersionUID = 52795861750765264L;
+
+    /**
+     * Class Constructor.
+     * @param metainf Algorithm Meta-information one has to provide to
+     * construct an AlgorithmRdfFormater object.
+     */
+    public AlgorithmRdfFormater(AlgorithmMetaInf metainf) {
+        super.metainf = metainf;
+    }
 
 
     private static class Elements{
@@ -70,41 +82,44 @@ public class AlgorithmRdfFormater extends AbstractAlgorithmFormater {
                 metainf.getAlgorithmType() +
                 "</"+Elements.OT.algType+">\n");
         builder.append("<"+Elements.OT.algParameters+">\n");
-        builder.append("<"+Elements.RDF.description+">");
+        builder.append("<"+Elements.RDF.description+">\n");
         if (metainf.getParameters()[0].length != 3) {
             System.err.println("ERROR!!! Invalid Parameters Element!");
         } else {
             for (int i = 0; i < metainf.getParameters().length; i++) {
-                builder.append("<"+Elements.OT.algParam+">");
-                builder.append("<"+Elements.OT.algParamName+">"+
+                builder.append("<"+Elements.OT.algParam+">\n");
+                builder.append("<"+Elements.RDF.description+">\n");
+                builder.append("<"+Elements.OT.algParamName+">\n"+
                         metainf.getParameters()[i][0]+
-                        "</"+Elements.OT.algParamName+">");
+                        "</"+Elements.OT.algParamName+">\n");
                 builder.append("<"+Elements.OT.algParamDefaultValue+" "+
-                        Elements.RDF.datatype+"=\""+super.xsd+metainf.getParameters()[i][1]+
+                        Elements.RDF.datatype+"=\""+
+                        super.xsd+metainf.getParameters()[i][1]+
                         "\" >");
                 builder.append(metainf.getParameters()[i][2]);
-                builder.append("</"+Elements.OT.algParamDefaultValue+">");
-                builder.append("</"+Elements.OT.algParam+">");
+                builder.append("</"+Elements.OT.algParamDefaultValue+">\n");
+                builder.append("</"+Elements.RDF.description+">\n");
+                builder.append("</"+Elements.OT.algParam+">\n");
             }
         }
-        builder.append("</"+Elements.RDF.description+">");
+        builder.append("</"+Elements.RDF.description+">\n");
         builder.append("</"+Elements.OT.algParameters+">\n");
 
         if (metainf.getStatisticsSupported().isEmpty()) {
             builder.append("<"+Elements.OT.algstatisticsSupported+"/>\n");
         } else {
             builder.append("<"+Elements.OT.algstatisticsSupported+">\n");
-            builder.append("<"+Elements.RDF.description+">");
+            builder.append("<"+Elements.RDF.description+">\n");
             for (int i = 0; i < metainf.getStatisticsSupported().size(); i++) {
-                builder.append("<"+Elements.OT.algstatistic+">" +
+                builder.append("<"+Elements.OT.algstatistic+">\n" +
                         metainf.getStatisticsSupported().get(i) +
                         "</"+Elements.OT.algstatistic+">\n");
             }
-            builder.append("</"+Elements.RDF.description+">");
+            builder.append("</"+Elements.RDF.description+">\n");
             builder.append("</"+Elements.OT.algstatisticsSupported+">\n");
         }
-        builder.append("</"+Elements.RDF.description+">");
-        builder.append("</"+Elements.OT.alg+">");
+        builder.append("</"+Elements.RDF.description+">\n");
+        builder.append("</"+Elements.OT.alg+">\n");
         
         return builder.toString();
     }
@@ -176,12 +191,7 @@ public class AlgorithmRdfFormater extends AbstractAlgorithmFormater {
         builder.append("</"+Elements.RDF.RDF+">\n\n");
         return new StringRepresentation(builder.toString(), mime);
     }
-
-    
-
-    public AlgorithmRdfFormater(AlgorithmMetaInf metainf) {
-        super.metainf = metainf;
-    }
+       
 
     
     /**
