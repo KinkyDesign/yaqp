@@ -1,0 +1,33 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:ot="http://opentox.org/api/1.1/#" > 
+  <rdf:Description rdf:nodeID="A0">
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">my_statistic_1</dc:title>
+    <rdf:type rdf:resource="http://opentox.org/api/1.1/#Statistic"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A1">
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">my_statistic_2</dc:title>
+    <rdf:type rdf:resource="http://opentox.org/api/1.1/#Statistic"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opentox.ntua.gr:3000/algorithm/example_algorithm">
+    <ot:statisticsSupported rdf:nodeID="A1"/>
+    <ot:statisticsSupported rdf:nodeID="A0"/>
+    <ot:parameters rdf:nodeID="A2"/>
+    <ot:parameters rdf:nodeID="A3"/>
+    <dc:type rdf:resource="http://opentox.org/api/1.1/#Algorithm"/>
+    <dc:identifier>http://opentox.ntua.gr:3000/algorithm/example_algorithm</dc:identifier>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A2">
+    <dc:type rdf:resource="http://opentox.org/api/1.1/#Parameter"/>
+    <ot:paramValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">99827</ot:paramValue>
+    <ot:paramScope rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mandatory</ot:paramScope>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">property_2</dc:title>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A3">
+    <dc:type rdf:resource="http://opentox.org/api/1.1/#Parameter"/>
+    <ot:paramValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">114432</ot:paramValue>
+    <ot:paramScope rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mandatory</ot:paramScope>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">property_1</dc:title>
+  </rdf:Description>
+</rdf:RDF>

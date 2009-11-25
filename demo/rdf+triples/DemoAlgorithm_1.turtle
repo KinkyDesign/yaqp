@@ -1,0 +1,33 @@
+@prefix ot:      <http://opentox.org/api/1.1/#> .
+
+<http://opentox.ntua.gr:3000/algorithm/example_algorithm>
+      ot:parameters
+              [ ot:paramScope "mandatory"^^<http://www.w3.org/2001/XMLSchema#string> ;
+                ot:paramValue "99827"^^<http://www.w3.org/2001/XMLSchema#double> ;
+                <http://purl.org/dc/elements/1.1/title>
+                        "property_2"^^<http://www.w3.org/2001/XMLSchema#string> ;
+                <http://purl.org/dc/elements/1.1/type>
+                        ot:Parameter
+              ] ;
+      ot:parameters
+              [ ot:paramScope "mandatory"^^<http://www.w3.org/2001/XMLSchema#string> ;
+                ot:paramValue "114432"^^<http://www.w3.org/2001/XMLSchema#double> ;
+                <http://purl.org/dc/elements/1.1/title>
+                        "property_1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+                <http://purl.org/dc/elements/1.1/type>
+                        ot:Parameter
+              ] ;
+      ot:statisticsSupported
+              [ a       ot:Statistic ;
+                <http://purl.org/dc/elements/1.1/title>
+                        "my_statistic_1"^^<http://www.w3.org/2001/XMLSchema#string>
+              ] ;
+      ot:statisticsSupported
+              [ a       ot:Statistic ;
+                <http://purl.org/dc/elements/1.1/title>
+                        "my_statistic_2"^^<http://www.w3.org/2001/XMLSchema#string>
+              ] ;
+      <http://purl.org/dc/elements/1.1/identifier>
+              "http://opentox.ntua.gr:3000/algorithm/example_algorithm" ;
+      <http://purl.org/dc/elements/1.1/type>
+              ot:Algorithm .

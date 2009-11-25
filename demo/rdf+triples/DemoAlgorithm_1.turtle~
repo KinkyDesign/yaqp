@@ -1,0 +1,78 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix default: <http://opentox.org/example/1.1/#> .
+@prefix ot: <http://www.opentox.org/api/1.1#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix protege: <http://protege.stanford.edu/plugins/owl/protege#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+_:prmnode0 rdf:type ot:Parameter ;
+dc:title "dataset" ; 
+ot:paramScope "mandatory"^^xsd:string ; 
+ot:paramValue "null"^^xsd:string . 
+
+_:prmnode1 rdf:type ot:Parameter ;
+dc:title "target" ; 
+ot:paramScope "mandatory"^^xsd:string ; 
+ot:paramValue "null"^^xsd:string . 
+
+_:prmnode2 rdf:type ot:Parameter ;
+dc:title "kernel" ; 
+ot:paramScope "optional"^^xsd:string ; 
+ot:paramValue "rbf"^^xsd:string . 
+
+_:prmnode3 rdf:type ot:Parameter ;
+dc:title "cost" ; 
+ot:paramScope "optional"^^xsd:string ; 
+ot:paramValue "10"^^xsd:double . 
+
+_:prmnode4 rdf:type ot:Parameter ;
+dc:title "gamma" ; 
+ot:paramScope "optional"^^xsd:string ; 
+ot:paramValue "1"^^xsd:double . 
+
+_:prmnode5 rdf:type ot:Parameter ;
+dc:title "coeff0" ; 
+ot:paramScope "optional"^^xsd:string ; 
+ot:paramValue "0"^^xsd:double . 
+
+_:prmnode6 rdf:type ot:Parameter ;
+dc:title "Degree" ; 
+ot:paramScope "optional"^^xsd:string ; 
+ot:paramValue "3"^^xsd:int . 
+
+_:prmnode7 rdf:type ot:Parameter ;
+dc:title "tolerance" ; 
+ot:paramScope "optional"^^xsd:string ; 
+ot:paramValue "1E-4"^^xsd:double . 
+
+_:prmnode8 rdf:type ot:Parameter ;
+dc:title "cacheSize" ; 
+ot:paramScope "optional"^^xsd:string ; 
+ot:paramValue "50"^^xsd:int . 
+
+
+
+_:stat0 rdf:type ot:statistic;
+dc:title "RootMeanSquaredError"^^xsd:string .
+
+_:stat1 rdf:type ot:statistic;
+dc:title "RelativeAbsoluteError"^^xsd:string .
+
+_:stat2 rdf:type ot:statistic;
+dc:title "RootRelativeSquaredError"^^xsd:string .
+
+_:stat3 rdf:type ot:statistic;
+dc:title "MeanAbsoluteError"^^xsd:string .
+
+default:svc
+rdf:type ot:Algorithm;
+rdfs:comment ""^^xsd:string ;
+dc:identifier "http://opentox.ntua.gr:3000/algorithm/svc" ;
+dc:title "svc" ;
+dc:source "http://opentox.ntua.gr:3000" ;
+dc:rights "http://www.gnu.org/licenses/gpl.txt" ;
+ot:statisticsSupported  _:stat0 , _:stat1 , _:stat2 , _:stat3;
+ot:parameters _:prmnode0 , _:prmnode1 , _:prmnode2 , _:prmnode3 , _:prmnode4 , _:prmnode5 , _:prmnode6 , _:prmnode7 , _:prmnode8 .
+
