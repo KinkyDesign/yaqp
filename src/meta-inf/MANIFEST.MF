@@ -3,8 +3,8 @@ Main-Class: org.opentox.server.Server
 
 Name: org/opentox/
 Specification-Title: OpenTox Restful WebServices
-Specification-Version: 1.3.2 (testing)
+Specification-Version: 1.3.3 (testing)
 Specification-Vendor: http://www.opentox.org/, OpenTox - An Open Source Predictive Toxicology Framework
 Implementation-Title: org.opentox
-Implementation-Version: build_2212 (Nov 22, 2009)
+Implementation-Version: build_2480 (Nov 26, 2009)
 Implementation-Vendor: National Technical University of Athens, School of Chemical Engineering, Automatic Control Laboratory

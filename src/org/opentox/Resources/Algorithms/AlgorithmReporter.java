@@ -36,7 +36,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         String[][] Parameters = null;
         if (algorithm == AlgorithmEnum.svm) {
             Parameters = new String[][]{
-                        {"dataset", "string", "null", "mandatory"},
+//                        {"dataset", "string", "null", "mandatory"},
                         {"target", "string", "null", "mandatory"},
                         {"kernel", "string", "rbf", "optional"},
                         {"cost", "double", "10", "optional"},
@@ -49,7 +49,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
                     };
         } else if (algorithm == AlgorithmEnum.svc) {
             Parameters = new String[][]{
-                        {"dataset", "string", "null", "mandatory"},
+  //                      {"dataset", "string", "null", "mandatory"},
                         {"target", "string", "null", "mandatory"},
                         {"kernel", "string", "rbf", "optional"},
                         {"cost", "double", "10", "optional"},
@@ -61,7 +61,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
                     };
         } else if (algorithm == AlgorithmEnum.mlr) {
             Parameters = new String[][]{
-                        {"dataset", "string", "null", "mandatory"},
+    //                    {"dataset", "string", "null", "mandatory"},
                         {"target", "string", "null", "mandatory"}
                     };
         }
