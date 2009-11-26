@@ -1,22 +1,19 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package org.opentox.formatters;
 
-
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import org.opentox.Resources.AbstractResource;
-import org.opentox.Resources.Algorithms.*;
-import org.opentox.formatters.NameSpaces.*;
+import org.opentox.Resources.Algorithms.AlgorithmMetaInf;
 import org.restlet.data.MediaType;
-import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
+import org.opentox.formatters.NameSpaces.*;
 
 /**
  *
@@ -24,19 +21,25 @@ import org.restlet.representation.StringRepresentation;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmTurtleFormatter extends AbstractAlgorithmFormatter{
+public class AlgorithmTriplesFormatter extends AbstractAlgorithmFormatter{
+private static final MediaType mime = MediaType.APPLICATION_RDF_TRIX;
 
-    private static final MediaType mime = MediaType.APPLICATION_RDF_TURTLE;
+    private static final long serialVersionUID = 52795861750765264L;
 
-    public AlgorithmTurtleFormatter(AlgorithmMetaInf metainf){
-        super();
+    /**
+     * Class Constructor.
+     * @param metainf Algorithm Meta-information one has to provide to
+     * construct an AlgorithmRdfFormater object.
+     */
+    public AlgorithmTriplesFormatter(AlgorithmMetaInf metainf) {
         super.metainf = metainf;
     }
-    
+
+
+
+
     @Override
     public StringRepresentation getStringRepresentation() {
-
-
         com.hp.hpl.jena.rdf.model.Model model =
                 com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
 
@@ -78,10 +81,12 @@ public class AlgorithmTurtleFormatter extends AbstractAlgorithmFormatter{
 
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        model.write(outStream, "TTL");
+        model.write(outStream, "N-TRIPLE");
 
         return new StringRepresentation(outStream.toString(), mime);
     }
 
-    
+
+
+
 }

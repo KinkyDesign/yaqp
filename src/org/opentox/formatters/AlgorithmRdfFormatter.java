@@ -1,5 +1,11 @@
 package org.opentox.formatters;
 
+
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
+import java.io.ByteArrayOutputStream;
+import org.opentox.formatters.NameSpaces.*;
 import org.opentox.Resources.Algorithms.*;
 import org.opentox.Resources.AbstractResource;
 import org.restlet.data.MediaType;
@@ -35,33 +41,53 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
 
     @Override
     public StringRepresentation getStringRepresentation() {        
-        return null;
+        com.hp.hpl.jena.rdf.model.Model model =
+                com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
+
+        model.setNsPrefix("ot", OT.getURI());
+        model.setNsPrefix("dc", DC.getURI());
+
+        com.hp.hpl.jena.rdf.model.Resource algorithmResource =
+                model.createResource(
+                metainf.identifier);
+
+        algorithmResource.
+                addProperty(DC.identifier, metainf.identifier).
+                addProperty(DC.type, OT.algorithm).
+                addProperty(DC.rights, metainf.rights).
+                addProperty(DC.publisher, AbstractResource.URIs.baseURI);
+
+        /**
+         * Add Parameters....
+         */
+        for (int i=0;i<metainf.Parameters.length;i++){
+            algorithmResource.
+                addProperty(OT.parameters, model.createResource().
+                    addProperty(DC.title,metainf.Parameters[i][0], XSDDatatype.XSDstring).
+                    addProperty(OT.paramScope, metainf.Parameters[i][3], XSDDatatype.XSDstring).
+                    addProperty(OT.paramValue, metainf.Parameters[i][2]).
+                    addProperty(DC.type, OT.parameter)
+                 );
+        }
+
+        /**
+         * Add supported statistics...
+         */
+        for (int i=0;i<metainf.statisticsSupported.size();i++){
+            algorithmResource.addProperty(OT.statisticsSupported,
+                model.createResource(). addProperty(RDF.type, OT.statistic).
+                addProperty(DC.title, metainf.statisticsSupported.get(i), XSDDatatype.XSDstring)
+                );
+        }
+
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        model.write(outStream);
+
+        return new StringRepresentation(outStream.toString(), mime);
     }
        
 
     
-    /**
-     * @param rdfns A new namespace for RDF
-     */
-    public void setRdfNamespace(String rdfns) {
-        this.rdf = rdfns;
-    }
-
-    /**
-     * Update the namespace for OpenTox Models and Algorithms.
-     * @param otns
-     */
-    public void setOpentoxNamespace(String otns) {
-        this.ot = otns;
-    }
-
-    /**
-     * Update the Dublin Core namespace.
-     * @param dcns new DCNS
-     */
-    public void setDcNamespace(String dcns) {
-        this.dc = dcns;
-    }
-
-   
+       
 }

@@ -69,6 +69,7 @@ public class Algorithm extends AbstractResource {
         variants.add(new Variant(OpenToxMediaType.TEXT_YAML));
         variants.add(new Variant(MediaType.APPLICATION_JSON));
         variants.add(new Variant(MediaType.APPLICATION_RDF_TURTLE));  //-- (application/x-turtle)
+        variants.add(new Variant(MediaType.APPLICATION_RDF_TRIX));  //-- (application/trix)
         getVariants().put(Method.GET, variants);
 
         /** The algorithm id can be one of {svm, mlr, svc} **/

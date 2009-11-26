@@ -8,6 +8,7 @@ import org.opentox.formatters.AlgorithmJsonFormatter;
 import java.util.ArrayList;
 import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.AbstractResource;
+import org.opentox.formatters.AlgorithmTriplesFormatter;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
@@ -69,7 +70,8 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
 
 
 
-    private StringRepresentation getStringRepresentationForMetaInf(AlgorithmMetaInf metainf, MediaType media){
+    private StringRepresentation getStringRepresentationForMetaInf(
+            AlgorithmMetaInf metainf, MediaType media){
         StringRepresentation representation = null;
         if (MediaType.APPLICATION_RDF_XML.equals(media)) {
                 AlgorithmRdfFormatter formater = new AlgorithmRdfFormatter(metainf);
@@ -85,6 +87,9 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
                 representation = formater.getStringRepresentation();
             } else if (OpenToxMediaType.TEXT_YAML.equals(media)) {
                 AlgorithmYamlFormatter formater = new AlgorithmYamlFormatter(metainf);
+                representation = formater.getStringRepresentation();
+            }else if (MediaType.APPLICATION_RDF_TRIX.equals(media)){
+                AlgorithmTriplesFormatter formater = new AlgorithmTriplesFormatter(metainf);
                 representation = formater.getStringRepresentation();
             } else {
             }
