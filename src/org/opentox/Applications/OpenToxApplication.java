@@ -11,7 +11,7 @@ import javax.security.auth.Subject;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.Algorithms.Algorithm;
 import org.opentox.Resources.Models.Model;
-import org.opentox.Resources.List.ListAllModels;
+import org.opentox.Resources.List.ListModels;
 import org.opentox.Resources.List.ListAlgorithms;
 import org.opentox.Resources.IndexResource;
 import org.opentox.Resources.StyleSheetResource;
@@ -205,7 +205,7 @@ public class OpenToxApplication extends Application {
         router.attach("/algorithm", ListAlgorithms.class);
         router.attach("/algorithm/{id}", Algorithm.class);
 
-        router.attach("/model", ListAllModels.class);
+        router.attach("/model", ListModels.class);
         router.attach("/model/{model_id}", modelKerberos);// The deletion of models is guarded!!!
 
 
