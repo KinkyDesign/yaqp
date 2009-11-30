@@ -1,5 +1,6 @@
 package org.opentox.Resources.Algorithms;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import org.opentox.formatters.AlgorithmYamlFormatter;
 import org.opentox.formatters.AlgorithmXmlFormatter;
 import org.opentox.formatters.AlgorithmTurtleFormatter;
@@ -32,38 +33,28 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         return statisticsSupported;
     }
 
-    private static String[][] Parameters(AlgorithmEnum algorithm) {
-        String[][] Parameters = null;
+    private static ArrayList<AlgorithmParameter> Parameters(AlgorithmEnum algorithm) {
+        ArrayList<AlgorithmParameter> Parameters = new ArrayList<AlgorithmParameter>();
+        Parameters.add(new AlgorithmParameter<String>("target", XSDDatatype.XSDstring, "null", "mandatory"));
         if (algorithm == AlgorithmEnum.svm) {
-            Parameters = new String[][]{
-//                        {"dataset", "string", "null", "mandatory"},
-                        {"target", "string", "null", "mandatory"},
-                        {"kernel", "string", "rbf", "optional"},
-                        {"cost", "double", "10", "optional"},
-                        {"epsilon", "double", "0.1", "optional"},
-                        {"gamma", "double", "1", "optional"},
-                        {"coeff0", "double", "0", "optional"},
-                        {"Degree", "int", "3", "optional"},
-                        {"tolerance", "double", "1E-4", "optional"},
-                        {"cacheSize", "int", "50", "optional"}
-                    };
+            Parameters.add(new AlgorithmParameter<String>("kernel", XSDDatatype.XSDstring, "rbf", "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("cost", XSDDatatype.XSDdouble, 10.0, "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("epsilon", XSDDatatype.XSDdouble, 0.10, "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("gamma", XSDDatatype.XSDdouble, 1.00, "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("coeff0", XSDDatatype.XSDdouble, 0.0, "optional"));
+            Parameters.add(new AlgorithmParameter<Integer>("degree", XSDDatatype.XSDpositiveInteger, 3, "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("tolerance", XSDDatatype.XSDdouble, 0.0001, "optional"));
+            Parameters.add(new AlgorithmParameter<Integer>("tolerance", XSDDatatype.XSDpositiveInteger, 50, "optional"));                    
         } else if (algorithm == AlgorithmEnum.svc) {
-            Parameters = new String[][]{
-  //                      {"dataset", "string", "null", "mandatory"},
-                        {"target", "string", "null", "mandatory"},
-                        {"kernel", "string", "rbf", "optional"},
-                        {"cost", "double", "10", "optional"},
-                        {"gamma", "double", "1", "optional"},
-                        {"coeff0", "double", "0", "optional"},
-                        {"Degree", "int", "3", "optional"},
-                        {"tolerance", "double", "1E-4", "optional"},
-                        {"cacheSize", "int", "50", "optional"}
-                    };
+            Parameters.add(new AlgorithmParameter<String>("kernel", XSDDatatype.XSDstring, "rbf", "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("cost", XSDDatatype.XSDdouble, 10.0, "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("gamma", XSDDatatype.XSDdouble, 1.00, "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("coeff0", XSDDatatype.XSDdouble, 0.0, "optional"));
+            Parameters.add(new AlgorithmParameter<Integer>("degree", XSDDatatype.XSDpositiveInteger, 3, "optional"));
+            Parameters.add(new AlgorithmParameter<Double>("tolerance", XSDDatatype.XSDdouble, 0.0001, "optional"));
+            Parameters.add(new AlgorithmParameter<Integer>("tolerance", XSDDatatype.XSDpositiveInteger, 50, "optional"));
         } else if (algorithm == AlgorithmEnum.mlr) {
-            Parameters = new String[][]{
-    //                    {"dataset", "string", "null", "mandatory"},
-                        {"target", "string", "null", "mandatory"}
-                    };
+            
         }
         return Parameters;
     }

@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.opentox.client;
 
 import java.io.BufferedReader;
@@ -21,7 +16,7 @@ import org.restlet.data.Status;
 import weka.core.Instances;
 
 /**
- * This class
+ * This class is used to make HTTP requests to other servers.
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Kolotouros Dimitris

@@ -29,10 +29,10 @@ public class AlgorithmJsonFormatter extends AbstractAlgorithmFormatter {
         builder.append("\"id\" : \""+metainf.identifier+"\",\n");
         builder.append("\"AlgorithmType\" : \""+metainf.algorithmType+"\",\n");
         builder.append("\"Parameters\" : {\n");
-        for (int i=0;i<metainf.Parameters.length;i++){
-            builder.append("\""+metainf.Parameters[i][0]+"\" : { \"type\" : \""+
-                    metainf.Parameters[i][1]+
-                    "\" , \"defaultValue\"  :\""+metainf.Parameters[i][2]+"\"\n");
+        for (int i=0;i<metainf.Parameters.size();i++){
+            builder.append("\""+metainf.Parameters.get(i).paramName+"\" : { \"type\" : \""+
+                    metainf.Parameters.get(i).dataType.toString()+
+                    "\" , \"defaultValue\"  :\""+metainf.Parameters.get(i).paramValue.toString()+"\"\n");
         }
         builder.append("},\n");
         builder.append("\"statisticsSupported\" : {\n");

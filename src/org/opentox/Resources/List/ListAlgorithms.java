@@ -50,27 +50,16 @@ public class ListAlgorithms extends AbstractResource {
     public Representation get(Variant variant) {
 
     ReferenceList list = new ReferenceList();    
-    String cls=baseURI+"/algorithm/learning/classification";
-    String reg=baseURI+"/algorithm/learning/regression";
-    String feat=baseURI+"/algorithm/preprocessing/featureselection/";
+    
+    Set<String > algorithms = AlgorithmsSet();
+    Iterator<String > algorithmIterator = algorithms.iterator();
+    
 
-    Map<String, Set<String>> map = getAlgorithmIdsAsMap();
-    Iterator<String> classificationAlgorithms = map.get("classification").iterator();
-    Iterator<String> regressionAlgorithms = map.get("regression").iterator();
-    Iterator<String> featureSelectionAlgorithms = map.get("featureselection").iterator();    
-
-    while (classificationAlgorithms.hasNext()){
-        list.add(cls+"/"+classificationAlgorithms.next());
+    while (algorithmIterator.hasNext()){
+        list.add(URIs.algorithmURI+"/"+algorithmIterator.next());
     }
 
-    while (regressionAlgorithms.hasNext()){
-        list.add(reg+"/"+regressionAlgorithms.next());
-    }
-
-    while(featureSelectionAlgorithms.hasNext()){
-        list.add(feat+featureSelectionAlgorithms.next());
-    }
-
+    
     
     Representation rep = null;
 

@@ -48,7 +48,7 @@ public abstract class AbstractResource extends ServerResource {
         /**
          * URI for all algorithms.
          */
-        private static final String algorithmURI = baseURI + "/algorithm";
+        public static final String algorithmURI = baseURI + "/algorithm";
         /*
          * URI for Support vector classifier.
          */
@@ -439,11 +439,11 @@ public abstract class AbstractResource extends ServerResource {
      * and feature selection. Every algorithm has a unique algorithm id.
      * @return The set of all algorithms
      */
-    private Set<String> AlgorithmsSet() {
+    public Set<String> AlgorithmsSet() {
         Set<String> algorithmsSet = new HashSet<String>();
         algorithmsSet.addAll((Collection<String>) ClassificationAlgorithmsSet());
         algorithmsSet.addAll((Collection<String>) RegressionAlgorithmsSet());
-        algorithmsSet.addAll((Collection<String>) FeatureSelectionAlgorithmsSet());
+        //algorithmsSet.addAll((Collection<String>) FeatureSelectionAlgorithmsSet());
         return algorithmsSet;
     }
 

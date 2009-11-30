@@ -2,7 +2,6 @@ package org.opentox.formatters;
 
 
 import org.opentox.Resources.Algorithms.*;
-import org.opentox.formatters.AbstractAlgorithmFormatter;
 import org.opentox.Resources.AbstractResource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
@@ -28,15 +27,13 @@ public class AlgorithmXmlFormatter extends AbstractAlgorithmFormatter{
         builder.append("<algorithmType>" + metainf.algorithmType + "</algorithmType>\n");
 
         builder.append("<Parameters>\n");
-        if (metainf.Parameters[0].length != 4) {
-            System.err.println("ERROR!!! Invalid Parameters Element!");
-        } else {
-            for (int i = 0; i < metainf.Parameters.length; i++) {
-                builder.append("<param type=\"" + metainf.Parameters[i][1] + "\" " +
-                        "defaultvalue=\"" + metainf.Parameters[i][2] + "\">" +
-                        metainf.Parameters[i][0] + "</param>\n");
+   
+            for (int i = 0; i < metainf.Parameters.size(); i++) {
+                builder.append("<param type=\"" + metainf.Parameters.get(i).dataType.toString() + "\" " +
+                        "defaultvalue=\"" + metainf.Parameters.get(i).paramValue.toString() + "\">" +
+                        metainf.Parameters.get(i).paramName + "</param>\n");
             }
-        }
+   
         builder.append("</Parameters>\n");
 
         if (metainf.statisticsSupported.isEmpty()) {

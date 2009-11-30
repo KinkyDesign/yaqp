@@ -60,12 +60,21 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
         /**
          * Add Parameters....
          */
-        for (int i=0;i<metainf.Parameters.length;i++){
+        for (int i=0;i<metainf.Parameters.size();i++){
             algorithmResource.
-                addProperty(OT.parameters, model.createResource().
-                    addProperty(DC.title,metainf.Parameters[i][0], XSDDatatype.XSDstring).
-                    addProperty(OT.paramScope, metainf.Parameters[i][3], XSDDatatype.XSDstring).
-                    addProperty(OT.paramValue, metainf.Parameters[i][2]).
+                addProperty(OT.parameters,
+                model.createResource().
+                    addProperty(DC.title,metainf.Parameters.get(i).paramName,
+                      XSDDatatype.XSDstring).
+
+                    addProperty(OT.paramScope,
+                      metainf.Parameters.get(i).paramScope,
+                        XSDDatatype.XSDstring).
+                    
+                    addProperty(OT.paramValue,
+                      metainf.Parameters.get(i).paramValue.toString(),
+                        metainf.Parameters.get(i).dataType).
+
                     addProperty(DC.type, OT.parameter)
                  );
         }

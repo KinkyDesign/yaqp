@@ -32,7 +32,7 @@ public class AlgorithmMetaInf {
 
     public ArrayList<String> statisticsSupported;
     
-    public String[][] Parameters;
+    public ArrayList<AlgorithmParameter> Parameters;
 
 
     public AlgorithmMetaInf(){
@@ -49,7 +49,7 @@ public class AlgorithmMetaInf {
         this.about = about;
     }
 
-    void setAlgorithm(ArrayList<String> statisticsSupported, String[][] Parameters) {
+    void setAlgorithm(ArrayList<String> statisticsSupported, ArrayList<AlgorithmParameter> Parameters) {
         this.statisticsSupported=statisticsSupported;
         this.Parameters=Parameters;
     }

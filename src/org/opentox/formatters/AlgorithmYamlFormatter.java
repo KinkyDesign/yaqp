@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.opentox.formatters;
 
 import org.opentox.Resources.Algorithms.*;
@@ -35,15 +32,13 @@ public class AlgorithmYamlFormatter extends AbstractAlgorithmFormatter{
         builder.append("    id : " + metainf.identifier + "\n");
         builder.append("    AlgorithmType : " + metainf.algorithmType + "\n");
         builder.append("    Parameters:\n");
-        if (metainf.Parameters[0].length != 3) {
-            System.err.println("ERROR!!! Invalid Parameters Element!");
-        } else {
-            for (int i = 0; i < metainf.Parameters.length; i++) {
-                builder.append("        -" + metainf.Parameters[i][0] + ":\n");
-                builder.append("            type:" + metainf.Parameters[i][1]+"\n");
-                builder.append("            defaultValue:" + metainf.Parameters[i][2]+"\n");
+        
+            for (int i = 0; i < metainf.Parameters.size(); i++) {
+                builder.append("        -" + metainf.Parameters.get(i).paramName + ":\n");
+                builder.append("            type:" + metainf.Parameters.get(i).dataType.toString()+"\n");
+                builder.append("            defaultValue:" + metainf.Parameters.get(i).paramValue.toString()+"\n");
             }
-        }
+        
         builder.append("    statisticsSupported:\n");
         if (!metainf.statisticsSupported.isEmpty()) {
             for (int i = 0; i < metainf.statisticsSupported.size(); i++) {
