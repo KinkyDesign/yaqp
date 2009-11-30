@@ -21,7 +21,7 @@ import org.restlet.representation.StringRepresentation;
 public class AlgorithmReporter extends AbstractAlgorithmReporter{
 
     private static final String
-            RegressionOntology = "Algorithm:MLDMTox:Learning:Regression:eager:1_target_variable";
+            RegressionOntology = "AlgorithmMLDMToxLearningRegressionEager1TargetVariable";
 
     private static ArrayList<String> statisticsSupported(AlgorithmEnum algorithm) {
         ArrayList<String> statisticsSupported = new ArrayList<String>();
