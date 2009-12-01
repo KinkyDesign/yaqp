@@ -39,4 +39,6 @@ public abstract class AbstractConverter {
      * @param instances The produces instances object.
      */
     public abstract void convert(final InputStream input_RDF_file, Instances instances);
+
+
 }
