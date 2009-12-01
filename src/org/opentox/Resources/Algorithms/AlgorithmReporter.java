@@ -35,7 +35,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
 
     private static ArrayList<AlgorithmParameter> Parameters(AlgorithmEnum algorithm) {
         ArrayList<AlgorithmParameter> Parameters = new ArrayList<AlgorithmParameter>();
-        Parameters.add(new AlgorithmParameter<String>("target", XSDDatatype.XSDstring, "null", "mandatory"));
+        Parameters.add(new AlgorithmParameter<String>("target", XSDDatatype.XSDanyURI, "http://opentox.ntua.gr:3000/files/192", "mandatory"));
         if (algorithm == AlgorithmEnum.svm) {
             Parameters.add(new AlgorithmParameter<String>("kernel", XSDDatatype.XSDstring, "rbf", "optional"));
             Parameters.add(new AlgorithmParameter<Double>("cost", XSDDatatype.XSDdouble, 10.0, "optional"));

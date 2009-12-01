@@ -2,6 +2,7 @@ package org.opentox.util.converters;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
 import weka.core.Instances;
 import java.io.BufferedWriter;
 
@@ -14,7 +15,7 @@ import java.io.BufferedWriter;
 */
 public class Converter extends AbstractConverter{
 
-    private static final long serialVersionUID = 8525170373664066039L;
+    private static final long serialVersionUID = 85251113527439L;
 
     public void Converter(){
     }
@@ -58,6 +59,11 @@ public class Converter extends AbstractConverter{
 
     @Override
     public void convert(final File dsdFile, Instances instances) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void convert(InputStream input_RDF_file, Instances instances) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

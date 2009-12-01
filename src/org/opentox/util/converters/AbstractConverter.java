@@ -1,11 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.opentox.util.converters;
 
 import java.io.File;
+import java.io.InputStream;
 import weka.core.Instances;
 
 /**
@@ -15,8 +11,32 @@ import weka.core.Instances;
  * @author Sarimveis Harry
  */
 public abstract class AbstractConverter {
-    private static final long serialVersionUID = -828374928532234117L;
+    private static final long serialVersionUID = -9023148768327107L;
 
+    /**
+     * Converts an Instances object into a DSD file.
+     * TODO: Change this method into:
+     * <code>
+     * public abstract void convert(final Instances instances, InputStream dsdFile);
+     * </code>
+     * So that it can handle URIs too.
+     * @param instances
+     * @param dsdFile
+     */
     public abstract void convert(final Instances instances, File dsdFile);
+
+    /**
+     * Creates an Instances object using a DSD file.
+     * @param dsdFile
+     * @param instances
+     */
     public abstract void convert(final File dsdFile, Instances instances);
+
+    /**
+     * Using the InputStream provided by a remote or local resource (file, URL etc)
+     * produces an Instances object accepted by weka.
+     * @param input_RDF_file InputStream From some RDF resource
+     * @param instances The produces instances object.
+     */
+    public abstract void convert(final InputStream input_RDF_file, Instances instances);
 }

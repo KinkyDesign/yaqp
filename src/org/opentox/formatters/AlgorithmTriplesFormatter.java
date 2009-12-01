@@ -47,7 +47,7 @@ private static final MediaType mime = MediaType.APPLICATION_RDF_TRIX;
 
         algorithmResource.
                 addProperty(DC.identifier, metainf.identifier).
-                addProperty(DC.type, OT.algorithm).
+                addProperty(DC.type, OT.OT_TYPE_Algorithm).
                 addProperty(DC.rights, metainf.rights).
                 addProperty(DC.publisher, AbstractResource.URIs.baseURI);
 
@@ -69,7 +69,7 @@ private static final MediaType mime = MediaType.APPLICATION_RDF_TRIX;
                       metainf.Parameters.get(i).paramValue.toString(),
                         metainf.Parameters.get(i).dataType).
 
-                    addProperty(DC.type, OT.parameter)
+                    addProperty(DC.type, OT.OT_TYPE_Parameter)
                  );
         }
         /**
@@ -77,7 +77,7 @@ private static final MediaType mime = MediaType.APPLICATION_RDF_TRIX;
          */
         for (int i=0;i<metainf.statisticsSupported.size();i++){
             algorithmResource.addProperty(OT.statisticsSupported,
-                model.createResource(). addProperty(RDF.type, OT.statistic).
+                model.createResource(). addProperty(RDF.type, OT.OT_TYPE_Statistic).
                 addProperty(DC.title, metainf.statisticsSupported.get(i), XSDDatatype.XSDstring)
                 );
         }
