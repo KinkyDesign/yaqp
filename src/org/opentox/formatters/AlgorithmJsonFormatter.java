@@ -22,7 +22,7 @@ public class AlgorithmJsonFormatter extends AbstractAlgorithmFormatter {
 
     
     @Override
-    public StringRepresentation getStringRepresentation() {
+    public StringRepresentation getStringRepresentation(MediaType mediatype) {
         StringBuilder builder = new StringBuilder();
         builder.append("\"Algorithm\": \n{\n");
         builder.append("\"name\" : \""+metainf.title+"\",\n");

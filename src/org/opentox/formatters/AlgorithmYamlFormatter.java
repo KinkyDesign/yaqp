@@ -25,7 +25,7 @@ public class AlgorithmYamlFormatter extends AbstractAlgorithmFormatter{
    }
 
 
-    public StringRepresentation getStringRepresentation() {
+    public StringRepresentation getStringRepresentation(MediaType mediatype) {
         StringBuilder builder = new StringBuilder();
         builder.append("---\nAlgorithm:\n");
         builder.append("    name : " + metainf.title + "\n");

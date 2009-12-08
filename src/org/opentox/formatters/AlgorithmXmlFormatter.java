@@ -20,7 +20,7 @@ public class AlgorithmXmlFormatter extends AbstractAlgorithmFormatter{
         super.metainf = metainf;
     }
 
-    public StringRepresentation getStringRepresentation() {
+    public StringRepresentation getStringRepresentation(MediaType mediatype) {
         StringBuilder builder = new StringBuilder();
         builder.append(AbstractResource.xmlIntro);
         builder.append("<algorithm name=\"" + metainf.title + "\" id=\"" + metainf.identifier + "\">\n");

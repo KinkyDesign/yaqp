@@ -1,16 +1,18 @@
 package org.opentox.formatters;
 
-
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import java.io.ByteArrayOutputStream;
-import org.opentox.formatters.NameSpaces.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.opentox.Resources.Algorithms.*;
 import org.opentox.Resources.AbstractResource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
-
+import org.opentox.ontology.*;
 
 /**
  * Build an RDF representation for an Algorithm.
@@ -23,8 +25,6 @@ import org.restlet.representation.StringRepresentation;
  */
 public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
 
-    private static final MediaType mime = MediaType.APPLICATION_RDF_XML;
-
     private static final long serialVersionUID = 52795861750765264L;
 
     /**
@@ -36,67 +36,57 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
         super.metainf = metainf;
     }
 
-
-
-
     @Override
-    public StringRepresentation getStringRepresentation() {        
-        com.hp.hpl.jena.rdf.model.Model model =
-                com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
+    public StringRepresentation getStringRepresentation(MediaType mediatype) {
 
-        model.setNsPrefix("ot", OT.getURI());
-        model.setNsPrefix("dc", DC.getURI());
+        OntModel jenaModel;
+        try {
+            // define a jena model:
+            jenaModel = OT.createModel();
 
-        com.hp.hpl.jena.rdf.model.Resource algorithmResource =
-                model.createResource(
-                metainf.identifier);
+            // defines Algorithm and Parameter classes:
+            OT.Class.Algorithm.createOntClass(jenaModel);
+            OT.Class.Parameter.createOntClass(jenaModel);
 
-        algorithmResource.
-                addProperty(DC.identifier, metainf.identifier).
-                addProperty(DC.type, OT.OT_TYPE_Algorithm).
-                addProperty(DC.rights, metainf.rights).
-                addProperty(DC.publisher, AbstractResource.URIs.baseURI);
+            // Create an Individual for the algorithm resource:
+            Individual algorithm = jenaModel.createIndividual(metainf.identifier,
+                    OT.Class.Algorithm.getOntClass(jenaModel));
 
-        /**
-         * Add Parameters....
-         */
-        for (int i=0;i<metainf.Parameters.size();i++){
-            algorithmResource.
-                addProperty(OT.parameters,
-                model.createResource().
-                    addProperty(DC.title,metainf.Parameters.get(i).paramName,
-                      XSDDatatype.XSDstring).
+            // set the title and the identifier for the algorithm:
+            algorithm.addLiteral(DC.title,
+                    jenaModel.createTypedLiteral(metainf.title,XSDDatatype.XSDstring));
+            algorithm.addLiteral(DC.identifier,
+                    jenaModel.createTypedLiteral(metainf.identifier,XSDDatatype.XSDanyURI));
 
-                    addProperty(OT.paramScope,
-                      metainf.Parameters.get(i).paramScope,
-                        XSDDatatype.XSDstring).
-                    
-                    addProperty(OT.paramValue,
-                      metainf.Parameters.get(i).paramValue.toString(),
-                        metainf.Parameters.get(i).dataType).
+            algorithm.addProperty(OT.isA, metainf.algorithmType.createProperty(jenaModel));
 
-                    addProperty(DC.type, OT.OT_TYPE_Parameter)
-                 );
+            Individual iparam;
+                    for (int i=0;i<metainf.Parameters.size();i++){
+                        iparam = jenaModel.createIndividual(OT.Class.Parameter.getOntClass(jenaModel));
+                        iparam.addProperty(DC.title, metainf.Parameters.get(i).paramName);
+                        iparam.addLiteral(OT.paramValue, jenaModel.createTypedLiteral(
+                                metainf.Parameters.get(i).paramValue.toString(),
+                                metainf.Parameters.get(i).dataType));
+                        iparam.addLiteral(OT.paramScope, jenaModel.
+                                createTypedLiteral(metainf.Parameters.get(i).paramScope,
+                                XSDDatatype.XSDstring));
+                        algorithm.addProperty(OT.parameters, iparam);
+                    }
+                    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                    String Lang="RDF/XML";
+                    if (MediaType.APPLICATION_RDF_TURTLE.equals(mediatype)){
+                        Lang="TTL";
+                    }else if (MediaType.APPLICATION_RDF_TRIX.equals(mediatype)){
+                        Lang="N-TRIPLE";
+                    }
+                    jenaModel.write(outStream, Lang);
+                    return new StringRepresentation(outStream.toString(), mediatype);
+
+        } catch (Exception ex) {
+            Logger.getLogger(AlgorithmRdfFormatter.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-
-        /**
-         * Add supported statistics...
-         */
-        for (int i=0;i<metainf.statisticsSupported.size();i++){
-            algorithmResource.addProperty(OT.statisticsSupported,
-                model.createResource(). addProperty(RDF.type, OT.OT_TYPE_Statistic).
-                addProperty(DC.title, metainf.statisticsSupported.get(i), XSDDatatype.XSDstring)
-                );
-        }
-
-
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        model.write(outStream);
-
-        return new StringRepresentation(outStream.toString(), mime);
-    }
-       
 
     
-       
+    }
 }

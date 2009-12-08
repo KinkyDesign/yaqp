@@ -3,13 +3,12 @@ package org.opentox.Resources.Algorithms;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import org.opentox.formatters.AlgorithmYamlFormatter;
 import org.opentox.formatters.AlgorithmXmlFormatter;
-import org.opentox.formatters.AlgorithmTurtleFormatter;
 import org.opentox.formatters.AlgorithmRdfFormatter;
 import org.opentox.formatters.AlgorithmJsonFormatter;
 import java.util.ArrayList;
 import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.AbstractResource;
-import org.opentox.formatters.AlgorithmTriplesFormatter;
+import org.opentox.ontology.AlgorithmTypes;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
@@ -21,9 +20,7 @@ import org.restlet.representation.StringRepresentation;
  */
 public class AlgorithmReporter extends AbstractAlgorithmReporter{
 
-    private static final String
-            RegressionOntology = "AlgorithmMLDMToxLearningRegressionEager1TargetVariable";
-
+       
     private static ArrayList<String> statisticsSupported(AlgorithmEnum algorithm) {
         ArrayList<String> statisticsSupported = new ArrayList<String>();
         statisticsSupported.add("RootMeanSquaredError");
@@ -64,24 +61,22 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
     private StringRepresentation getStringRepresentationForMetaInf(
             AlgorithmMetaInf metainf, MediaType media){
         StringRepresentation representation = null;
-        if (MediaType.APPLICATION_RDF_XML.equals(media)) {
+        if (
+                (MediaType.APPLICATION_RDF_XML.equals(media))||
+                (MediaType.APPLICATION_RDF_TURTLE.equals(media))||
+                (MediaType.APPLICATION_RDF_TRIX.equals(media))
+        ){
                 AlgorithmRdfFormatter formater = new AlgorithmRdfFormatter(metainf);
-                representation = formater.getStringRepresentation();
+                representation = formater.getStringRepresentation(media);
             } else if (MediaType.APPLICATION_JSON.equals(media)) {
                 AlgorithmJsonFormatter formater = new AlgorithmJsonFormatter(metainf);
-                representation = formater.getStringRepresentation();
-            } else if (MediaType.APPLICATION_RDF_TURTLE.equals(media)) {
-                AlgorithmTurtleFormatter formater = new AlgorithmTurtleFormatter(metainf);
-                representation = formater.getStringRepresentation();
+                representation = formater.getStringRepresentation(media);
             } else if (MediaType.TEXT_XML.equals(media)) {
                 AlgorithmXmlFormatter formater = new AlgorithmXmlFormatter(metainf);
-                representation = formater.getStringRepresentation();
+                representation = formater.getStringRepresentation(media);
             } else if (OpenToxMediaType.TEXT_YAML.equals(media)) {
                 AlgorithmYamlFormatter formater = new AlgorithmYamlFormatter(metainf);
-                representation = formater.getStringRepresentation();
-            }else if (MediaType.APPLICATION_RDF_TRIX.equals(media)){
-                AlgorithmTriplesFormatter formater = new AlgorithmTriplesFormatter(metainf);
-                representation = formater.getStringRepresentation();
+                representation = formater.getStringRepresentation(media);
             } else {
             }
         return representation;
@@ -113,7 +108,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
             MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.title=("mlr");
             MlrMetaInf.subject=("MLR, Multiple Linear Regression");
-            MlrMetaInf.algorithmType=(RegressionOntology+":mlr");
+            MlrMetaInf.algorithmType=AlgorithmTypes.Class.RegressionEagerSingleTarget;
             MlrMetaInf.description=("Multiple Linear Regression Training Algorithm");
             MlrMetaInf.identifier=(AbstractResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.mlr),
@@ -126,7 +121,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
             SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
             SvmMetaInf.title=("svm");
             SvmMetaInf.subject=("SVM Regression");
-            SvmMetaInf.algorithmType=(RegressionOntology+":svm");
+            SvmMetaInf.algorithmType=AlgorithmTypes.Class.RegressionEagerSingleTarget;
             SvmMetaInf.description=("Training Algorithm for Support Vector" +
                     "Machine Regression Models");
             SvmMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svm),
@@ -140,7 +135,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
             SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
             SvcMetaInf.title=("svc");
             SvcMetaInf.subject=("SVC Classification");
-            SvcMetaInf.algorithmType=(RegressionOntology+":svc");
+            SvcMetaInf.algorithmType=AlgorithmTypes.Class.ClassificationEagerSingleTarget;
             SvcMetaInf.description=("Training Algorithm for Support Vector" +
                     "Machine Classification Models");
             SvcMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svc),

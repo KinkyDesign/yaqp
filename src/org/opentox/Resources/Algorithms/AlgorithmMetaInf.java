@@ -1,5 +1,6 @@
 package org.opentox.Resources.Algorithms;
 
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import java.util.ArrayList;
 
 /**
@@ -9,6 +10,8 @@ import java.util.ArrayList;
  * @author Sarimveis Harry
  */
 public class AlgorithmMetaInf {
+
+    public org.opentox.ontology.AlgorithmTypes.Class algorithmType;
     
     public String
             title,
@@ -20,7 +23,6 @@ public class AlgorithmMetaInf {
             rights,
             provenance,
             audience,
-            algorithmType,
             identifier,
             date,
             format,
