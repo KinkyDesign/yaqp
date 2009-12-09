@@ -4,18 +4,18 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.RDF;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.Algorithms.*;
-import org.opentox.Resources.AbstractResource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 import org.opentox.ontology.*;
 
 /**
  * Build an RDF representation for an Algorithm.
+ * 
  * Validated at <a href="http://www.rdfabout.com/demo/validator/">
  * http://www.rdfabout.com/demo/validator/</a> !
  * @author OpenTox - http://www.opentox.org
@@ -45,7 +45,7 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             jenaModel = OT.createModel();
 
             // defines Algorithm and Parameter classes:
-            OT.Class.Algorithm.createOntClass(jenaModel);
+            
             OT.Class.Parameter.createOntClass(jenaModel);
 
             // Create an Individual for the algorithm resource:
@@ -76,8 +76,10 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
                     String Lang="RDF/XML";
                     if (MediaType.APPLICATION_RDF_TURTLE.equals(mediatype)){
                         Lang="TTL";
-                    }else if (MediaType.APPLICATION_RDF_TRIX.equals(mediatype)){
+                    }else if (OpenToxMediaType.TEXT_TRIPLE.equals(mediatype)){
                         Lang="N-TRIPLE";
+                    }else if (OpenToxMediaType.TEXT_N3.equals(mediatype)){
+                        Lang="N3";
                     }
                     jenaModel.write(outStream, Lang);
                     return new StringRepresentation(outStream.toString(), mediatype);

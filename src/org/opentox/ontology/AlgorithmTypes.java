@@ -1,8 +1,6 @@
 package org.opentox.ontology;
 
-import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  *
@@ -10,41 +8,36 @@ import com.hp.hpl.jena.rdf.model.Property;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmTypes {
+public class AlgorithmTypes extends Namespace{
 
-    protected static final String _NS = "http://www.opentox.org/algorithmTypes.owl#%s";
-    public static final String NS = String.format(_NS, "");
+    public static class Class extends Namespace.Class{
 
-    public enum Class {
-
-        ClassificationEagerMultipleTargets,
-        RegressionEagerMultipleTargets,
-        RegressionEagerSingleTarget,
-        ClassificationEagerSingleTarget,
-        EagerLearning,
-        Regression,
-        Supervised,
-        Learning,
-        SingleTarget,
-        MultipleTargets,
-        MSDMTox;
-
-        public String getNS() {
-            return String.format(_NS,
-                    toString());
+        public Class(Resource resource){
+            super(resource);
         }
 
-        public OntClass getOntClass(OntModel model) {
-            return model.getOntClass(getNS());
-        }
-
-        public OntClass createOntClass(OntModel model) {
-            return model.createClass(getNS());
-        }
-
-        public Property createProperty(OntModel model) {
-            return model.createProperty(getNS());
-        }
+        public static final Class ClassificationEagerMultipleTargets =
+                new Class(m_model.createResource(String.format(_NS, "ClassificationEagerMultipleTargets")));
+        public static final Class RegressionEagerMultipleTargets =
+                new Class(m_model.createResource(String.format(_NS, "RegressionEagerMultipleTargets")));
+        public static final Class RegressionEagerSingleTarget =
+                new Class(m_model.createResource(String.format(_NS, "RegressionEagerSingleTarget")));
+        public static final Class ClassificationEagerSingleTarget =
+                new Class(m_model.createResource(String.format(_NS, "ClassificationEagerSingleTarget")));
+        public static final Class EagerLearning =
+                new Class(m_model.createResource(String.format(_NS, "EagerLearning")));
+        public static final Class Regression =
+                new Class(m_model.createResource(String.format(_NS, "Regression")));
+        public static final Class Supervised =
+                new Class(m_model.createResource(String.format(_NS, "Supervised")));
+        public static final Class Learning =
+                new Class(m_model.createResource(String.format(_NS, "Learning")));
+        public static final Class SingleTarget =
+                new Class(m_model.createResource(String.format(_NS, "SingleTarget")));
+        public static final Class MultipleTargets =
+                new Class(m_model.createResource(String.format(_NS, "MultipleTargets")));
+        public static final Class MSDMTox =
+                new Class(m_model.createResource(String.format(_NS, "MSDMTox")));
     };
 }
 

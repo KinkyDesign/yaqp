@@ -32,7 +32,8 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
 
     private static ArrayList<AlgorithmParameter> Parameters(AlgorithmEnum algorithm) {
         ArrayList<AlgorithmParameter> Parameters = new ArrayList<AlgorithmParameter>();
-        Parameters.add(new AlgorithmParameter<String>("target", XSDDatatype.XSDanyURI, "http://opentox.ntua.gr:3000/files/192", "mandatory"));
+        Parameters.add(new AlgorithmParameter<String>("target",
+                XSDDatatype.XSDanyURI, "http://someserver.com/feature/xyz", "mandatory"));
         if (algorithm == AlgorithmEnum.svm) {
             Parameters.add(new AlgorithmParameter<String>("kernel", XSDDatatype.XSDstring, "rbf", "optional"));
             Parameters.add(new AlgorithmParameter<Double>("cost", XSDDatatype.XSDdouble, 10.0, "optional"));
@@ -64,7 +65,8 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
         if (
                 (MediaType.APPLICATION_RDF_XML.equals(media))||
                 (MediaType.APPLICATION_RDF_TURTLE.equals(media))||
-                (MediaType.APPLICATION_RDF_TRIX.equals(media))
+                (OpenToxMediaType.TEXT_N3.equals(media))||
+                (OpenToxMediaType.TEXT_TRIPLE.equals(media))
         ){
                 AlgorithmRdfFormatter formater = new AlgorithmRdfFormatter(metainf);
                 representation = formater.getStringRepresentation(media);

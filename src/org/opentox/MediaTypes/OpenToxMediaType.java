@@ -29,6 +29,12 @@ public class OpenToxMediaType {
     public static final MediaType TEXT_YAML = new MediaType("text/x-yaml");
     public static final MediaType TEXT_ARFF = new MediaType("text/x-arff");
     public static final MediaType APPLICATION_YAML = new MediaType("application/x-yaml");
+    /**
+     * See <a href="http://www.openrdf.org/doc/sesame2/system/ch08.html">
+     * http://www.openrdf.org/doc/sesame2/system/ch08.html</a> for reference
+     */
+    public static final MediaType TEXT_N3 = new MediaType("text/rdf+n3");
+    public static final MediaType TEXT_TRIPLE = new MediaType("text/x-triple");
 
 
 

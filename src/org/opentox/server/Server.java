@@ -1,8 +1,6 @@
 package org.opentox.server;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.AbstractResource;
 import org.restlet.Application;
