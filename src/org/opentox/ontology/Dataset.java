@@ -186,8 +186,6 @@ public class Dataset {
 
         }
         dataEntryIterator.close();
-
-
         return data;
 
     }
