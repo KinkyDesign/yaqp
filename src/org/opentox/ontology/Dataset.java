@@ -4,6 +4,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +23,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import weka.core.Attribute;
 import weka.core.FastVector;
+import weka.core.Instance;
 
 /**
  *
@@ -74,49 +77,7 @@ public class Dataset {
         return jenaModel;
     }
 
-    /**
-     * Parses the Dataset.
-     * @param jenaModel
-     * @throws IOException
-     */
-    public void parseDataset(OntModel jenaModel) throws IOException {
-        
-        Resource dataEntryResource = OT.Class.DataEntry.getOntClass(jenaModel);
-        Resource dataSetResource = OT.Class.Dataset.getOntClass(jenaModel);
-
-        StmtIterator dataSetIter = jenaModel.listStatements(new SimpleSelector(null, null, dataSetResource));
-        while (dataSetIter.hasNext()){
-            System.err.println(dataSetIter.next().getSubject());
-        }
-
-        // Iterates over the triples that match the case [?, type, DataEntry]
-        StmtIterator dataEntriesIterator = jenaModel.listStatements(new SimpleSelector(null,RDF.type, dataEntryResource));
-
-        while (dataEntriesIterator.hasNext()) {
-            Statement st = dataEntriesIterator.next();
-
-            // DataEntry:
-            System.out.println(String.format("%s %s", "This is the data entry: ",st.getSubject()));
-
-           
-            StmtIterator valuesIterator =
-                    jenaModel.listStatements(new SimpleSelector(st.getSubject(), OT.values, (RDFNode) null));
-            while (valuesIterator.hasNext()) {
-                st = valuesIterator.next();
-                if (st.getObject().isResource()) {
-                    Resource featureValueResource = (Resource) st.getObject();
-                    RDFNode value = featureValueResource.getProperty(OT.value).getObject();
-                    System.out.println(String.format("%s = %s",
-                            //Feature
-                            featureValueResource.getProperty(OT.feature).getObject().toString(),
-                            // Value
-                            value));
-                }
-            }
-        }
-    }
-
-
+    
 
     /**
      * Have you created a new Dataset object, you can cast it as a weka.core.Instances
@@ -125,33 +86,37 @@ public class Dataset {
      */
     public Instances getWekaDataset() {
 
-        // 1. Some initial definitions:
+        // A1. Some initial definitions:
         Resource dataEntryResource = OT.Class.DataEntry.getOntClass(jenaModel),
                 dataSetResource = OT.Class.Dataset.getOntClass(jenaModel),
                 featureResource = OT.Class.Feature.getOntClass(jenaModel);
         FastVector attributes;
         Instances data = null;
-
+        StmtIterator dataSetIterator = null,
+                featureIterator = null,
+                valuesIterator = null,
+                dataEntryIterator = null;
 
 
         /**
-         * 2. Set the relation name for the data:
+         * A2. Set the relation name for the data:
          * If there is no DataSet element declaration set the relation name to
          * "NoName". Otherwise use the URI of the dataset. If more than one datasets
          * are declared in the RDF, throw an error!
          */
         
-        StmtIterator dataSetIter =
-                jenaModel.listStatements(new SimpleSelector(null, null, dataSetResource));
+        dataSetIterator =
+                jenaModel.listStatements(new SimpleSelector(null, RDF.type, dataSetResource));
         String relationName = null;
-        if (dataSetIter.hasNext()){
-            relationName = dataSetIter.next().getSubject().getURI();
-            if (dataSetIter.hasNext()){
+        if (dataSetIterator.hasNext()){
+            relationName = dataSetIterator.next().getSubject().getURI();
+            if (dataSetIterator.hasNext()){
                 return null;
             }
         }else{
             relationName = "http://someserver.com/dataset/NoName"+jenaModel.hashCode();
         }
+        dataSetIterator.close();
 
         /**
          * Create a Map<String, String> such that its first entry is a feature in
@@ -160,40 +125,81 @@ public class Dataset {
         Map<Resource, String> featureTypeMap = new HashMap<Resource, String>();
 
 
-        //  3. Iterate over all Features.
-        StmtIterator featureIterator =
+        //  A3. Iterate over all Features.
+        featureIterator =
                 jenaModel.listStatements(new SimpleSelector(null, RDF.type, featureResource));
         while (featureIterator.hasNext()){
             Statement feature = featureIterator.next();
 
-            // 4. For every single feature in the dataset, pick a "values" node.
-            StmtIterator valuesIterator =
+            // A4. For every single feature in the dataset, pick a "values" node.
+            valuesIterator =
                     jenaModel.listStatements(new SimpleSelector(null, OT.feature, feature.getSubject()));
             if (valuesIterator.hasNext()){
                 Statement values = valuesIterator.next();
 
-                // 5. For this values node, get the value
+                // A5. For this values node, get the value
                 StmtIterator valueInValuesIter =
                         jenaModel.listStatements(new SimpleSelector(values.getSubject(), OT.value, (Resource)null));
                 if (valueInValuesIter.hasNext()){
                    featureTypeMap.put(feature.getSubject(), valueInValuesIter.next().getLiteral().getDatatypeURI());
                 }
             }
+            valuesIterator.close();
         }
+        featureIterator.close();
+
 
         /**
-         * 6. Now update the attributes of the dataset.
+         * A6. Now update the attributes of the dataset.
          */
         attributes = getAttributes(featureTypeMap);
+        data = new Instances(relationName, attributes, 0);
 
+        /**
+         * B1. Iterate over all dataentries
+         */
+        dataEntryIterator =
+                jenaModel.listStatements(new SimpleSelector(null, RDF.type, dataEntryResource));
+        while (dataEntryIterator.hasNext()){
+            Statement dataEntry = dataEntryIterator.next();
+
+            /**
+             * B.2. For every dataEntry, iterate over all values nodes.
+             */
+            valuesIterator =
+                    jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OT.values, (Resource) null));
+            while (valuesIterator.hasNext()){
+                Statement values = valuesIterator.next();
+
+                /*
+                 * B3. A pair of the form (AttributeName, AttributeValue) is created.
+                 * This will be registered in an Instance-type object which
+                 * is turn will be used to update the dataset.
+                 */
+
+                // atVal is the value of the attribute
+                String atVal = values.getProperty(OT.value).getObject().as(Literal.class).getValue().toString();
+                // and atName is the name of the corresponding attribute.
+                String atName = values.getProperty(OT.feature).getObject().as(Resource.class).getURI();
+            }
+
+
+        }
+        dataEntryIterator.close();
 
 
         return data;
 
     }
 
-    
-    
+        
+
+    /**
+     * Returns a FastVector for the attributes of the dataset as an Instaces
+     * object.
+     * @param featureTypeMap
+     * @return FastVector of Attributes
+     */
     private FastVector getAttributes(Map<Resource, String> featureTypeMap) {
         FastVector atts = new FastVector();
 
@@ -213,17 +219,25 @@ public class Dataset {
         numericXSDtypes.add(XSDDatatype.XSDunsignedLong.getURI());
         numericXSDtypes.add(XSDDatatype.XSDunsignedShort.getURI());
 
+        Set<String> stringXSDtypes = new HashSet<String>();
+        stringXSDtypes.add(XSDDatatype.XSDstring.getURI());
+        stringXSDtypes.add(XSDDatatype.XSDanyURI.getURI());
+
         Iterator<Entry<Resource, String>> mapIterator = featureTypeMap.entrySet().iterator();
         Entry<Resource, String> entry;
         while (mapIterator.hasNext()){
             entry = mapIterator.next();
             String dataType = entry.getValue();
             if (numericXSDtypes.contains(dataType)){
-                System.out.println("The feature "+entry.getKey().getURI()+" is numeric!");
+                atts.addElement(new Attribute(entry.getKey().getURI()));
+            }else if (stringXSDtypes.contains(dataType)){
+                atts.addElement(new Attribute (entry.getKey().getURI(), (FastVector) null) );
             }
         }
-        return new FastVector();
+        return atts;
     }
+
+    
 
 
 }
