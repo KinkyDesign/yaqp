@@ -8,15 +8,14 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.ibm.icu.impl.Trie.DataManipulate;
 import java.io.InputStream;
 import weka.core.Instances;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -90,7 +89,7 @@ public class Dataset {
         Resource dataEntryResource = OT.Class.DataEntry.getOntClass(jenaModel),
                 dataSetResource = OT.Class.Dataset.getOntClass(jenaModel),
                 featureResource = OT.Class.Feature.getOntClass(jenaModel);
-        FastVector attributes;
+        FastVector attributes = null;
         Instances data = null;
         StmtIterator dataSetIterator = null,
                 featureIterator = null,
@@ -164,10 +163,11 @@ public class Dataset {
             Statement dataEntry = dataEntryIterator.next();
 
             /**
-             * B.2. For every dataEntry, iterate over all values nodes.
+             * B2. For every dataEntry, iterate over all values nodes.
              */
             valuesIterator =
                     jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OT.values, (Resource) null));
+            Instance tempInstance;
             while (valuesIterator.hasNext()){
                 Statement values = valuesIterator.next();
 
@@ -181,11 +181,31 @@ public class Dataset {
                 String atVal = values.getProperty(OT.value).getObject().as(Literal.class).getValue().toString();
                 // and atName is the name of the corresponding attribute.
                 String atName = values.getProperty(OT.feature).getObject().as(Resource.class).getURI();
+                
+                double[] vals = new double[data.numAttributes()];
+                for (int i=0; i<data.numAttributes();i++){
+                    vals[i] = Instance.missingValue();
+                }
+
+
+                try{
+                    vals[data.attribute(atName).index()] = Double.parseDouble(atVal);
+                }catch(NumberFormatException e){
+                    vals[data.attribute(atName).index()] = data.attribute(atName).addStringValue(atVal);
+                }
+
+                data.add(new Instance(1.0, vals));
             }
 
 
         }
         dataEntryIterator.close();
+
+
+        
+        
+        
+
         return data;
 
     }
