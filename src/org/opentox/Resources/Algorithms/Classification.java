@@ -302,7 +302,7 @@ public class Classification extends AbstractResource{
                  */
                 try{
                     i=Integer.parseInt(dataid);
-                    File dataFile = new File(dsdDir+"/"+dataSetPrefix+dataid);
+                    File dataFile = new File("??");
                     boolean exists = dataFile.exists();
                     if (!exists){
                         //// File not found Exception!
@@ -480,8 +480,8 @@ public class Classification extends AbstractResource{
                     ker="3";
                 else
                     ker="3";
-        String scaledPath = scaledDir+"/"+dataSetPrefix+dataid;
-                String modelPath = CLS_SVM_modelsDir + "/" + model_id;
+        String scaledPath = "";//scaledDir+"/"+dataSetPrefix+dataid;
+                String modelPath ="";// CLS_SVM_modelsDir + "/" + model_id;
                 if (ker.equalsIgnoreCase("0")){
                     String[] ops={
                         "-s", "0",
@@ -592,7 +592,7 @@ public class Classification extends AbstractResource{
                          * If yes, set the status to 200,
                          * otherwise the status is set to 500
                          */
-                    File modelFile = new File(CLS_SVM_modelsDir+"/"+model_id);
+                    File modelFile = null;//new File(CLS_SVM_modelsDir+"/"+model_id);
                     boolean modelCreated = modelFile.exists();
                     if (!(modelCreated)){
                         representation = new StringRepresentation(
@@ -617,7 +617,7 @@ public class Classification extends AbstractResource{
                      */
                     if (internalStatus.equals(Status.SUCCESS_OK)){
                     
-                    representation = new StringRepresentation(ModelURI + "/" + model_id+"\n\n", MediaType.TEXT_PLAIN);
+                    representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/" + model_id+"\n\n", MediaType.TEXT_PLAIN);
                     // TODO : create and store xml
                        StringBuilder xmlstr = new StringBuilder();
                        xmlstr.append(xmlIntro);
@@ -644,7 +644,7 @@ public class Classification extends AbstractResource{
                        xmlstr.append("</ot:Model>\n");
                        try{
 
-                           FileWriter fstream = new FileWriter(modelsXmlDir + "/" + model_id);
+                           FileWriter fstream = null;//new FileWriter(modelsXmlDir + "/" + model_id);
                            BufferedWriter out = new BufferedWriter(fstream);
                            out.write(xmlstr.toString());
                            out.flush();

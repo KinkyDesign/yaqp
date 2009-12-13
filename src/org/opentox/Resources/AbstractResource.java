@@ -66,6 +66,20 @@ public abstract class AbstractResource extends ServerResource {
 
     /**
      * Directories on the server.
+     * <pre>
+     *
+     * /OpenToxServer
+     *      |
+     *      |--> /log
+     *      |--> /model
+     *      |       |-->/rdf
+     *      |       |-->/pmml
+     *      |       |-->/raw
+     *      |-->/data
+     *            |-->/scaled
+     *            |-->/ranges
+     *            |-->/dsd
+     * </pre>
      */
     public static class Directories {
 
@@ -73,240 +87,58 @@ public abstract class AbstractResource extends ServerResource {
          * Base Directory for all files the services needs to store or to read from.
          */
         private static final String baseDir = System.getProperty("user.home") + "/OpenToxServer";
-        /**
-         * Server Logs.
-         */
         public static final String logDir = baseDir + "/log";
-        private static final String tempDir = baseDir + "/.temp";
-        public static final String tempDSDDir = tempDir + "/.dsd";
-        public static final String tempScaledDir = tempDir + "/.scaled";
         private static final String modelDir = baseDir + "/model";
-        public static final String trash = modelDir + "/.trash";
-        public static final String rangesDir = modelDir + "/ranges";
-        
-        /**
-         * The folder where all xml representations of models are stored.
-         */
-        public static final String modelXmlDir = modelDir + "/xml";
-
-        private static final String classificationModel = modelDir + "/classification";
-        private static final String regressionModel = modelDir + "/regression";
-        public static final String svcModel = classificationModel + "/svc";
-        public static final String svmModel = regressionModel + "/svm";
-        public static final String mlrModel = regressionModel + "/mlr";
+        public static final String modelRdfDir = modelDir + "/rdf";
+        public static final String modelPmmlDir = modelDir + "/pmml";
+        public static final String modelRawDir = modelDir + "/raw";
+        private static final String dataDir = baseDir + "/data";
+        public static final String dataDSDDir = dataDir + "/dsd";
+        public static final String dataScaledDir = dataDir + "/scaled";
+        public static final String dataRangesDir = dataDir + "/ranges";
 
         /**
          * Checks if the necessary directories already exist.
          */
         public static void checkDirs() {
-            if (!(new File(baseDir)).exists()) {
-                new File(baseDir).mkdirs();
-                new File(logDir).mkdirs();
+            if (!(new File(modelDir)).exists()) {
                 new File(modelDir).mkdirs();
-                new File(modelXmlDir).mkdirs();
-                new File(classificationModel).mkdirs();
-                new File(regressionModel).mkdirs();
-                new File(svcModel).mkdirs();
-                new File(svmModel).mkdirs();
-                new File(mlrModel).mkdirs();
-                OpenToxApplication.opentoxLogger.warning("No Data Folders Found and they were created!");
-            } else {
-                if (!(new File(logDir)).exists()) {
-                    new File(logDir).mkdirs();
-                    OpenToxApplication.opentoxLogger.warning("The /log folder was not found and it was created!");
-                }
-                if (!(new File(modelDir)).exists()) {
-                    new File(modelDir).mkdirs();
-                    new File(classificationModel).mkdirs();
-                    new File(regressionModel).mkdirs();
-                    new File(svcModel).mkdirs();
-                    new File(svmModel).mkdirs();
-                    new File(mlrModel).mkdirs();
-                    new File(modelXmlDir).mkdirs();
-                    OpenToxApplication.opentoxLogger.warning("The /model folder was not found and it was created" +
-                            "with all its subfolders!");
-                } else {
-                    if (!(new File(modelXmlDir)).exists()) {
-                        new File(modelXmlDir).mkdirs();
-                        OpenToxApplication.opentoxLogger.warning("The /model/xml folder was not found and it was created!");
-                    }
-                    if (!(new File(classificationModel)).exists()) {
-                        new File(classificationModel).mkdirs();
-                        new File(svcModel).mkdirs();
-                        OpenToxApplication.opentoxLogger.warning("The /model/classification folder was not " +
-                                "found and it was created with all its subfolders!");
-                    } else {
-                        if (!(new File(svcModel)).exists()) {
-                            new File(svcModel).mkdirs();
-                            OpenToxApplication.opentoxLogger.warning("The /model/classification/svc " +
-                                    "folder was not found and it was created!");
-                        }
-
-                    }
-                    if (!(new File(regressionModel)).exists()) {
-                        new File(regressionModel).mkdirs();
-                        new File(svmModel).mkdirs();
-                        new File(mlrModel).mkdirs();
-                        OpenToxApplication.opentoxLogger.warning("The /model/regression folder was not " +
-                                "found and it was created with all its subfolders!");
-                    } else {
-                        if (!(new File(svmModel)).exists()) {
-                            new File(svmModel).mkdirs();
-                            OpenToxApplication.opentoxLogger.warning("The /model/regression/svm " +
-                                    "folder was not found and it was created!");
-                        }
-                        if (!(new File(mlrModel)).exists()) {
-                            new File(mlrModel).mkdirs();
-                            OpenToxApplication.opentoxLogger.warning("The /model/regression/mlr " +
-                                    "folder was not found and it was created!");
-                        }
-                    }
-
-                }
-
-
+                new File(modelRdfDir).mkdirs();
+                new File(modelPmmlDir).mkdirs();
+                new File(modelRawDir).mkdirs();
+                OpenToxApplication.opentoxLogger.warning("No Model Folders Found and they were created!");
             }
 
+            if (!(new File(dataDir)).exists()) {
+                new File(dataDir).mkdirs();
+                new File(dataDSDDir).mkdirs();
+                new File(dataRangesDir).mkdirs();
+                new File(dataScaledDir).mkdirs();
+                OpenToxApplication.opentoxLogger.warning("No Model Folders Found and they were created!");
+            }
         }
     }
-
     /**
      * The first line of every XML file.
      */
     public static final String xmlIntro = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-
     /**
      * Head of HTML files
      */
-    protected String htmlHEAD = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" +
-            "\"http://www.w3.org/TR/html4/loose.dtd\">\n" +
-            "<html>\n<head>\n<title>NTUA - RESTful Web Services</title></head><body>";
-
+    protected String htmlHEAD = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""
+            + "\"http://www.w3.org/TR/html4/loose.dtd\">\n"
+            + "<html>\n<head>\n<title>NTUA - RESTful Web Services</title></head><body>";
     /**
      * End of HTML files
      */
     protected static final String htmlEND = "</body>\n</html>";
-
     /**
      * Head of PMML files
      */
-    public static final String PMMLIntro = "<PMML version=\"3.2\" " +
-            " xmlns=\"http://www.dmg.org/PMML-3_2\"  " +
-            " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
-            " <Header copyright=\"Copyleft (c) OpenTox - An Open Source Predictive Toxicology Framework, http://www.opentox.org, 2009\" />\n";
-    private static final String baseDir = System.getProperty("user.home") + "/Documents/RESTfulWebServices";
-
-    /**
-     * Log
-     */
-    public static final String logDir = baseDir + "/log";
-
-    /**
-     * Data directory.
-     * Directory where users have permission to upload data files.
-     */
-    protected static final String uploadDir = baseDir + "/uploads/data";
-
-    /**
-     * Repository for arff files uploaded by the users.
-     */
-    protected static final String arffDir = uploadDir + "/arff";
-
-    /**
-     * Repository for xrff files
-     */
-    protected static final String xrffDir = uploadDir + "/xrff";
-
-    /**
-     * Repository for the generated DSD files which are automatically
-     * generated each time a user uploads an ARFF file.
-     */
-    protected static final String dsdDir = uploadDir + "/dsd";
-
-    /**
-     * Repository for the generated meta-inf XML files which are automatically
-     * generated each time a user uploads an ARFF file.
-     */
-    protected static final String metaDir = uploadDir + "/meta";
-
-    /**
-     * Repository for the generated scaled-DSD files which are automatically
-     * generated each time a user uploads an ARFF file.
-     */
-    protected static final String scaledDir = uploadDir + "/scaled";
-
-    /**
-     * Repository for the generated range files which are automatically
-     * generated each time a user uploads an ARFF file.
-     */
-    protected static final String rangeDir = uploadDir + "/range";
-
-    /**
-     * Repository for classification and regression models.
-     */
-    private static final String modelsDir = baseDir + "/models";
-
-    /**
-     * Repository for xml representations of models
-     *
-     */
-    public static final String modelsXmlDir = modelsDir + "/xml";
-
-    /**
-     * Repository for classification models.
-     */
-    @Deprecated
-    private static final String CLS_modelsDir = modelsDir + "/classification";
-
-    /**
-     * Repository for regreesion models.
-     */
-    @Deprecated
-    private static final String REG_modelsDir = modelsDir + "/regression";
-
-    /**
-     * Repository for svc (classification models).
-     */
-    @Deprecated
-    protected static final String CLS_SVM_modelsDir = CLS_modelsDir + "/svc";
-
-    /**
-     * Repository for svm regression models
-     */
-    @Deprecated
-    protected static final String REG_SVM_modelsDir = REG_modelsDir + "/svm";
-
-    /**
-     * Repository for MLR regression models. The MLR models generated by the
-     * users are stored in this directory.
-     */
-    @Deprecated
-    protected static final String REG_MLR_modelsDir = REG_modelsDir + "/mlr";
-
-    /**
-     * Prefix of uploaded arff files
-     */
-    @Deprecated
-    protected static final String dataSetPrefix = "dataSet-";
-
-    /**
-     * Prefix of all models.
-     */
-    @Deprecated
-    protected static final String modelPrefix = "model-";
-
-    /**
-     * General Prefix.
-     */
-    @Deprecated
-    protected static final String OpenToxPrefix = "OpenTox-";
-
-    /**
-     * Prefix of validation results.
-     */
-    @Deprecated
-    protected static final String validationResultPrefix = "validation-";
-
+    public static final String PMMLIntro = "<PMML version=\"3.2\" "
+            + " xmlns=\"http://www.dmg.org/PMML-3_2\"  "
+            + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+            + " <Header copyright=\"Copyleft (c) OpenTox - An Open Source Predictive Toxicology Framework, http://www.opentox.org, 2009\" />\n";
     /**
      * Port used by the web services. This variable has to be overriden if the
      * services are deployed on another domain.
@@ -317,62 +149,11 @@ public abstract class AbstractResource extends ServerResource {
      * services are deployed on another domain.
      */
     public static String baseURI = "http://opentox.ntua.gr:" + port;
-    public static final String ModelURI = baseURI + "/model";
-    /**
-     * Server IP.
-     */
-    @Deprecated
-    protected static String serverIP = "147.102.82.32";
-    /**
-     * Validation Results.
-     */
-    @Deprecated
-    private static final String validationResultsDir = baseDir + "/validationResults";
-    /**
-     * Regression Validation Results.
-     */
-    @Deprecated
-    private static final String RegressionValidationResultsDir = validationResultsDir + "/regression";
-    /**
-     * Classification Validation Results.
-     */
-    @Deprecated
-    private static final String ClassificationValidationResultsDir = validationResultsDir + "/classification";
-    /**
-     * Path to the repository of validation results for MLR regression models.
-     */
-    @Deprecated
-    protected static final String MlrValidationResultsDir = RegressionValidationResultsDir + "/mlr";
-    /**
-     * Path to the repository of validation results for SVC classification
-     * models.
-     */
-    @Deprecated
-    protected static final String SvcValidationResultsDir = ClassificationValidationResultsDir + "/svc";
-    /**
-     * Path to the repository of static files (HTML, CSS and other Static content)
-     */
-    @Deprecated
-    private static final String StaticDir = baseDir + "/Static";
-    /**
-     * Path to the repository of HTML files (Web Interface)
-     */
-    @Deprecated
-    public static final String HTMLDir = StaticDir + "/HTML";
-    /**
-     * Path to the javadoc directory
-     */
-    @Deprecated
-    public static final String javadocDir = StaticDir + "/javadoc";
 
     @Override
     public void doInit() throws ResourceException {
         super.doInit();
         System.gc();
-    }
-
-    protected String getBaseDirectory() {
-        return baseDir;
     }
 
     /**

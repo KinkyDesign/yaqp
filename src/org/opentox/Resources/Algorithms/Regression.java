@@ -473,7 +473,7 @@ public class Regression extends AbstractResource {
         //beginning of PMML element
         pmml.append(PMMLIntro);
         pmml.append("<Model ID=\"" + model_id + "\" Name=\"MLR Model\">\n");
-        pmml.append("<link href=\"" + ModelURI + "/" + model_id + "\" />\n");
+        pmml.append("<link href=\"" + AbstractResource.URIs.modelURI + "/" + model_id + "\" />\n");
         pmml.append("<AlgorithmID href=\"" + URIs.mlrAlgorithmURI + "\"/>\n");
         pmml.append("<DatasetID href=\"" + datasetURI.toString() + "\"/>\n");
         pmml.append("<AlgorithmParameters />\n");
@@ -728,10 +728,10 @@ public class Regression extends AbstractResource {
         saver.setInstances(new Instances(dataInstances));
 
         String key = CreateARandomFilename();
-        File tempDsdFile = new File(Directories.tempDSDDir + "/" + key);
+        File tempDsdFile = new File(Directories.dataDSDDir + "/" + key);
         while(tempDsdFile.exists()){
             key = CreateARandomFilename();
-            tempDsdFile = new File(Directories.tempDSDDir + "/" + key);
+            tempDsdFile = new File(Directories.dataDSDDir + "/" + key);
         }
 
         try {
@@ -740,12 +740,12 @@ public class Regression extends AbstractResource {
 
             //Scaling data and saving a temp scaled data file (dsd format)
             svm_scale scaler = new svm_scale();
-            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s", Directories.rangesDir + "/" + model_id, tempDsdFile.getPath()};
+            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s", Directories.dataRangesDir + "/" + model_id, tempDsdFile.getPath()};
             key = CreateARandomFilename();
-            File tempScaledFile = new File(Directories.tempScaledDir + "/" + key);
+            File tempScaledFile = new File(Directories.dataScaledDir + "/" + key);
             while(tempScaledFile.exists()){
                 key = CreateARandomFilename();
-                tempScaledFile = new File(Directories.tempScaledDir + "/" + key);
+                tempScaledFile = new File(Directories.dataScaledDir + "/" + key);
             }
             try {
                 scaler.scale(scalingOptions, tempScaledFile.toString());
@@ -753,12 +753,12 @@ public class Regression extends AbstractResource {
                 Logger.getLogger(Regression.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            String[] options = getSvmOptions(tempDsdFile.toString(), Directories.svmModel + "/" + model_id);
+            String[] options = getSvmOptions(tempDsdFile.toString(), Directories.modelRawDir + "/" + model_id);
             if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
 
                 representation = new StringRepresentation(getResponse().getStatus().toString(), MediaType.TEXT_PLAIN);
                 svm_train.main(options);
-                representation = new StringRepresentation(ModelURI + "/" + model_id + "\n\n", MediaType.TEXT_PLAIN);
+                representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/" + model_id + "\n\n", MediaType.TEXT_PLAIN);
 
                 /*Creating the xml*/
                 StringBuilder xmlstr = new StringBuilder();
@@ -788,7 +788,7 @@ public class Regression extends AbstractResource {
                 /*Writing the xml to file*/
                 try {
 
-                    FileWriter fstream = new FileWriter(Directories.modelXmlDir + "/" + model_id);
+                    FileWriter fstream = new FileWriter(Directories.modelRdfDir + "/" + model_id);
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(xmlstr.toString());
                     out.flush();
@@ -798,7 +798,7 @@ public class Regression extends AbstractResource {
                 }
 
                 //check if model was succesfully created
-                File modelFile = new File(Directories.modelXmlDir + "/" + model_id);
+                File modelFile = new File(Directories.modelRdfDir + "/" + model_id);
                 boolean modelCreated = modelFile.exists();
                 if (!(modelCreated)) {
                     representation = new StringRepresentation(
@@ -885,7 +885,7 @@ public class Regression extends AbstractResource {
                             baseURI + "/algorithm/learning/regression/mlr");
 
                     //!! Now store the PMML representation in a file:
-                    FileWriter fileStream = new FileWriter(Directories.modelXmlDir + "/" + model_id);
+                    FileWriter fileStream = new FileWriter(Directories.modelRdfDir + "/" + model_id);
                     BufferedWriter output = new BufferedWriter(fileStream);
                     output.write(mlrXml);
                     output.flush();

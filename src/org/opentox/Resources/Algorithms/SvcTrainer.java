@@ -59,9 +59,9 @@ public class SvcTrainer extends AbstractTrainer{
         weka.core.converters.LibSVMSaver saver = new weka.core.converters.LibSVMSaver();
         saver.setInstances(new Instances(dataInstances));
 
-        File tempDsdFile = new File(Directories.tempDSDDir + "/" + CreateARandomFilename());
+        File tempDsdFile = new File(Directories.dataDSDDir + "/" + CreateARandomFilename());
         while (tempDsdFile.exists()) {
-            tempDsdFile = new File(Directories.tempDSDDir + "/" + CreateARandomFilename());
+            tempDsdFile = new File(Directories.dataDSDDir + "/" + CreateARandomFilename());
         }
         try {
             saver.setFile(tempDsdFile);
@@ -70,11 +70,11 @@ public class SvcTrainer extends AbstractTrainer{
             //Scaling data and saving a temp scaled data file (dsd format)
             svm_scale scaler = new svm_scale();
             String[] scalingOptions = {"-l", "-1", "-u", "1", "-s",
-             Directories.rangesDir + "/" + model_id, tempDsdFile.getPath()};
+             Directories.dataRangesDir + "/" + model_id, tempDsdFile.getPath()};
 
-            File tempScaledFile = new File(Directories.tempScaledDir + "/" + CreateARandomFilename());
+            File tempScaledFile = new File(Directories.dataScaledDir + "/" + CreateARandomFilename());
             while (tempScaledFile.exists()) {
-                tempScaledFile = new File(Directories.tempScaledDir + "/" + CreateARandomFilename());
+                tempScaledFile = new File(Directories.dataScaledDir + "/" + CreateARandomFilename());
             }
             try {
                 scaler.scale(scalingOptions, tempScaledFile.toString());
@@ -83,7 +83,7 @@ public class SvcTrainer extends AbstractTrainer{
             }
 
 
-            String[] options = getSvcOptions(tempDsdFile.toString(), Directories.svcModel + "/" + model_id);
+            String[] options = getSvcOptions(tempDsdFile.toString(), Directories.modelRdfDir + "/" + model_id);
 
             /**
              * If all the posted parameters (kernel type, cost, gamma, etc)
@@ -104,7 +104,7 @@ public class SvcTrainer extends AbstractTrainer{
                      * If yes, set the status to 200,
                      * otherwise the status is set to 500
                      */
-                    File modelFile = new File(Directories.svcModel + "/" + model_id);
+                    File modelFile = new File(Directories.modelRdfDir + "/" + model_id);
                     boolean modelCreated = modelFile.exists();
                     if (!(modelCreated)) {
                         representation = new StringRepresentation(
@@ -135,7 +135,7 @@ public class SvcTrainer extends AbstractTrainer{
                                 model_id + "\n\n", MediaType.TEXT_PLAIN);
                         String xmlstr = xmlString();
                         try {
-                            FileWriter fstream = new FileWriter(Directories.modelXmlDir + "/" + model_id);
+                            FileWriter fstream = new FileWriter(Directories.modelRdfDir + "/" + model_id);
                             BufferedWriter out = new BufferedWriter(fstream);
                             out.write(xmlstr);
                             out.flush();

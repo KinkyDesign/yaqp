@@ -14,7 +14,6 @@ import org.opentox.Resources.Models.Model;
 import org.opentox.Resources.List.ListModels;
 import org.opentox.Resources.List.ListAlgorithms;
 import org.opentox.Resources.IndexResource;
-import org.opentox.Resources.StyleSheetResource;
 import org.opentox.database.CredentialsVerifier;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -77,7 +76,6 @@ public class OpenToxApplication extends Application {
     public OpenToxApplication() throws IOException {
         if (!(new File(AbstractResource.Directories.logDir)).exists()) {
             new File(AbstractResource.Directories.logDir).mkdirs();
-            System.out.println("x");
         }
         opentoxLogger = Logger.getLogger("org.restlet");
         FileHandler fileHand = new FileHandler(AbstractResource.Directories.logDir + "/" + new Date());
@@ -96,7 +94,7 @@ public class OpenToxApplication extends Application {
         Enroler enroler = new Enroler() {
             @Override
             public void enrole(Subject subject) {
-                System.out.println(subject);
+                //System.out.println(subject);
             }
         };
 
@@ -139,6 +137,8 @@ public class OpenToxApplication extends Application {
         return guard;
     }
 
+
+
     /**
      * Creates a root Restlet that will receive all incoming calls.
      * <p>Brief list of services:
@@ -170,7 +170,7 @@ public class OpenToxApplication extends Application {
         /**
          * Authenticate authorized users.
          */
-        CredentialsVerifier verifier = new CredentialsVerifier(this,Priviledges.USER);
+        CredentialsVerifier verifier = new CredentialsVerifier(this, Priviledges.USER);
         UniformGuard modelKerberos = createGuard(verifier, false);
         modelKerberos.setNext(Model.class);
 
@@ -194,8 +194,7 @@ public class OpenToxApplication extends Application {
          */
         router.attach(
                 "", IndexResource.class);
-        router.attach(
-                "/styles/style1.css", StyleSheetResource.class);
+        
         
 
         /**
@@ -206,7 +205,7 @@ public class OpenToxApplication extends Application {
         router.attach("/algorithm/{id}", Algorithm.class);
 
         router.attach("/model", ListModels.class);
-        router.attach("/model/{model_id}", modelKerberos);// The deletion of models is guarded!!!
+        router.attach("/model/{model_id}", org.opentox.Resources.Models.Model.class);// The deletion of models is guarded!!!
 
 
         return router;
