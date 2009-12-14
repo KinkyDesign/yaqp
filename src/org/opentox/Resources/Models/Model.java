@@ -13,9 +13,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentox.Applications.OpenToxApplication;
+import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.Algorithms.Preprocessing;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.InHouseDB;
+import org.opentox.formatters.ModelFormatter;
 import org.opentox.ontology.Dataset;
 import org.opentox.util.RepresentationFactory;
 import org.restlet.data.Form;
@@ -68,9 +70,10 @@ public class Model extends AbstractResource {
         super.doInit();
         List<Variant> variants = new ArrayList<Variant>();
         variants.add(new Variant(MediaType.APPLICATION_RDF_XML));
-        variants.add(new Variant(MediaType.TEXT_PLAIN));
-        /** Sometime we will support HTML representation for models **/
-        //variants.add(new Variant(MediaType.TEXT_HTML));
+        variants.add(new Variant(MediaType.APPLICATION_RDF_TURTLE));
+        variants.add(new Variant(OpenToxMediaType.TEXT_TRIPLE));
+        variants.add(new Variant(OpenToxMediaType.TEXT_N3));
+        variants.add(new Variant(MediaType.APPLICATION_XML));
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
     }
@@ -82,26 +85,9 @@ public class Model extends AbstractResource {
      */
     @Override
     public Representation get(Variant variant) {
-        File modelXmlFile = new File(Directories.modelRdfDir + "/" + model_id);
-        if (modelXmlFile.exists()) {
-            RepresentationFactory model = new RepresentationFactory(modelXmlFile.getAbsolutePath());
-            try {
-                getResponse().setStatus(Status.SUCCESS_OK);
-                return new StringRepresentation(model.getString().toString(), MediaType.TEXT_XML);
-
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                return new StringRepresentation("Model not found! Exception Details: " + ex.getMessage());
-            } catch (IOException ex) {
-                Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                return new StringRepresentation("IO Exception! Details: " + ex.getMessage());
-            }
-        } else {
-            getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-            return new StringRepresentation("Model not found!");
-        }
+        ModelFormatter modelFormatter = new ModelFormatter(Integer.parseInt(model_id));
+        return modelFormatter.getStringRepresentation(variant.getMediaType());
+        
     }
 
     @Override
@@ -127,12 +113,15 @@ public class Model extends AbstractResource {
 
             Preprocessing.removeStringAtts(testData);
 
+
             /***** MLR *****/
             if (InHouseDB.isModel(model_id, "mlr")) {
                 try {
-                    PMMLModel mlrModel = PMMLFactory.getPMMLModel(new File(Directories.modelPmmlDir + "/" + model_id));
+                    PMMLModel mlrModel = PMMLFactory.getPMMLModel(
+                            new File(Directories.modelPmmlDir + "/" + model_id));
                     if (mlrModel instanceof PMMLClassifier) {
-                        Attribute att = testData.attribute(mlrModel.getMiningSchema().getFieldsAsInstances().classAttribute().name());
+                        Attribute att = testData.attribute(
+                                mlrModel.getMiningSchema().getFieldsAsInstances().classAttribute().name());
                         testData.setClass(att);
                         PMMLClassifier classifier = (PMMLClassifier) mlrModel;
                         String predictions = "";
