@@ -32,25 +32,22 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter{
 
     private static ArrayList<AlgorithmParameter> Parameters(AlgorithmEnum algorithm) {
         ArrayList<AlgorithmParameter> Parameters = new ArrayList<AlgorithmParameter>();
-        Parameters.add(new AlgorithmParameter<String>("target",
-                XSDDatatype.XSDanyURI, "http://someserver.com/feature/xyz", "mandatory"));
+        Parameters.add(ConstantParameters.TARGET);
         if (algorithm == AlgorithmEnum.svm) {
-            Parameters.add(new AlgorithmParameter<String>("kernel", XSDDatatype.XSDstring, "rbf", "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("cost", XSDDatatype.XSDdouble, 10.0, "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("epsilon", XSDDatatype.XSDdouble, 0.10, "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("gamma", XSDDatatype.XSDdouble, 1.00, "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("coeff0", XSDDatatype.XSDdouble, 0.0, "optional"));
-            Parameters.add(new AlgorithmParameter<Integer>("degree", XSDDatatype.XSDpositiveInteger, 3, "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("tolerance", XSDDatatype.XSDdouble, 0.0001, "optional"));
-            Parameters.add(new AlgorithmParameter<Integer>("tolerance", XSDDatatype.XSDpositiveInteger, 50, "optional"));                    
+            Parameters.add(ConstantParameters.KERNEL);
+            Parameters.add(ConstantParameters.COST);
+            Parameters.add(ConstantParameters.EPSILON);
+            Parameters.add(ConstantParameters.GAMMA);
+            Parameters.add(ConstantParameters.COEFF0);
+            Parameters.add(ConstantParameters.DEGREE);
+            Parameters.add(ConstantParameters.TOLERANCE);
         } else if (algorithm == AlgorithmEnum.svc) {
-            Parameters.add(new AlgorithmParameter<String>("kernel", XSDDatatype.XSDstring, "rbf", "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("cost", XSDDatatype.XSDdouble, 10.0, "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("gamma", XSDDatatype.XSDdouble, 1.00, "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("coeff0", XSDDatatype.XSDdouble, 0.0, "optional"));
-            Parameters.add(new AlgorithmParameter<Integer>("degree", XSDDatatype.XSDpositiveInteger, 3, "optional"));
-            Parameters.add(new AlgorithmParameter<Double>("tolerance", XSDDatatype.XSDdouble, 0.0001, "optional"));
-            Parameters.add(new AlgorithmParameter<Integer>("tolerance", XSDDatatype.XSDpositiveInteger, 50, "optional"));
+            Parameters.add(ConstantParameters.KERNEL);
+            Parameters.add(ConstantParameters.COST);
+            Parameters.add(ConstantParameters.GAMMA);
+            Parameters.add(ConstantParameters.COEFF0);
+            Parameters.add(ConstantParameters.DEGREE);
+            Parameters.add(ConstantParameters.TOLERANCE);
         } else if (algorithm == AlgorithmEnum.mlr) {
             
         }

@@ -1,11 +1,9 @@
 package org.opentox.ontology;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -16,7 +14,9 @@ import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import weka.core.Instances;
@@ -26,55 +26,45 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.restlet.data.Status;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 
 /**
- *
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class Dataset {
+public class Dataset extends RDFParser{
 
     private static final long serialVersionUID = -920482801546239926L;
-    private OntModel jenaModel;
+
 
     public Dataset(InputStream in) {
-        try {
-            jenaModel = OT.createModel();
-            jenaModel.read(in, null);
+        super(in);
+    }
 
-        } catch (Exception ex) {
-            Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
+    public Dataset(){
+        super();
+    }    
+
+
+    /**
+     * Returns the set of features in the dataset.
+     * @return
+     */
+    public Set<String> setOfFeatures(){
+        Set<String> set = new HashSet<String>();
+        StmtIterator features =
+                jenaModel.listStatements(
+                new SimpleSelector(null, RDF.type, OT.Class.Feature.getOntClass(jenaModel)));
+        while (features.hasNext()){
+            set.add(features.next().getSubject().toString());
         }
+        return set;
     }
 
-    /**
-     * Creates an ExtendedIterator over the set of all resources which correspond
-     * to a specific class. Exampe of use:<br/><br/>
-     * <pre> Dataset data = new Dataset(new FileInputStream("/path/to/some/file.rdf"));
-     * ExtendedIterator&lt;? extends OntResource&gt; it = data.getIteratorFor(OT.Class.Feature);
-     * while (it.hasNext()){
-     *   System.out.println(it.next());
-     * }
-     * </pre>
-     * @param someClass
-     * @return
-     */
-    public ExtendedIterator<? extends OntResource> getClassMemberIteratorFor(Namespace.Class someClass) {
-        OntClass myClass = someClass.getOntClass(jenaModel);
-        return myClass.listInstances();
-    }
-
-    /**
-     * Returns the jena Model.
-     * @return
-     */
-    public OntModel getModel() {
-        return jenaModel;
-    }
 
     /**
      * This method is used to encapsulate the data of the RDF document in a
@@ -197,6 +187,7 @@ public class Dataset {
                     try {
                         vals[data.attribute(atName).index()] = data.attribute(atName).parseDate(atVal);
                     } catch (ParseException ex) {
+                        internalStatus = Status.SERVER_ERROR_INTERNAL;
                         Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -277,6 +268,76 @@ public class Dataset {
         return atts;
     }
 
+
+
+    /**
+     * Generates a random dataset of prescribed dimensions.
+     * @param numOfCompounds The number of compounds in the dataset.
+     * @param numOfFeatures The number of features of the dataset.
+     * @param out The output stream to be used to write the dataset. Can be System.out
+     * (The standard system output), a FileOutputStream or other stream. If set to
+     * null, System.out will be used.
+     * @param Lang The prefered language of the representation. Choose among
+     * "RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE" and "N3"
+     */
+    public static void createNewDataset(int numOfCompounds, int numOfFeatures,
+            OutputStream out, String Lang){
+        OntModel datasetModel;
+        try {
+            datasetModel = OT.createModel();
+            Individual dataset = datasetModel.createIndividual("http://sth.com/dataset/1",
+                datasetModel.getOntClass(OT.Class.Dataset.getURI()));
+        dataset.addRDFType(OT.Class.Dataset.createProperty(datasetModel));
+
+
+        OT.Class.Dataset.createOntClass(datasetModel);
+        OT.Class.DataEntry.createOntClass(datasetModel);
+        OT.Class.Feature.createOntClass(datasetModel);
+        OT.Class.FeatureValue.createOntClass(datasetModel);
+        OT.Class.Compound.createOntClass(datasetModel);
+
+
+        Individual dataEntry = null, compound = null, feature = null, featureValue=null;
+
+
+
+        for (int i = 0; i < numOfCompounds; i++) {
+        dataEntry = datasetModel.createIndividual(OT.Class.DataEntry.getOntClass(datasetModel));
+        dataset.addProperty(OT.dataEntry, dataEntry);        
+
+            compound = datasetModel.createIndividual(
+                    "http://sth.com/compound/"+i, OT.Class.Compound.getOntClass(datasetModel));
+            dataEntry.addProperty(OT.compound, compound);
+
+            for (int j=0;j<numOfFeatures;j++){
+                feature = datasetModel.createIndividual("http://sth.com/feature/"+j,
+                OT.Class.Feature.getOntClass(datasetModel));
+                featureValue = datasetModel.createIndividual(
+                        OT.Class.FeatureValue.getOntClass(datasetModel));
+                featureValue.addProperty(OT.feature, feature);
+                featureValue.addLiteral(OT.value, datasetModel.
+                        createTypedLiteral(Math.random(), XSDDatatype.XSDdouble));
+                dataEntry.addProperty(OT.values, featureValue);
+            }
+
+            dataset.addProperty(OT.dataEntry, dataEntry);
+
+        }
+        if (out==null){
+            out = System.out;
+        }
+        if (Lang==null){
+            Lang="RDF/XML";
+        }
+        datasetModel.write(out, Lang);
+
+        } catch (Exception ex) {
+            Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+
     /**
      * This main method is for testing purposes only and will be removed.
      * @param args
@@ -285,7 +346,8 @@ public class Dataset {
     public static void main(String[] args) throws IOException, URISyntaxException {
 
         //URI d_set = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/6");
-        URI d_set = new URI("http://localhost/files/ds.rdf");
+        createNewDataset(100, 15, new FileOutputStream("/var/www/files/1.rdf"), null);
+        URI d_set = new URI("http://localhost/files/1.rdf");
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection con = null;
         try {
@@ -297,8 +359,12 @@ public class Dataset {
 
             Dataset data = new Dataset(con.getInputStream());
             //Dataset data = new Dataset(new FileInputStream(System.getProperty("user.home")+"/Files/myDs.rdf"));
-            Instances wekaData = data.getWekaDataset();
-            System.out.println(wekaData);
+            ///// Instances wekaData = data.getWekaDataset();
+            Set<String > set = data.setOfFeatures();
+            Iterator<String> it = set.iterator();
+            while (it.hasNext()){
+                System.out.println(it.next());
+            }
 
         } catch (IOException ex) {
         }

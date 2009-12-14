@@ -1,0 +1,151 @@
+package org.opentox.ontology;
+
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import org.opentox.Resources.AbstractResource;
+import org.opentox.Resources.AbstractResource.URIs;
+import org.opentox.Resources.Algorithms.AlgorithmParameter;
+import org.restlet.data.Status;
+import weka.core.Instances;
+
+/**
+ *
+ * @author Sopasakis Pantelis
+ */
+public class Model extends RDFParser{
+
+    private static final long serialVersionUID = -9272347612221496L;
+    private List<AlgorithmParameter> algorithmParameters;
+
+    
+
+    public Model(){
+        super();
+    }
+
+
+    public Model(InputStream in){
+        super(in);
+    }
+
+
+
+    /**
+     * Returns the set of features in the Model (RDF representation).
+     * @return
+     */
+    public Set<String> setOfFeatures(){
+        Set<String> set = new HashSet<String>();
+        OntClass myClass = OT.Class.Feature.getOntClass(jenaModel);
+        ExtendedIterator<? extends OntResource> featureIterator = myClass.listInstances() ;
+        while (featureIterator.hasNext()){
+            set.add(featureIterator.next().getURI());
+        }
+        return set;
+    }
+
+    public static void main(String[] args) throws FileNotFoundException{
+        Model m = new Model(new FileInputStream(AbstractResource.Directories.modelRdfDir+"/10"));
+        Set<String > s = m.setOfFeatures();
+        Iterator<String> sit = s.iterator();
+        while (sit.hasNext()){
+            System.out.println(sit.next());
+        }
+    }
+
+
+
+    /**
+     * Creates the RDF representation for an OpenTox model given its name, the uri
+     * of the dataset used to train it, its target feature, the Data and a List of
+     * tuning parameters for the training algorithm. The RDF document is built according
+     * to the specification of OpenTox API (v 1.1).
+     * @param model_id The id of the model (Integer).
+     * @param dataseturi The URI of the dataset used to train the model.
+     * @param targeturi The URI of the target feature, i.e. the dependent variable of
+     * the model.
+     * @param data The Instances object containing the training data.
+     * @param algorithmParameters A List of the tuning parameters of the algorithm.
+     * @param out The output stream used to store the model.
+     */
+    public void createModel(String model_id, String dataseturi, String targeturi, Instances data,
+            List<AlgorithmParameter> algorithmParameters, OutputStream out){
+            try {
+            jenaModel = org.opentox.ontology.Namespace.createModel();
+
+            OT.Class.Dataset.createOntClass(jenaModel);
+            OT.Class.Feature.createOntClass(jenaModel);
+            OT.Class.Algorithm.createOntClass(jenaModel);
+            OT.Class.Parameter.createOntClass(jenaModel);
+
+
+            Individual ot_model = jenaModel.createIndividual(
+            URIs.modelURI + "/" + model_id, OT.Class.Model.getOntClass(jenaModel));
+            ot_model.addProperty(DC.title, "Model " + model_id);
+            ot_model.addProperty(DC.identifier, URIs.modelURI + "/" + model_id);
+            ot_model.addProperty(DC.creator, AbstractResource.baseURI);
+            ot_model.addProperty(DC.date, java.util.GregorianCalendar.getInstance().getTime().toString());
+
+            //the algorithm
+            Individual algorithm = jenaModel.createIndividual(
+                    AbstractResource.URIs.mlrAlgorithmURI, OT.Class.Algorithm.getOntClass(jenaModel));
+            ot_model.addProperty(OT.algorithm, algorithm);
+
+            //assign training dataset (same as above)
+            Individual dataset = jenaModel.createIndividual(dataseturi.toString(), OT.Class.Dataset.getOntClass(jenaModel));
+            ot_model.addProperty(OT.trainingDataset, dataset);
+
+            // Add all parameters:
+            Individual iparam;
+                    for (int i=0;i<algorithmParameters.size();i++){
+                        iparam = jenaModel.createIndividual(OT.Class.Parameter.getOntClass(jenaModel));
+                        iparam.addProperty(DC.title, algorithmParameters.get(i).paramName);
+                        iparam.addLiteral(OT.paramValue, jenaModel.createTypedLiteral(
+                                algorithmParameters.get(i).paramValue.toString(),
+                                algorithmParameters.get(i).dataType));
+                        iparam.addLiteral(OT.paramScope, jenaModel.
+                                createTypedLiteral(algorithmParameters.get(i).paramScope,
+                                XSDDatatype.XSDstring));
+                        ot_model.addProperty(OT.parameters, iparam);
+                    }
+
+            Individual feature = null;
+
+            for (int i = 0; i < data.numAttributes(); i++) {
+                // for the target attribute...
+                if (targeturi.toString().equals(data.attribute(i).name())) {
+                    feature = jenaModel.createIndividual(targeturi.toString(),
+                            OT.Class.Feature.getOntClass(jenaModel));
+                    ot_model.addProperty(OT.dependentVariables, feature);
+                } else {
+                    feature = jenaModel.createIndividual(data.attribute(i).name(),
+                            OT.Class.Feature.getOntClass(jenaModel));
+                    ot_model.addProperty(OT.independentVariables, feature);
+                }
+            }
+            jenaModel.write(out);
+
+        } catch (Exception ex) {
+            internalStatus = Status.SERVER_ERROR_INTERNAL;
+        }
+
+    }
+
+    
+
+}

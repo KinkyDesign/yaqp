@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.opentox.formatters;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -22,8 +17,9 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
 /**
- *
- * @author chung
+ * Reads a stored or online model (in RDF format) and returns it in a prefered
+ * MIME type (format).
+ * @author Sopasakis Pantelis
  */
 public class ModelFormatter extends AbstractModelFormatter {
 

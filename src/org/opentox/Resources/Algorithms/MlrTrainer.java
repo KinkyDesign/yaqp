@@ -1,21 +1,27 @@
 package org.opentox.Resources.Algorithms;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.AbstractResource;
-import org.opentox.client.opentoxClient;
 import org.opentox.ontology.Dataset;
+import org.opentox.ontology.Model;
 import org.opentox.ontology.OT;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -53,8 +59,10 @@ public class MlrTrainer extends AbstractTrainer {
 
         if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
 
-
-
+            /**
+             * Retrive the Dataset (RDF), parse it and generate the corresponding
+             * weka.core.Instances object.
+             */
             HttpURLConnection.setFollowRedirects(false);
             HttpURLConnection con = null;
             try {
@@ -67,8 +75,12 @@ public class MlrTrainer extends AbstractTrainer {
                 Dataset dataset = new Dataset(con.getInputStream());
                 data = dataset.getWekaDataset();
 
+              
             } catch (IOException ex) {
             }
+
+
+
 
 
             try {
@@ -76,16 +88,41 @@ public class MlrTrainer extends AbstractTrainer {
                 Preprocessing.removeStringAtts(data);
                 LinearRegression linreg = new LinearRegression();
                 String[] linRegOptions = {"-S", "1", "-C"};
+
+                /**
+                 * Train the model using Weka...
+                 */
                 try {
 
                     linreg.setOptions(linRegOptions);
                     linreg.buildClassifier(data);
                     generatePMML(linreg.coefficients(), model_id);
-                    generateRdfModel(model_id);
-                    setInternalStatus(Status.SUCCESS_OK);
-                    representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
-                            + OpenToxApplication.dbcon.registerNewModel(
-                            AbstractResource.URIs.mlrAlgorithmURI) + "\n");
+
+                    List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
+                    paramList.add(ConstantParameters.TARGET(targeturi.toString()));
+
+                    /**
+                     * Store the model as RDF...
+                     */
+                    Model model = new Model();
+                    model.createModel(Integer.toString(model_id),
+                            dataseturi.toString(),
+                            targeturi.toString(),
+                            data,
+                            paramList,
+                            new FileOutputStream(AbstractResource.Directories.modelRdfDir + "/" + model_id));
+                    setInternalStatus(model.internalStatus);
+                    // return the URI of generated model:
+                    if (Status.SUCCESS_OK.equals(internalStatus)) {
+                        // if status is OK(200), register the new model in the database and
+                        // return the URI to the client.
+                        representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
+                                + OpenToxApplication.dbcon.registerNewModel(
+                                AbstractResource.URIs.mlrAlgorithmURI) + "\n");
+                    } else {
+                        representation = new StringRepresentation(internalStatus.toString());
+                    }
+
                 } catch (Exception ex) {
                     OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n"
                             + "Details :" + ex.getMessage() + "\n");
@@ -147,60 +184,6 @@ public class MlrTrainer extends AbstractTrainer {
         } else {
             setInternalStatus(Status.SUCCESS_ACCEPTED);
             return null;
-        }
-    }
-
-    /**
-     * Generate and store the RDF repreesentation of the Model.
-     */
-    private void generateRdfModel(int model_id) {
-        try {
-            OntModel jenaModel = org.opentox.ontology.Namespace.createModel();
-
-            OT.Class.Dataset.createOntClass(jenaModel);
-            OT.Class.Feature.createOntClass(jenaModel);
-            OT.Class.Algorithm.createOntClass(jenaModel);
-
-
-
-            Individual ot_model = jenaModel.createIndividual(
-                    AbstractResource.URIs.modelURI + "/" + model_id, OT.Class.Model.getOntClass(jenaModel));
-            ot_model.addProperty(DC.title, "Model " + model_id);
-            ot_model.addProperty(DC.identifier, AbstractResource.URIs.modelURI + "/" + model_id);
-            ot_model.addProperty(DC.creator, AbstractResource.baseURI);
-            ot_model.addProperty(DC.date, java.util.GregorianCalendar.getInstance().getTime().toString());
-
-            //the algorithm
-            Individual algorithm = jenaModel.createIndividual(
-                    AbstractResource.URIs.mlrAlgorithmURI, OT.Class.Algorithm.getOntClass(jenaModel));
-            ot_model.addProperty(OT.algorithm, algorithm);
-
-            //assign training dataset (same as above)
-            Individual dataset = jenaModel.createIndividual(dataseturi.toString(), OT.Class.Dataset.getOntClass(jenaModel));
-            ot_model.addProperty(OT.trainingDataset, dataset);
-
-            Individual feature = null;
-
-            for (int i = 0; i < data.numAttributes(); i++) {
-                // for the target attribute...
-                if (targeturi.toString().equals(data.attribute(i).name())) {
-                    feature = jenaModel.createIndividual(targeturi.toString(),
-                            OT.Class.Feature.getOntClass(jenaModel));
-                    ot_model.addProperty(OT.dependentVariables, feature);
-                } else {
-                    feature = jenaModel.createIndividual(data.attribute(i).name(),
-                            OT.Class.Feature.getOntClass(jenaModel));
-                    ot_model.addProperty(OT.independentVariables, feature);
-                }
-            }
-
-            jenaModel.write(new FileOutputStream(AbstractResource.Directories.modelRdfDir+"/"+model_id));
-
-
-
-
-        } catch (Exception ex) {
-            Logger.getLogger(MlrTrainer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -95,7 +95,7 @@ public class Regression extends AbstractResource {
     /**
      * The name of the dataset.
      */
-//    private String dataset;
+
     /**
      * The kernel used in the SVM model.
      * This can be rbf, linear, sigmoid or polynomial.
@@ -712,6 +712,8 @@ public class Regression extends AbstractResource {
         return key;
     }
 
+
+    
     private Representation SvmTrain(Form form) {
         Representation representation = checkSvmParameters(form);
         /**
@@ -740,7 +742,8 @@ public class Regression extends AbstractResource {
 
             //Scaling data and saving a temp scaled data file (dsd format)
             svm_scale scaler = new svm_scale();
-            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s", Directories.dataRangesDir + "/" + model_id, tempDsdFile.getPath()};
+            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s",
+              Directories.dataRangesDir + "/" + model_id, tempDsdFile.getPath()};
             key = CreateARandomFilename();
             File tempScaledFile = new File(Directories.dataScaledDir + "/" + key);
             while(tempScaledFile.exists()){

@@ -10,11 +10,11 @@ import java.util.logging.SimpleFormatter;
 import javax.security.auth.Subject;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.Algorithms.Algorithm;
-import org.opentox.Resources.Models.Model;
+import org.opentox.Resources.Models.ModelResource;
 import org.opentox.Resources.List.ListModels;
 import org.opentox.Resources.List.ListAlgorithms;
 import org.opentox.Resources.IndexResource;
-import org.opentox.Resources.Models.ModelInfo;
+import org.opentox.Resources.Models.ModelInfoResource;
 import org.opentox.database.CredentialsVerifier;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -179,7 +179,7 @@ public class OpenToxApplication extends Application {
         CredentialsVerifier verifier = new CredentialsVerifier(
                 this, Priviledges.USER);
         UniformGuard modelKerberos = createGuard(verifier, false);
-        modelKerberos.setNext(Model.class);
+        modelKerberos.setNext(ModelResource.class);
 
         Router router = new Router(getContext());
 
@@ -213,7 +213,7 @@ public class OpenToxApplication extends Application {
         router.attach("/model", ListModels.class);
         router.attach("/model/{model_id}", modelKerberos);
         // The deletion of models is guarded!!!
-        router.attach("/model/{model_id}/{info}", ModelInfo.class);
+        router.attach("/model/{model_id}/{info}", ModelInfoResource.class);
 
 
         return router;
