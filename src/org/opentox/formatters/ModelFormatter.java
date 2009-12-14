@@ -66,7 +66,7 @@ public class ModelFormatter extends AbstractModelFormatter {
         }else if (MediaType.APPLICATION_XML.equals(mediatype)){
             RepresentationFactory rf = new RepresentationFactory(Directories.modelPmmlDir+"/"+model_id);
             try {
-                rep = new StringRepresentation(rf.getString().toString());
+                rep = new StringRepresentation(rf.getString().toString(), mediatype);
             } catch (FileNotFoundException ex) {
                 rep = new StringRepresentation("Model not Found!\n");
             } catch (IOException ex) {

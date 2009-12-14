@@ -14,6 +14,7 @@ import org.opentox.Resources.Models.Model;
 import org.opentox.Resources.List.ListModels;
 import org.opentox.Resources.List.ListAlgorithms;
 import org.opentox.Resources.IndexResource;
+import org.opentox.Resources.Models.ModelInfo;
 import org.opentox.database.CredentialsVerifier;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -109,6 +110,7 @@ public class OpenToxApplication extends Application {
         };
         authorizer.getAuthenticatedMethods().add(Method.DELETE);
         authorizer.getAuthenticatedMethods().add(Method.GET);
+        authorizer.getAuthenticatedMethods().add(Method.POST);
         
 
                 
@@ -122,7 +124,11 @@ public class OpenToxApplication extends Application {
             @Override
             protected boolean authenticate(Request request, Response response) {
                 /** Allow everyone to GET but only Admins to apply DELETE!**/
-                if (Method.GET.equals(request.getMethod())){
+                if (
+                        (Method.GET.equals(request.getMethod()))
+                        || (Method.POST.equals(request.getMethod()))
+                ){
+                    System.out.println("PASS without password!");
                     return true;
                 }else{
                     return super.authenticate(request, response);
@@ -170,7 +176,8 @@ public class OpenToxApplication extends Application {
         /**
          * Authenticate authorized users.
          */
-        CredentialsVerifier verifier = new CredentialsVerifier(this, Priviledges.USER);
+        CredentialsVerifier verifier = new CredentialsVerifier(
+                this, Priviledges.USER);
         UniformGuard modelKerberos = createGuard(verifier, false);
         modelKerberos.setNext(Model.class);
 
@@ -196,7 +203,6 @@ public class OpenToxApplication extends Application {
                 "", IndexResource.class);
         
         
-
         /**
          * Resources compliant to the
          * OpenTox API specifications:
@@ -205,7 +211,9 @@ public class OpenToxApplication extends Application {
         router.attach("/algorithm/{id}", Algorithm.class);
 
         router.attach("/model", ListModels.class);
-        router.attach("/model/{model_id}", org.opentox.Resources.Models.Model.class);// The deletion of models is guarded!!!
+        router.attach("/model/{model_id}", modelKerberos);
+        // The deletion of models is guarded!!!
+        router.attach("/model/{model_id}/{info}", ModelInfo.class);
 
 
         return router;
