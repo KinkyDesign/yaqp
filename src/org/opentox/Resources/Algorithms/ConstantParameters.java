@@ -44,7 +44,7 @@ public class ConstantParameters {
         return new AlgorithmParameter<Double>("coeff0", XSDDatatype.XSDdouble, value, "optional");
     }
 
-    private static final AlgorithmParameter<Integer> DEGREE(int value) {
+    public static final AlgorithmParameter<Integer> DEGREE(int value) {
         return new AlgorithmParameter<Integer>("degree",
                 XSDDatatype.XSDpositiveInteger, value, "optional");
     }

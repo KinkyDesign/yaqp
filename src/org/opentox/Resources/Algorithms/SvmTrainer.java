@@ -1,6 +1,7 @@
 package org.opentox.Resources.Algorithms;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -10,10 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.AbstractResource.Directories;
+import org.opentox.Resources.AbstractResource.URIs;
 import org.opentox.database.FeaturesDB;
 import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
+import org.opentox.ontology.Model;
 import org.opentox.util.libSVM.svm_scale;
 import org.opentox.util.libSVM.svm_train;
 import org.restlet.data.Form;
@@ -95,7 +99,6 @@ public class SvmTrainer extends AbstractTrainer {
         super.form = form;
     }
 
-
     /**
      * Trains a new SVM model.
      * @return
@@ -125,10 +128,10 @@ public class SvmTrainer extends AbstractTrainer {
         /**
          * !!!! Some important definitions
          */
-        String  dataDSDFile = Directories.dataDSDDir + "/" + model_id,
+        String dataDSDFile = Directories.dataDSDDir + "/" + model_id,
                 scaledFile = Directories.dataScaledDir + "/" + model_id,
                 rangeFile = Directories.dataRangesDir + "/" + model_id,
-                modelDSDFile  = Directories.modelRawDir+"/"+model_id;
+                modelDSDFile = Directories.modelRawDir + "/" + model_id;
 
         /**
          * 4. Store the DSD representation of the dataset in DSD format.
@@ -158,10 +161,41 @@ public class SvmTrainer extends AbstractTrainer {
             /**
              * 7. Check if the model was indeed generated
              */
-            if (new File(modelDSDFile).exists()){
+            if (new File(modelDSDFile).exists()) {
 
+                /**
+                 * 8. Generate the RDF representation of the model and
+                 * store it in a file.
+                 */
+                List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
+                paramList.add(ConstantParameters.COEFF0(Double.parseDouble(coeff0)));
+                paramList.add(ConstantParameters.COST(Double.parseDouble(cost)));
+                paramList.add(ConstantParameters.TARGET(targetAttribute));
+                paramList.add(ConstantParameters.DEGREE(Integer.parseInt(degree)));
+                paramList.add(ConstantParameters.KERNEL(kernel));
+                paramList.add(ConstantParameters.EPSILON(Double.parseDouble(epsilon)));
 
+                Model opentoxModel = new Model();
+                        System.out.println(Integer.toString(model_id));
+                        System.out.println(paramList.get(0).paramName);
+                        System.out.println(Directories.modelRdfDir + "/" + model_id);
 
+                opentoxModel.createModel(Integer.toString(model_id),
+                        dataseturi.toString(),
+                        targetAttribute,
+                        dataInstances,
+                        paramList,
+                        new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
+                setInternalStatus(opentoxModel.internalStatus);
+
+                if (Status.SUCCESS_OK.equals(internalStatus)) {
+                    // if status is OK(200), register the new model in the database and
+                    // return the URI to the client.
+                    rep = new StringRepresentation(URIs.modelURI + "/"
+                            + ModelsDB.registerNewModel(URIs.mlrAlgorithmURI) + "\n");
+                } else {
+                    rep = new StringRepresentation(internalStatus.toString());
+                }
             }
 
 
@@ -450,8 +484,6 @@ public class SvmTrainer extends AbstractTrainer {
 
 
     }
-
-
 
     /**
      *
