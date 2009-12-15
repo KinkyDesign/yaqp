@@ -1,9 +1,8 @@
 package org.opentox.Resources.List;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.opentox.Resources.*;
 import org.restlet.data.MediaType;
@@ -40,7 +39,7 @@ public class ListAlgorithms extends AbstractResource {
     @Override
     public void doInit() throws ResourceException{
         super.doInit();
-        List<Variant> variants = new ArrayList<Variant>();
+        Collection<Variant> variants = new ArrayList<Variant>();
         variants.add(new Variant(MediaType.TEXT_URI_LIST));
         variants.add(new Variant(MediaType.TEXT_HTML));
         getVariants().put(Method.GET, variants);

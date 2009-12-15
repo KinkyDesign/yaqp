@@ -140,7 +140,7 @@ public class Dataset extends RDFParser{
          * A6. Now update the attributes of the dataset.
          */
         attributes = getAttributes(featureTypeMap);
-        data = new Instances(relationName, attributes, 10000);
+        data = new Instances(relationName, attributes, 0);
 
 
 
@@ -345,9 +345,9 @@ public class Dataset extends RDFParser{
      */
     public static void main(String[] args) throws IOException, URISyntaxException {
 
-        //URI d_set = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/6");
-        createNewDataset(100, 15, new FileOutputStream("/var/www/files/1.rdf"), null);
-        URI d_set = new URI("http://localhost/files/1.rdf");
+        URI d_set = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/6");
+        
+        //URI d_set = new URI("http://localhost/files/1.rdf");
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection con = null;
         try {

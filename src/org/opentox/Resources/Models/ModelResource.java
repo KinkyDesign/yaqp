@@ -6,22 +6,20 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Resources.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.Algorithms.Preprocessing;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.InHouseDB;
+import org.opentox.database.ModelsDB;
 import org.opentox.formatters.ModelFormatter;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
-import org.opentox.util.RepresentationFactory;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -70,7 +68,7 @@ public class ModelResource extends AbstractResource {
         allowedMethods.add(Method.POST);
         getAllowedMethods().addAll(allowedMethods);
         super.doInit();
-        List<Variant> variants = new ArrayList<Variant>();
+        Collection<Variant> variants = new ArrayList<Variant>();
         variants.add(new Variant(MediaType.APPLICATION_RDF_XML));
         variants.add(new Variant(MediaType.APPLICATION_RDF_TURTLE));
         variants.add(new Variant(OpenToxMediaType.TEXT_TRIPLE));
@@ -116,10 +114,6 @@ public class ModelResource extends AbstractResource {
             Preprocessing.removeStringAtts(testData);
 
             /**
-             * TODO: Check if the set of features in the model is a subset
-             * of the set of features of the testData.
-             */
-            /**
              * Check if all features of the model are contained in the features of the dataset.
              */
             if (wekaData.setOfFeatures().
@@ -127,7 +121,7 @@ public class ModelResource extends AbstractResource {
                     new FileInputStream(AbstractResource.Directories.modelRdfDir + "/" + model_id)).setOfFeatures())) {
 
                 /***** MLR *****/
-                if (InHouseDB.isModel(model_id, "mlr")) {
+                if (ModelsDB.isModel(model_id, "mlr")) {
                     try {
                         PMMLModel mlrModel = PMMLFactory.getPMMLModel(
                                 new File(Directories.modelPmmlDir + "/" + model_id));
@@ -136,6 +130,7 @@ public class ModelResource extends AbstractResource {
                                     mlrModel.getMiningSchema().getFieldsAsInstances().classAttribute().name());
                             testData.setClass(att);
                             PMMLClassifier classifier = (PMMLClassifier) mlrModel;
+                            // list of predicted values...
                             String predictions = "";
                             for (int i = 0; i < testData.numInstances(); i++) {
                                 predictions = predictions + classifier.classifyInstance(testData.instance(i)) + "\n";
@@ -152,9 +147,6 @@ public class ModelResource extends AbstractResource {
 
             }
 
-
-
-
         } catch (IOException ex) {
             Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
@@ -163,13 +155,15 @@ public class ModelResource extends AbstractResource {
         return result;
     }
 
+
+
     @Override
     public Representation delete() {
         String responseText = null;
         try {
             if (opentoxClient.IsMimeAvailable(new URI("http://localhost:3000/model/" + model_id),
                     MediaType.TEXT_XML, false)) {
-                OpenToxApplication.dbcon.removeModel(model_id);
+                ModelsDB.removeModel(model_id);
                 File modelFile = new File(Directories.modelRdfDir + "/" + model_id);
                 responseText = "The resource was detected and removed from OT database successfully!";
                 if (modelFile.exists()) {
@@ -182,10 +176,10 @@ public class ModelResource extends AbstractResource {
                 }
             } else {
                 getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                responseText = "Model not found on the server!";
+                responseText = "Model not found on the server!\n";
             }
         } catch (URISyntaxException ex) {
-            responseText = "Model Not Found!";
+            responseText = "Model Not Found!\n";
             OpenToxApplication.opentoxLogger.severe("Model URI : http://localhost:3000/model/" + model_id
                     + "seems to be invalid!");
         }

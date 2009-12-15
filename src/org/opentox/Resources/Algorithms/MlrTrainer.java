@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.AbstractResource;
+import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
 import org.opentox.ontology.OT;
@@ -49,7 +50,7 @@ public class MlrTrainer extends AbstractTrainer {
     public synchronized Representation train() {
         Representation representation = null;
         int model_id = 0;
-        model_id = org.opentox.Applications.OpenToxApplication.dbcon.getModelsStack() + 1;
+        model_id = ModelsDB.getModelsStack() + 1;
 
 
         Representation errorRep = checkParameters();
@@ -79,10 +80,7 @@ public class MlrTrainer extends AbstractTrainer {
             } catch (IOException ex) {
             }
 
-
-
-
-
+            
             try {
                 data.setClass(data.attribute(targeturi.toString()));
                 Preprocessing.removeStringAtts(data);
@@ -117,7 +115,7 @@ public class MlrTrainer extends AbstractTrainer {
                         // if status is OK(200), register the new model in the database and
                         // return the URI to the client.
                         representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
-                                + OpenToxApplication.dbcon.registerNewModel(
+                                + ModelsDB.registerNewModel(
                                 AbstractResource.URIs.mlrAlgorithmURI) + "\n");
                     } else {
                         representation = new StringRepresentation(internalStatus.toString());
@@ -161,7 +159,7 @@ public class MlrTrainer extends AbstractTrainer {
 
 
         try {
-            dataseturi = new URI(form.getFirstValue("dataset"));
+            dataseturi = new URI(form.getFirstValue("dataset_uri"));
         } catch (URISyntaxException ex) {
             setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "[Wrong Posted Parameter ]: The client did"

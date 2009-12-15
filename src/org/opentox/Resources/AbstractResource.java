@@ -87,14 +87,42 @@ public abstract class AbstractResource extends ServerResource {
          * Base Directory for all files the services needs to store or to read from.
          */
         private static final String baseDir = System.getProperty("user.home") + "/OpenToxServer";
+        /**
+         * Folder where server logs are stored.
+         */
         public static final String logDir = baseDir + "/log";
+        /**
+         * Folder where all model-related files are stored.
+         */
         private static final String modelDir = baseDir + "/model";
+        /**
+         * Folder where all RDF representations of models are stored.
+         * Each model has an RDF file stored in that folder.
+         */
         public static final String modelRdfDir = modelDir + "/rdf";
+        /**
+         * Folder where all PMML documents are stored.
+         */
         public static final String modelPmmlDir = modelDir + "/pmml";
+        /**
+         * Folder where all RAW (dsd-like) files are stored.
+         */
         public static final String modelRawDir = modelDir + "/raw";
+        /**
+         * Directory of data files.
+         */
         private static final String dataDir = baseDir + "/data";
+        /**
+         * Directory where DSD data files are stored.
+         */
         public static final String dataDSDDir = dataDir + "/dsd";
+        /**
+         * Directory where all Scaled data are stored.
+         */
         public static final String dataScaledDir = dataDir + "/scaled";
+        /**
+         * Directory where all scaling parameters are stored.
+         */
         public static final String dataRangesDir = dataDir + "/ranges";
 
         /**

@@ -1,8 +1,10 @@
 package org.opentox.Resources.List;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.opentox.Resources.*;
+import org.opentox.database.ModelsDB;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -40,7 +42,7 @@ public class ListModels extends AbstractResource {
     @Override
     public void doInit() throws ResourceException {
         super.doInit();
-        List<Variant> variants = new ArrayList<Variant>();
+        Collection<Variant> variants = new ArrayList<Variant>();
         variants.add(new Variant(MediaType.TEXT_URI_LIST));
         variants.add(new Variant(MediaType.TEXT_HTML));
         getVariants().put(Method.GET, variants);
@@ -60,9 +62,9 @@ public class ListModels extends AbstractResource {
         Representation rep = null;
         ReferenceList list = new ReferenceList();
         if (!(searchAlgorithm == null)) {
-            list = org.opentox.Applications.OpenToxApplication.dbcon.getReferenceListFromAlgId(searchAlgorithm);
+            list = ModelsDB.getReferenceListFromAlgId(searchAlgorithm);
         } else {
-            list = org.opentox.Applications.OpenToxApplication.dbcon.getModelsAsReferenceList();
+            list = ModelsDB.getModelsAsReferenceList();
         }
 
 
