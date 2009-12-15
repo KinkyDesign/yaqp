@@ -1,8 +1,10 @@
 package org.opentox.database;
 
+
 import java.sql.*;
 import java.util.logging.Level;
 import org.opentox.Applications.OpenToxApplication;
+
 
 /**
  * This is a class to manage access to the database behind the services. 
@@ -17,7 +19,9 @@ import org.opentox.Applications.OpenToxApplication;
  * @author Kolotouros Dimitris
  * @author Sopasakis Pantelis
  */
-public class InHouseDB implements DBase {
+public class InHouseDB implements DataBaseAccess {
+
+    
 
     private static Driver myDriver = null;
     protected static Connection connection = null;
@@ -132,4 +136,7 @@ public class InHouseDB implements DBase {
                     + "Details: " + ex.getMessage());
         }
     }
-}
+
+
+   
+}// end of class

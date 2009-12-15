@@ -161,6 +161,43 @@ public class svm_train {
 		}
 	}
 
+
+        /**
+         * Usage: svm_train [options] training_set_file [model_file]"<br/>
+         * options:<br/>
+         * <b>-s</b> svm_type : set type of SVM (default 0)<br/>
+         * <ul>
+         * <li>0 -- C-SVC</li>
+         * <li>1 -- nu-SVC</li>
+         * <li>2 -- one-class SVM</li>
+         * <li>3 -- epsilon-SVR</li>
+         * <li>4 -- nu-SVR</li>
+         * </ul>
+         * <b>-t</b> kernel_type : set type of kernel function (default 2)<br/>
+         * <ul>
+         * <li>0 -- linear: u'*v</li>
+         * <li>1 -- polynomial: (gamma*u'*v + coef0)^degree</li>
+         * <li>2 -- radial basis function: exp(-gamma*|u-v|^2)</li>
+         * <li>3 -- sigmoid: tanh(gamma*u'*v + coef0)</li>
+         * <li>4 -- precomputed kernel (kernel values in training_set_file)</li>
+         * </ul>
+         * <b>-d</b> degree : set degree in kernel function (default 3)<br/><br/>
+         * <b>-g</b> gamma : set gamma in kernel function (default 1/k)<br/><br/>
+         * <b>-r</b> coef0 : set coef0 in kernel function (default 0)<br/><br/>
+         * <b>-c</b> cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)<br/><br/>
+         * <b>-n</b> nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)\n"<br/><br/>
+         * <b>-p</b> epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)\n"<br/><br/>
+         * <b>-m</b> cachesize : set cache memory size in MB (default 100)<br/><br/>
+         * <b>-e</b> epsilon : set tolerance of termination criterion (default 0.001)<br/><br/>
+         * <b>-h</b> shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)<br/><br/>
+         * <b>-b</b> probability_estimates : whether to train a SVC or SVR model
+         * for probability estimates, 0 or 1 (default 0)<br/><br/>
+         * <b>-wi</b> weight : set the parameter C of class i to weight*C, for C-SVC (default 1)<br/><br/>
+         * <b>-v</b> n : n-fold cross validation mode<br/><br/>
+         * <b>-q</b> : quiet mode (no outputs)<br/>
+         * @param argv
+         * @throws IOException
+         */
 	public static void main(String argv[]) throws IOException
 	{
 		svm_train t = new svm_train();

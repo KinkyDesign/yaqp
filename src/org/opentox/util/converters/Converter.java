@@ -11,13 +11,13 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.util.FileManager;
-import com.hp.hpl.jena.vocabulary.DC;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import weka.core.Instances;
 import java.io.BufferedWriter;
-import org.opentox.ontology.OT;
+import org.opentox.Resources.Algorithms.Preprocessing;
+import org.opentox.ontology.Dataset;
 /**
 *
 * @author OpenTox - http://www.opentox.org
@@ -32,9 +32,24 @@ public class Converter extends AbstractConverter{
     public void Converter(){
     }
 
-    
+
+    /**
+     * Saves a given Instances object in a DSD file. The given Instances should have <b>no
+     * string attributes</b>. <br/><br/>Consider applying
+     * {@link org.opentox.Resources.Algorithms.Preprocessing#removeStringAtts(Instances)}
+     * before using this method. The columns of the produced DSD file have exactly
+     * the same ordering with the attributes of the Instances. For example, if the
+     * attributes are x1, x2, x3, ..., xn, then the DSD file will have n columns
+     * , and precisely x1,x2,...,xn (with the same ordering). Make sure that the
+     * Instances has only numeric attributes!
+     * @param instances {@link weka.core.Instances} object which has only numeric
+     * attributes!
+     * @param dsdFile Destination {@link java.io.File} where the result is stored.
+     */
+
     @Override
     public void convert(final Instances instances, File dsdFile) {
+
         int i, j, targetIdx;
 
         StringBuilder DsdString = new StringBuilder();
@@ -69,6 +84,7 @@ public class Converter extends AbstractConverter{
         }
     }
 
+
     @Override
     public void convert(final File dsdFile, Instances instances) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -78,49 +94,9 @@ public class Converter extends AbstractConverter{
 
     @Override
     public void convert(InputStream input_RDF_file, Instances instances) {
-
-        com.hp.hpl.jena.rdf.model.Model model =
-                com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
-        model.read(input_RDF_file, null);
-
-        /**
-         * Build a Query
-         */
-        Query query = QueryFactory.make();
-        query.setQueryType(Query.QueryTypeSelect);
-        ElementGroup elg = new ElementGroup();
-        Var varEntry = Var.alloc("dataEntry");
-        Var varX = Var.alloc("x");
-        Triple triple = new Triple(varX, OT.dataEntry.asNode(),  varEntry);
-        elg.addTriplePattern(triple);
-        query.setQueryPattern(elg);
-        query.addResultVar(varEntry);
-
-        QueryExecution qexec = QueryExecutionFactory.create(query, model) ;
-
-        try {
-            // Assumption: it's a SELECT query.
-            ResultSet rs = qexec.execSelect() ;
-
-            // The order of results is undefined.
-            System.out.println("DataEntries......... ") ;
-            
-            int numberOfCompounds=0;
-            for ( ; rs.hasNext() ; )
-            {
-                numberOfCompounds++;
-                QuerySolution rb = rs.nextSolution() ;
-                // Get title - variable names do not include the '?' (or '$')
-                RDFNode x = rb.get("dataEntry") ;
-                System.out.println("    " + x) ;
-
-            }
-            System.out.println("Number of Compouds = " + numberOfCompounds);
-        }
-        finally {
-            // QueryExecution objects should be closed to free any system resources
-            qexec.close() ;
-        }
+        Dataset dataset = new Dataset(input_RDF_file);
+        instances = dataset.getWekaDataset();
+        
 
     }
 

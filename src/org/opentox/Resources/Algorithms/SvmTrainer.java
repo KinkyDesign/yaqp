@@ -6,10 +6,16 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import org.opentox.Applications.OpenToxApplication;
-import org.opentox.Resources.AbstractResource;
-import org.opentox.database.InHouseDB;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.opentox.Resources.AbstractResource.Directories;
+import org.opentox.database.FeaturesDB;
+import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
+import org.opentox.util.libSVM.svm_scale;
+import org.opentox.util.libSVM.svm_train;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -89,17 +95,80 @@ public class SvmTrainer extends AbstractTrainer {
         super.form = form;
     }
 
+
     /**
      * Trains a new SVM model.
      * @return
      */
     @Override
     public Representation train() {
+        /**
+         * 1. Check the parameters posted by the client.
+         */
         Representation rep = checkParameters();
-        System.out.println(dataInstances.classAttribute().name());
-        org.opentox.util.converters.Converter converter = new org.opentox.util.converters.Converter();
-        model_id = OpenToxApplication.dbcon.getModelsStack() + 1;
-        converter.convert(dataInstances, new File(AbstractResource.Directories.dataDSDDir+"/"+model_id));
+
+        /**
+         * 2. Remove String attributes
+         */
+        Preprocessing.removeStringAtts(dataInstances);
+
+        /**
+         * 3. Register the list of features in the database.
+         */
+        model_id = ModelsDB.getModelsStack() + 1;
+        List<String> listOfFeatures = new ArrayList<String>();
+        for (int k = 0; k < dataInstances.numAttributes(); k++) {
+            listOfFeatures.add(dataInstances.attribute(k).name());
+        }
+        FeaturesDB.registerFeatureList(model_id, listOfFeatures);
+
+        /**
+         * !!!! Some important definitions
+         */
+        String  dataDSDFile = Directories.dataDSDDir + "/" + model_id,
+                scaledFile = Directories.dataScaledDir + "/" + model_id,
+                rangeFile = Directories.dataRangesDir + "/" + model_id,
+                modelDSDFile  = Directories.modelRawDir+"/"+model_id;
+
+        /**
+         * 4. Store the DSD representation of the dataset in DSD format.
+         */
+        org.opentox.util.converters.Converter converter =
+                new org.opentox.util.converters.Converter();
+        converter.convert(dataInstances, new File(dataDSDFile));
+
+        /**
+         * 5. Scale the DSD file using libSVM (svm_scale)
+         */
+        String[] scalingOptions = {
+            "-l", "-1",
+            "-u", "1",
+            "-s", rangeFile,
+            Directories.dataDSDDir + "/" + model_id
+        };
+        svm_scale scaler = new svm_scale();
+        try {
+            scaler.scale(scalingOptions, scaledFile);
+
+            /**
+             * 6. Train the model and store its DSD representation
+             */
+            svm_train.main(getSvmOptions(scaledFile, modelDSDFile));
+
+            /**
+             * 7. Check if the model was indeed generated
+             */
+            if (new File(modelDSDFile).exists()){
+
+
+
+            }
+
+
+        } catch (IOException ex) {
+            Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         return rep;
     }
 
@@ -181,21 +250,21 @@ public class SvmTrainer extends AbstractTrainer {
             setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "[Wrong Posted Parameter ] The client did"
                     + " not post a valid URI for the dataset\n";
-        } catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "* [Wrong Posted Parameter ] The dataset URI"
-                    + " you POSTed seems not to be valid: "+dataseturi+"\n";
-        } catch (UnknownHostException ex){
-             setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "* [Wrong Posted Parameter ] Unknown host: "+
-                    dataseturi.getHost()+"\n";
+                    + " you POSTed seems not to be valid: " + dataseturi + "\n";
+        } catch (UnknownHostException ex) {
+            setInternalStatus(clientPostedWrongParametersStatus);
+            errorDetails = errorDetails + "* [Wrong Posted Parameter ] Unknown host: "
+                    + dataseturi.getHost() + "\n";
         } catch (IOException ex) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [Internal Error ] Internal Error. " +
-                    "The following exception was thrown: " + ex+"\n";
-        } catch (Throwable thr){
+            errorDetails = errorDetails + "* [Internal Error ] Internal Error. "
+                    + "The following exception was thrown: " + ex + "\n";
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -209,10 +278,10 @@ public class SvmTrainer extends AbstractTrainer {
         } catch (URISyntaxException ex) {
             setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "* [Wrong Posted Parameter ] The target URI"
-                    + " you POSTed seems not to be valid: "+dataseturi+"\n";
-        } catch (Throwable thr){
+                    + " you POSTed seems not to be valid: " + dataseturi + "\n";
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
         try {
@@ -220,9 +289,9 @@ public class SvmTrainer extends AbstractTrainer {
         } catch (NullPointerException ex) {
             setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] The target you posted in not a feature of the dataset: " + targetAttribute + "\n";
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -249,9 +318,9 @@ public class SvmTrainer extends AbstractTrainer {
                     + "* [Inacceptable Parameter Value]  The cost should be Double type, while you specified "
                     + "a non double value : " + cost + "\n";
             setInternalStatus(clientPostedWrongParametersStatus);
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -268,9 +337,9 @@ public class SvmTrainer extends AbstractTrainer {
         } catch (NumberFormatException e) {
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -286,9 +355,9 @@ public class SvmTrainer extends AbstractTrainer {
         } catch (NumberFormatException e) {
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] The degree must be a strictly positive integer!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -306,9 +375,9 @@ public class SvmTrainer extends AbstractTrainer {
         } catch (NumberFormatException e) {
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] gamma must be a strictly positive double!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -320,9 +389,9 @@ public class SvmTrainer extends AbstractTrainer {
         } catch (NumberFormatException e) {
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] coeff must be a number!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -340,9 +409,9 @@ public class SvmTrainer extends AbstractTrainer {
             errorDetails = errorDetails
                     + "* [Inacceptable Parameter Value] Tolerance must be a strictly positive double (preferably small)!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -363,9 +432,9 @@ public class SvmTrainer extends AbstractTrainer {
                     + "Details: cache size (in MB) should be an Integer, while you specified "
                     + "a non Integer value : " + cacheSize + "\n\n";
             setInternalStatus(clientPostedWrongParametersStatus);
-        } catch (Throwable thr){
+        } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: "+thr;
+            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
 
@@ -380,6 +449,89 @@ public class SvmTrainer extends AbstractTrainer {
         }
 
 
+    }
+
+
+
+    /**
+     *
+     * @param scaledPath Path to the scaled DSD data file.
+     * @param modelPath Model Destination.
+     * @return
+     */
+    private String[] getSvmOptions(String scaledPath, String modelPath) {
+        String[] options = {""};
+
+
+        String ker = "";
+        if (kernel.equalsIgnoreCase("linear")) {
+            ker = "0";
+        } else if (kernel.equalsIgnoreCase("polynomial")) {
+            ker = "1";
+        } else if (kernel.equalsIgnoreCase("rbf")) {
+            ker = "2";
+        } else if (kernel.equalsIgnoreCase("sigmoid")) {
+            ker = "3";
+        } else {
+            ker = "2";
+        }
+
+
+        if (ker.equalsIgnoreCase("0")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", "0",
+                "-c", cost,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        } else if (ker.equalsIgnoreCase("1")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", ker,
+                "-c", cost,
+                "-g", gamma,
+                "-d", degree,
+                "-r", coeff0,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        } else if (ker.equalsIgnoreCase("2")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", ker,
+                "-c", cost,
+                "-g", gamma,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        } else if (ker.equalsIgnoreCase("3")) {
+            String[] ops = {
+                "-s", "3",// epsilon-SVr
+                "-t", ker,
+                "-c", cost,
+                "-g", gamma,
+                "-e", tolerance,
+                "-q",
+                scaledPath,
+                modelPath
+            };
+            options =
+                    ops;
+        }
+        return options;
     }
 }
 

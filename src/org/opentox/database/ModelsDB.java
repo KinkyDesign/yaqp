@@ -38,7 +38,9 @@ public class ModelsDB extends InHouseDB {
      * |      *       |
      * </pre>
      */
+    @CreateTable
     protected static void createModelsStackTable() {
+        System.out.println();
         OpenToxApplication.opentoxLogger.info("Creating Table : " + MODELS_STACK_TABLE);
         String CreateTable = "create table " + MODELS_STACK_TABLE + "(STACK INTEGER)";
 
@@ -74,6 +76,7 @@ public class ModelsDB extends InHouseDB {
      *
      * </pre>
      */
+    @CreateTable
     protected static void createModelInfoTable() {
         OpenToxApplication.opentoxLogger.info("Creating table: " + MODEL_INFO_TABLE);
         String CreateTable = "create table " + MODEL_INFO_TABLE + "("
@@ -110,6 +113,7 @@ public class ModelsDB extends InHouseDB {
      * @param AlgID URI of the algorithm used to train the model
      * @return New model's ID
      */
+    @Registration
     public static int registerNewModel(String AlgID) {
         int id = getModelsStack() + 1;
         String uri = org.opentox.Resources.AbstractResource.baseURI + "/model/" + id;
@@ -130,6 +134,7 @@ public class ModelsDB extends InHouseDB {
      * This method is used to delete a model registered in the database.
      * @param ID
      */
+    @Removal
     public static void removeModel(String ID){
         String removeModel = "DELETE FROM "+MODEL_INFO_TABLE+" WHERE "+COL_MODEL_ID+"="+ID;
         Statement stmt;

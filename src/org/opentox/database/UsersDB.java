@@ -11,7 +11,7 @@ import org.opentox.Applications.OpenToxApplication;
  *
  * @author chung
  */
-public class UsersDB extends InHouseDB implements DBase{
+public class UsersDB extends InHouseDB implements DataBaseAccess{
 
     protected final static String USER_ACCOUNTS_TABLE = "USERS";
 
@@ -31,6 +31,7 @@ public class UsersDB extends InHouseDB implements DBase{
      *
      * TODO: Use MD5s....
      */
+    @CreateTable
     protected static void createUsersTable(){
         OpenToxApplication.opentoxLogger.info("Creating table: " + USER_ACCOUNTS_TABLE);
         String CreateTable = "create table " + USER_ACCOUNTS_TABLE + "(" +
@@ -53,6 +54,7 @@ public class UsersDB extends InHouseDB implements DBase{
      * @param PassWord
      * @param Priviledges
      */
+    @Registration
     public static void addUser(String UserName, String PassWord, Priviledges priviledges){
         String addUser = "INSERT INTO "+USER_ACCOUNTS_TABLE+ " VALUES ('"+UserName+"' , '"+
                 PassWord+"' , '"+priviledges.getLevel()+"' )";
@@ -68,6 +70,7 @@ public class UsersDB extends InHouseDB implements DBase{
      * Delete a user.
      * @param UserName
      */
+    @Removal
     public static void removeUser(String UserName){
         String removeUser = "DELETE FROM "+USER_ACCOUNTS_TABLE+" WHERE USER_NAME = '"+UserName+"'";
         Statement stmt;
