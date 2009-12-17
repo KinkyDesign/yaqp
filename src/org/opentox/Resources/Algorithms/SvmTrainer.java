@@ -23,6 +23,11 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
+import weka.classifiers.functions.SVMreg;
+import weka.classifiers.functions.supportVector.Kernel;
+import weka.classifiers.functions.supportVector.PolyKernel;
+import weka.classifiers.functions.supportVector.RBFKernel;
+import weka.classifiers.functions.supportVector.RegSMOImproved;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 
@@ -34,12 +39,11 @@ import weka.core.converters.ArffSaver;
  */
 public class SvmTrainer extends AbstractTrainer {
 
-    private static final long serialVersionUID = -9058627046190364530L;
+    private static final long serialVersionUID = -7842803451125769693L;
     /**
      * The id of the regression algorithm.
      * This can be either mlr or svm.
      */
-    private volatile String algorithmId;
     private int i;
     private double d;
     /**
@@ -132,38 +136,41 @@ public class SvmTrainer extends AbstractTrainer {
                 dataSaver.writeBatch();
 
                 // 6. Build the Regression Model:
-                weka.classifiers.functions.LibSVM regressor = new LibSVM();
-                regressor.setEps(Double.parseDouble(epsilon));
+                weka.classifiers.functions.SVMreg regressor = new SVMreg();
+                String[] regressorOptions = {"-P", epsilon,
+                    "-T", tolerance};
 
-                String kernelFlag = null;
-                if (kernel.equalsIgnoreCase("linear")) {
-                    kernelFlag = "0";
-                } else if (kernel.equalsIgnoreCase("polynomial")) {
-                    kernelFlag = "1";
-                } else if (kernel.equalsIgnoreCase("rbf")) {
-                    kernelFlag = "2";
-                } else if (kernel.equalsIgnoreCase("sigmoid")) {
-                    kernelFlag = "3";
+                Kernel svm_kernel = null;
+                if (this.kernel.equalsIgnoreCase("rbf")) {
+                    RBFKernel rbf_kernel = new RBFKernel();
+                    rbf_kernel.setGamma(Double.parseDouble(gamma));
+                    rbf_kernel.setCacheSize(Integer.parseInt(cacheSize));
+                    svm_kernel = rbf_kernel;
+                } else if (this.kernel.equalsIgnoreCase("polynomial")) {
+                    PolyKernel poly_kernel = new PolyKernel();                    
+                    poly_kernel.setExponent(Double.parseDouble(degree));
+                    poly_kernel.setCacheSize(Integer.parseInt(cacheSize));
+                    poly_kernel.setUseLowerOrder(true);
+                    svm_kernel = poly_kernel;
+                } else if (this.kernel.equalsIgnoreCase("linear")){
+                    PolyKernel linear_kernel = new PolyKernel();
+                    PolyKernel poly_kernel = new PolyKernel();
+                    poly_kernel.setExponent((double)1.0);
+                    poly_kernel.setCacheSize(Integer.parseInt(cacheSize));
+                    poly_kernel.setUseLowerOrder(true);
+                    svm_kernel = poly_kernel;
                 }
+                System.out.println(svm_kernel);
+                regressor.setKernel(svm_kernel);
+                regressor.setOptions(regressorOptions);
 
-                String[] options = {
-                    "-S", "3", // This "3" means that this is an epsilon-SVR algorithm
-                    "-P", epsilon,
-                    "-C", cost,
-                    "-K", kernelFlag,
-                    "-D", degree,
-                    "-G", gamma,
-                    "-R", coeff0,
-                    "-E", tolerance,
-                    "-M", cacheSize,
-                    //// Set the class index:
+                String[] generalOptions = {
                     "-c", Integer.toString(dataInstances.classIndex() + 1),
-                    /// Use the temporarily saved arff file:
                     "-t", temporaryArffFile,
                     /// Save the model in the following directory
                     "-d", modelFile};
 
-                Evaluation.evaluateModel(regressor, options);
+                Evaluation.evaluateModel(regressor, generalOptions);
 
                 // Delete the temporary file:
                 new File(temporaryArffFile).delete();
@@ -197,13 +204,11 @@ public class SvmTrainer extends AbstractTrainer {
                         // if status is OK(200), register the new model in the database and
                         // return the URI to the client.
                         rep = new StringRepresentation(URIs.modelURI + "/"
-                                + ModelsDB.registerNewModel(URIs.mlrAlgorithmURI) + "\n");
+                                + ModelsDB.registerNewModel(URIs.svmAlgorithmURI) + "\n");
                     } else {
                         rep = new StringRepresentation(internalStatus.toString());
                     }
                 }
-
-
             } catch (AssertionError e) {
                 Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, e);
             } catch (IOException ex) {
@@ -287,7 +292,7 @@ public class SvmTrainer extends AbstractTrainer {
 
             Dataset data = new Dataset(con.getInputStream());
 
-            dataInstances = data.getWekaDataset();
+            dataInstances = data.getWekaDataset(null, false);
 
 
 

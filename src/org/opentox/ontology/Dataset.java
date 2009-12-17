@@ -30,41 +30,39 @@ import org.restlet.data.Status;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
+import weka.filters.unsupervised.attribute.NumericToNominal;
 
 /**
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class Dataset extends RDFParser{
+public class Dataset extends RDFParser {
 
     private static final long serialVersionUID = -920482801546239926L;
-
 
     public Dataset(InputStream in) {
         super(in);
     }
 
-    public Dataset(){
+    public Dataset() {
         super();
-    }    
-
+    }
 
     /**
      * Returns the set of features in the dataset.
      * @return
      */
-    public Set<String> setOfFeatures(){
+    public Set<String> setOfFeatures() {
         Set<String> set = new HashSet<String>();
         StmtIterator features =
                 jenaModel.listStatements(
                 new SimpleSelector(null, RDF.type, OT.Class.Feature.getOntClass(jenaModel)));
-        while (features.hasNext()){
+        while (features.hasNext()) {
             set.add(features.next().getSubject().toString());
         }
         return set;
     }
-
 
     /**
      * This method is used to encapsulate the data of the RDF document in a
@@ -72,7 +70,7 @@ public class Dataset extends RDFParser{
      * classification models using weka algorithms.
      * @return The Instances object which encapsulates the data in the RDF document.
      */
-    public Instances getWekaDataset() {
+    public Instances getWekaDataset(String target, boolean isClassNominal) {
 
         // A1. Some initial definitions:
         Resource dataEntryResource = OT.Class.DataEntry.getOntClass(jenaModel),
@@ -199,13 +197,29 @@ public class Dataset extends RDFParser{
             // Add the Instance only if its compatible with the dataset!
             if (data.checkInstance(temp)) {
                 data.add(temp);
-            }else{
-                System.err.println("Warning! The instance "+temp+" is not compatible with the dataset!");
+            } else {
+                System.err.println("Warning! The instance " + temp + " is not compatible with the dataset!");
             }
 
 
         }
         dataEntryIterator.close();
+
+        if (isClassNominal) {
+            NumericToNominal filter = new NumericToNominal();
+            try {
+                filter.setInputFormat(data);
+                int[] filtered_attributes = {data.attribute(target).index()};
+                filter.setAttributeIndicesArray(filtered_attributes);
+                data = new Instances(NumericToNominal.useFilter(data, filter));
+            } catch (NullPointerException ex) {
+                // The specified attribute is not valid!
+                // Do nothing!
+            } catch (Exception ex) {
+                Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
 
 
         return data;
@@ -268,8 +282,6 @@ public class Dataset extends RDFParser{
         return atts;
     }
 
-
-
     /**
      * Generates a random dataset of prescribed dimensions.
      * @param numOfCompounds The number of compounds in the dataset.
@@ -281,62 +293,60 @@ public class Dataset extends RDFParser{
      * "RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE" and "N3"
      */
     public static void createNewDataset(int numOfCompounds, int numOfFeatures,
-            OutputStream out, String Lang){
+            OutputStream out, String Lang) {
         OntModel datasetModel;
         try {
             datasetModel = OT.createModel();
             Individual dataset = datasetModel.createIndividual("http://sth.com/dataset/1",
-                datasetModel.getOntClass(OT.Class.Dataset.getURI()));
-        dataset.addRDFType(OT.Class.Dataset.createProperty(datasetModel));
+                    datasetModel.getOntClass(OT.Class.Dataset.getURI()));
+            dataset.addRDFType(OT.Class.Dataset.createProperty(datasetModel));
 
 
-        OT.Class.Dataset.createOntClass(datasetModel);
-        OT.Class.DataEntry.createOntClass(datasetModel);
-        OT.Class.Feature.createOntClass(datasetModel);
-        OT.Class.FeatureValue.createOntClass(datasetModel);
-        OT.Class.Compound.createOntClass(datasetModel);
+            OT.Class.Dataset.createOntClass(datasetModel);
+            OT.Class.DataEntry.createOntClass(datasetModel);
+            OT.Class.Feature.createOntClass(datasetModel);
+            OT.Class.FeatureValue.createOntClass(datasetModel);
+            OT.Class.Compound.createOntClass(datasetModel);
 
 
-        Individual dataEntry = null, compound = null, feature = null, featureValue=null;
+            Individual dataEntry = null, compound = null, feature = null, featureValue = null;
 
 
 
-        for (int i = 0; i < numOfCompounds; i++) {
-        dataEntry = datasetModel.createIndividual(OT.Class.DataEntry.getOntClass(datasetModel));
-        dataset.addProperty(OT.dataEntry, dataEntry);        
+            for (int i = 0; i < numOfCompounds; i++) {
+                dataEntry = datasetModel.createIndividual(OT.Class.DataEntry.getOntClass(datasetModel));
+                dataset.addProperty(OT.dataEntry, dataEntry);
 
-            compound = datasetModel.createIndividual(
-                    "http://sth.com/compound/"+i, OT.Class.Compound.getOntClass(datasetModel));
-            dataEntry.addProperty(OT.compound, compound);
+                compound = datasetModel.createIndividual(
+                        "http://sth.com/compound/" + i, OT.Class.Compound.getOntClass(datasetModel));
+                dataEntry.addProperty(OT.compound, compound);
 
-            for (int j=0;j<numOfFeatures;j++){
-                feature = datasetModel.createIndividual("http://sth.com/feature/"+j,
-                OT.Class.Feature.getOntClass(datasetModel));
-                featureValue = datasetModel.createIndividual(
-                        OT.Class.FeatureValue.getOntClass(datasetModel));
-                featureValue.addProperty(OT.feature, feature);
-                featureValue.addLiteral(OT.value, datasetModel.
-                        createTypedLiteral(Math.random(), XSDDatatype.XSDdouble));
-                dataEntry.addProperty(OT.values, featureValue);
+                for (int j = 0; j < numOfFeatures; j++) {
+                    feature = datasetModel.createIndividual("http://sth.com/feature/" + j,
+                            OT.Class.Feature.getOntClass(datasetModel));
+                    featureValue = datasetModel.createIndividual(
+                            OT.Class.FeatureValue.getOntClass(datasetModel));
+                    featureValue.addProperty(OT.feature, feature);
+                    featureValue.addLiteral(OT.value, datasetModel.createTypedLiteral(Math.random(), XSDDatatype.XSDdouble));
+                    dataEntry.addProperty(OT.values, featureValue);
+                }
+
+                dataset.addProperty(OT.dataEntry, dataEntry);
+
             }
-
-            dataset.addProperty(OT.dataEntry, dataEntry);
-
-        }
-        if (out==null){
-            out = System.out;
-        }
-        if (Lang==null){
-            Lang="RDF/XML";
-        }
-        datasetModel.write(out, Lang);
+            if (out == null) {
+                out = System.out;
+            }
+            if (Lang == null) {
+                Lang = "RDF/XML";
+            }
+            datasetModel.write(out, Lang);
 
         } catch (Exception ex) {
             Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
-
 
     /**
      * This main method is for testing purposes only and will be removed.
@@ -345,30 +355,25 @@ public class Dataset extends RDFParser{
      */
     public static void main(String[] args) throws IOException, URISyntaxException {
 
-        createNewDataset(2, 2, System.out, null);
 
 //        URI d_set = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/6");
 //
-//        //URI d_set = new URI("http://localhost/files/1.rdf");
-//        HttpURLConnection.setFollowRedirects(false);
-//        HttpURLConnection con = null;
-//        try {
-//            con = (HttpURLConnection) d_set.toURL().openConnection();
-//            con.setDoInput(true);
-//            con.setDoOutput(true);
-//            con.setUseCaches(false);
-//            con.addRequestProperty("Accept", "application/rdf+xml");
-//
-//            Dataset data = new Dataset(con.getInputStream());
-//            //Dataset data = new Dataset(new FileInputStream(System.getProperty("user.home")+"/Files/myDs.rdf"));
-//            ///// Instances wekaData = data.getWekaDataset();
-//            Set<String > set = data.setOfFeatures();
-//            Iterator<String> it = set.iterator();
-//            while (it.hasNext()){
-//                System.out.println(it.next());
-//            }
-//
-//        } catch (IOException ex) {
-//        }
+        URI d_set = new URI("http://localhost/files/ds.rdf");
+        HttpURLConnection.setFollowRedirects(false);
+        HttpURLConnection con = null;
+        try {
+            con = (HttpURLConnection) d_set.toURL().openConnection();
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setUseCaches(false);
+            con.addRequestProperty("Accept", "application/rdf+xml");
+
+            Dataset data = new Dataset(con.getInputStream());
+            //Dataset data = new Dataset(new FileInputStream(System.getProperty("user.home")+"/Files/myDs.rdf"));
+            Instances wekaData = data.getWekaDataset("http://sth.com/feature/1", true);
+            System.out.println(wekaData);
+
+        } catch (IOException ex) {
+        }
     }
 }

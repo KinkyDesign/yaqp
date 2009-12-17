@@ -10,6 +10,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class AlgorithmTypes extends Namespace{
 
+    private static final long serialVersionUID = -6959757110626828334L;
+
     public static class Class extends Namespace.Class{
 
         public Class(Resource resource){

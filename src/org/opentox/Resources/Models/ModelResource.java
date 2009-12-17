@@ -30,9 +30,11 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.service.MetadataService;
 import weka.classifiers.functions.LibSVM;
+import weka.classifiers.functions.SVMreg;
 import weka.classifiers.pmml.consumer.PMMLClassifier;
 import weka.core.Attribute;
 import weka.core.Instances;
+import weka.core.SerializationHelper;
 import weka.core.pmml.PMMLFactory;
 import weka.core.pmml.PMMLModel;
 
@@ -74,10 +76,10 @@ public class ModelResource extends AbstractResource {
         variants.add(new Variant(MediaType.APPLICATION_RDF_TURTLE));
         variants.add(new Variant(OpenToxMediaType.TEXT_TRIPLE));
         variants.add(new Variant(OpenToxMediaType.TEXT_N3));
-       // variants.add(new Variant(MediaType.APPLICATION_XML));
+        // variants.add(new Variant(MediaType.APPLICATION_XML));
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
-        
+
     }
 
     /**
@@ -95,7 +97,7 @@ public class ModelResource extends AbstractResource {
     @Override
     public Representation post(Representation entity) {
         Representation result = null;
-        
+
         /** Get the posted parameters **/
         Form form = new Form(entity);
 
@@ -112,8 +114,11 @@ public class ModelResource extends AbstractResource {
             con.addRequestProperty("Accept", "application/rdf+xml");
 
             Dataset wekaData = new Dataset(con.getInputStream());
-            Instances testData = wekaData.getWekaDataset();
+            Instances testData = wekaData.getWekaDataset(null, false);
             Preprocessing.removeStringAtts(testData);
+
+            testData.setClass(testData.attribute("http://sth.com/feature/1"));
+
 
             /**
              * Check if all features of the model are contained in the features of the dataset.
@@ -143,13 +148,20 @@ public class ModelResource extends AbstractResource {
                         Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }// end of MLR prediction
-
                 /********* SVM ********/
-                
-                else if (ModelsDB.isModel(model_id, "svm")){
+                else if (ModelsDB.isModel(model_id, "svm")) {
+                    try {
+                        SVMreg wekaModel = (SVMreg) SerializationHelper.read(Directories.modelWekaDir + "/" + model_id);
+                        String predictions = "";
+                        for (int k = 0; k < testData.numInstances(); k++) {
+                            predictions = predictions + "Instance: "+testData.instance(k)+" ----> " +
+                                    wekaModel.classifyInstance(testData.instance(k)) + "\n";
+                        }
+                        result = new StringRepresentation(predictions, MediaType.TEXT_PLAIN);
 
-
-
+                    } catch (Exception ex) {
+                        Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
 
             }
@@ -161,8 +173,6 @@ public class ModelResource extends AbstractResource {
         }
         return result;
     }
-
-
 
     @Override
     public Representation delete() {

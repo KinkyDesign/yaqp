@@ -4,17 +4,11 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.RDF;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.opentox.Resources.AbstractResource;
@@ -29,10 +23,8 @@ import weka.core.Instances;
  */
 public class Model extends RDFParser{
 
-    private static final long serialVersionUID = -9272347612221496L;
-    private List<AlgorithmParameter> algorithmParameters;
-
-    
+    private static final long serialVersionUID = -4754250023818796913L;
+     
 
     public Model(){
         super();
@@ -58,17 +50,7 @@ public class Model extends RDFParser{
         }
         return set;
     }
-
-    public static void main(String[] args) throws FileNotFoundException{
-        Model m = new Model(new FileInputStream(AbstractResource.Directories.modelRdfDir+"/10"));
-        Set<String > s = m.setOfFeatures();
-        Iterator<String> sit = s.iterator();
-        while (sit.hasNext()){
-            System.out.println(sit.next());
-        }
-    }
-
-
+    
 
     /**
      * Creates the RDF representation for an OpenTox model given its name, the uri

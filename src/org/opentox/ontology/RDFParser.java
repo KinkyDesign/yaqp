@@ -15,6 +15,8 @@ import org.restlet.data.Status;
  */
 public abstract class RDFParser {
 
+    private static final long serialVersionUID = 6602541954910338287L;
+
 
     /**
      * The Jena Ontological Model used to read/write/modify
@@ -58,7 +60,8 @@ public abstract class RDFParser {
      * @param someClass
      * @return
      */
-    public ExtendedIterator<? extends OntResource> getClassMemberIteratorFor(Namespace.Class someClass) {
+    public ExtendedIterator<? extends OntResource> getClassMemberIteratorFor(
+            Namespace.Class someClass) {
         OntClass myClass = someClass.getOntClass(jenaModel);
         return myClass.listInstances();
     }

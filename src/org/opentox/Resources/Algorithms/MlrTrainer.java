@@ -67,7 +67,7 @@ public class MlrTrainer extends AbstractTrainer {
                 con.addRequestProperty("Accept", "application/rdf+xml");
 
                 Dataset dataset = new Dataset(con.getInputStream());
-                data = dataset.getWekaDataset();
+                data = dataset.getWekaDataset(null, false);
 
               
             } catch (IOException ex) {

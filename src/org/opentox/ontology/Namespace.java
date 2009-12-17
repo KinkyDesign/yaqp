@@ -20,8 +20,12 @@ import java.util.Map;
  */
 public abstract class Namespace {
 
+    private static final long serialVersionUID = 569539073288446072L;
+
     protected static final String _NS = "http://www.opentox.org/api/1.1#%s";
+
     public static final String NS = String.format(_NS, "");
+
     /** <p>The RDF model that holds the vocabulary terms</p> */
     protected static Model m_model = ModelFactory.createDefaultModel();
 
