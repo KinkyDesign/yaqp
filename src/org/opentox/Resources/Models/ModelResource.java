@@ -142,7 +142,10 @@ public class ModelResource extends AbstractResource {
                     }
                 }// end of MLR prediction
 
-                else {
+                /********* SVM ********/
+                
+                else if (ModelsDB.isModel(model_id, "svm")){
+
                 }
 
             }

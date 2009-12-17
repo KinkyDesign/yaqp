@@ -17,6 +17,7 @@ import org.opentox.Resources.AbstractResource.Directories;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.opentox.client.opentoxClient;
+import org.opentox.database.ModelsDB;
 import org.opentox.util.libSVM.svm_train;
 import org.opentox.util.libSVM.svm_scale;
 import org.restlet.data.Form;
@@ -51,7 +52,7 @@ public class SvcTrainer extends AbstractTrainer{
     @Override
     public Representation train() {
         
-        model_id = org.opentox.Applications.OpenToxApplication.dbcon.getModelsStack() + 1;
+        model_id = ModelsDB.getModelsStack() + 1;
 
         Representation representation = checkParameters();
         dataInstances = opentoxClient.getInstances(dataseturi);
@@ -79,7 +80,7 @@ public class SvcTrainer extends AbstractTrainer{
             try {
                 scaler.scale(scalingOptions, tempScaledFile.toString());
             } catch (IOException ex) {
-                Logger.getLogger(Regression.class.getName()).log(Level.SEVERE, null, ex);
+                //
             }
 
 
@@ -116,7 +117,7 @@ public class SvcTrainer extends AbstractTrainer{
                         setInternalStatus(Status.SERVER_ERROR_INTERNAL);
                     } else {
                         /** if the model was successfully created... **/
-                        org.opentox.Applications.OpenToxApplication.dbcon.
+                        ModelsDB.
                                 registerNewModel(AbstractResource.URIs.svcAlgorithmURI);
                         setInternalStatus(Status.SUCCESS_OK);
                     }

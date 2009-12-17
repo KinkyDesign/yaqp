@@ -1,5 +1,4 @@
 #!/bin/sh
-FILES="*.java";
 SHA=sha512sum;
 MD5=md5sum;
 MD5FILE=md5sums;
