@@ -22,6 +22,7 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
 import org.opentox.database.Priviledges;
+import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.routing.Router;
@@ -84,7 +85,7 @@ public class OpenToxApplication extends Application {
         opentoxLogger.addHandler(fileHand);
         opentoxLogger.setLevel(Level.INFO);
         dbcon = new InHouseDB();
-        AbstractResource.Directories.checkDirs();
+        AbstractResource.Directories.checkDirs();        
     }
 
 

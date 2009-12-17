@@ -11,21 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.AbstractResource.Directories;
 import org.opentox.Resources.AbstractResource.URIs;
-import org.opentox.database.FeaturesDB;
 import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
-import org.opentox.util.libSVM.svm_scale;
-import org.opentox.util.libSVM.svm_train;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
+import weka.classifiers.Evaluation;
+import weka.classifiers.functions.LibSVM;
 import weka.core.Instances;
+import weka.core.converters.ArffSaver;
 
 /**
  *
@@ -101,109 +100,120 @@ public class SvmTrainer extends AbstractTrainer {
 
     /**
      * Trains a new SVM model.
+     * Stores a serialized version of the weka model and produces an RDF
+     * representation which is also stored in a file.
      * @return
      */
     @Override
     public Representation train() {
-        /**
-         * 1. Check the parameters posted by the client.
-         */
+
+        // 1. Check the parameters posted by the client:
         Representation rep = checkParameters();
 
-        /**
-         * 2. Remove String attributes
-         */
-        Preprocessing.removeStringAtts(dataInstances);
+        if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
+            // 2. Remove all string attributes from the dataset:
+            Preprocessing.removeStringAtts(dataInstances);
+            // 3. Lock an ID for the model:
+            model_id = ModelsDB.getModelsStack() + 1;
 
-        /**
-         * 3. Register the list of features in the database.
-         */
-        model_id = ModelsDB.getModelsStack() + 1;
-        List<String> listOfFeatures = new ArrayList<String>();
-        for (int k = 0; k < dataInstances.numAttributes(); k++) {
-            listOfFeatures.add(dataInstances.attribute(k).name());
-        }
-        FeaturesDB.registerFeatureList(model_id, listOfFeatures);
+            // 4. Define the temporary arff file that will be used to store data
+            //    and the path to the model file that will be created.
+            long rand = System.currentTimeMillis();
+            String temporaryArffFile = Directories.dataDir + "/" + rand + ".arff",
+                    modelFile = Directories.modelWekaDir + "/" + model_id;
 
-        /**
-         * !!!! Some important definitions
-         */
-        String dataDSDFile = Directories.dataDSDDir + "/" + model_id,
-                scaledFile = Directories.dataScaledDir + "/" + model_id,
-                rangeFile = Directories.dataRangesDir + "/" + model_id,
-                modelDSDFile = Directories.modelRawDir + "/" + model_id;
+            try {
+                assert (dataInstances != null);
 
-        /**
-         * 4. Store the DSD representation of the dataset in DSD format.
-         */
-        org.opentox.util.converters.Converter converter =
-                new org.opentox.util.converters.Converter();
-        converter.convert(dataInstances, new File(dataDSDFile));
+                // 5. Save the dataset in a temporary ARFF file:
+                ArffSaver dataSaver = new ArffSaver();
+                dataSaver.setInstances(dataInstances);
+                dataSaver.setDestination(new FileOutputStream(temporaryArffFile));
+                dataSaver.writeBatch();
 
-        /**
-         * 5. Scale the DSD file using libSVM (svm_scale)
-         */
-        String[] scalingOptions = {
-            "-l", "-1",
-            "-u", "1",
-            "-s", rangeFile,
-            Directories.dataDSDDir + "/" + model_id
-        };
-        svm_scale scaler = new svm_scale();
-        try {
-            scaler.scale(scalingOptions, scaledFile);
+                // 6. Build the Regression Model:
+                weka.classifiers.functions.LibSVM regressor = new LibSVM();
+                regressor.setEps(Double.parseDouble(epsilon));
 
-            /**
-             * 6. Train the model and store its DSD representation
-             */
-            svm_train.main(getSvmOptions(scaledFile, modelDSDFile));
-
-            /**
-             * 7. Check if the model was indeed generated
-             */
-            if (new File(modelDSDFile).exists()) {
-
-                /**
-                 * 8. Generate the RDF representation of the model and
-                 * store it in a file.
-                 */
-                List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
-                paramList.add(ConstantParameters.COEFF0(Double.parseDouble(coeff0)));
-                paramList.add(ConstantParameters.COST(Double.parseDouble(cost)));
-                paramList.add(ConstantParameters.TARGET(targetAttribute));
-                paramList.add(ConstantParameters.DEGREE(Integer.parseInt(degree)));
-                paramList.add(ConstantParameters.KERNEL(kernel));
-                paramList.add(ConstantParameters.EPSILON(Double.parseDouble(epsilon)));
-
-                Model opentoxModel = new Model();
-                        System.out.println(Integer.toString(model_id));
-                        System.out.println(paramList.get(0).paramName);
-                        System.out.println(Directories.modelRdfDir + "/" + model_id);
-
-                opentoxModel.createModel(Integer.toString(model_id),
-                        dataseturi.toString(),
-                        targetAttribute,
-                        dataInstances,
-                        paramList,
-                        new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
-                setInternalStatus(opentoxModel.internalStatus);
-
-                if (Status.SUCCESS_OK.equals(internalStatus)) {
-                    // if status is OK(200), register the new model in the database and
-                    // return the URI to the client.
-                    rep = new StringRepresentation(URIs.modelURI + "/"
-                            + ModelsDB.registerNewModel(URIs.mlrAlgorithmURI) + "\n");
-                } else {
-                    rep = new StringRepresentation(internalStatus.toString());
+                String kernelFlag = null;
+                if (kernel.equalsIgnoreCase("linear")) {
+                    kernelFlag = "0";
+                } else if (kernel.equalsIgnoreCase("polynomial")) {
+                    kernelFlag = "1";
+                } else if (kernel.equalsIgnoreCase("rbf")) {
+                    kernelFlag = "2";
+                } else if (kernel.equalsIgnoreCase("sigmoid")) {
+                    kernelFlag = "3";
                 }
+
+                String[] options = {
+                    "-S", "3", // This "3" means that this is an epsilon-SVR algorithm
+                    "-P", epsilon,
+                    "-C", cost,
+                    "-K", kernelFlag,
+                    "-D", degree,
+                    "-G", gamma,
+                    "-R", coeff0,
+                    "-E", tolerance,
+                    "-M", cacheSize,
+                    //// Set the class index:
+                    "-c", Integer.toString(dataInstances.classIndex() + 1),
+                    /// Use the temporarily saved arff file:
+                    "-t", temporaryArffFile,
+                    /// Save the model in the following directory
+                    "-d", modelFile};
+
+                Evaluation.evaluateModel(regressor, options);
+
+                // Delete the temporary file:
+                new File(temporaryArffFile).delete();
+
+
+                if ((new File(modelFile).exists()) && (new File(modelFile).length() > 0)) {
+
+                    /**
+                     * 7. Generate the RDF representation of the model and
+                     * store it in a file.
+                     */
+                    List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
+                    paramList.add(ConstantParameters.COEFF0(Double.parseDouble(coeff0)));
+                    paramList.add(ConstantParameters.COST(Double.parseDouble(cost)));
+                    paramList.add(ConstantParameters.TARGET(targetAttribute));
+                    paramList.add(ConstantParameters.DEGREE(Integer.parseInt(degree)));
+                    paramList.add(ConstantParameters.KERNEL(kernel));
+                    paramList.add(ConstantParameters.EPSILON(Double.parseDouble(epsilon)));
+
+                    Model opentoxModel = new Model();
+
+                    opentoxModel.createModel(Integer.toString(model_id),
+                            dataseturi.toString(),
+                            targetAttribute,
+                            dataInstances,
+                            paramList,
+                            new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
+                    setInternalStatus(opentoxModel.internalStatus);
+
+                    if (Status.SUCCESS_OK.equals(internalStatus)) {
+                        // if status is OK(200), register the new model in the database and
+                        // return the URI to the client.
+                        rep = new StringRepresentation(URIs.modelURI + "/"
+                                + ModelsDB.registerNewModel(URIs.mlrAlgorithmURI) + "\n");
+                    } else {
+                        rep = new StringRepresentation(internalStatus.toString());
+                    }
+                }
+
+
+            } catch (AssertionError e) {
+                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, e);
+            } catch (IOException ex) {
+                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-
-        } catch (IOException ex) {
-            Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         return rep;
+
     }
 
     /**
@@ -227,31 +237,32 @@ public class SvmTrainer extends AbstractTrainer {
          */
         kernel = form.getFirstValue("kernel");
         if (kernel == null) {
-            kernel = "RBF";
+            kernel = ConstantParameters.KERNEL.paramValue.toString();
         }
+
         cost = form.getFirstValue("cost");
         if (cost == null) {
-            cost = "100";
+            cost = ConstantParameters.COST.paramValue.toString();
         }
         gamma = form.getFirstValue("gamma");
         if (gamma == null) {
-            gamma = "1.5";
+            gamma = ConstantParameters.GAMMA.paramValue.toString();
         }
         epsilon = form.getFirstValue("epsilon");
         if (epsilon == null) {
-            epsilon = "0.1";
+            epsilon = ConstantParameters.EPSILON.paramValue.toString();
         }
         coeff0 = form.getFirstValue("coeff0");
         if (coeff0 == null) {
-            coeff0 = "0";
+            coeff0 = ConstantParameters.COEFF0.paramValue.toString();
         }
         degree = form.getFirstValue("degree");
         if (degree == null) {
-            degree = "3";
+            degree = ConstantParameters.DEGREE.paramValue.toString();
         }
         tolerance = form.getFirstValue("tolerance");
         if (tolerance == null) {
-            tolerance = "0.0001";
+            tolerance = ConstantParameters.TOLERANCE.paramValue.toString();
         }
         cacheSize = form.getFirstValue("cacheSize");
         if (cacheSize == null) {
@@ -322,17 +333,17 @@ public class SvmTrainer extends AbstractTrainer {
             dataInstances.setClass(dataInstances.attribute(targetAttribute));
         } catch (NullPointerException ex) {
             setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "* [Inacceptable Parameter Value] The target you posted in not a feature of the dataset: " + targetAttribute + "\n";
+            errorDetails = errorDetails + "* [Inacceptable Parameter Value] "
+                    + "The target you posted in not a feature of the dataset: " + targetAttribute + "\n";
         } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
-
-        if (!((kernel.equalsIgnoreCase("rbf"))
-                || (kernel.equalsIgnoreCase("linear"))
-                || (kernel.equalsIgnoreCase("sigmoid"))
-                || (kernel.equalsIgnoreCase("polynomial")))) {
+        if (!((kernel.equalsIgnoreCase("linear"))
+                || (kernel.equalsIgnoreCase("polynomial"))
+                || (kernel.equalsIgnoreCase("rbf"))
+                || (kernel.equalsIgnoreCase("sigmoid")))) {
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] Invalid Kernel Type!\n";
             setInternalStatus(clientPostedWrongParametersStatus);
         }
@@ -343,7 +354,9 @@ public class SvmTrainer extends AbstractTrainer {
          */
         try {
             d = Double.parseDouble(cost);
+            System.out.println(d);
             if (d <= 0) {
+                System.out.println("x2");
                 errorDetails = errorDetails + "* [Inacceptable Parameter Value] The cost should be strictly positive\n";
                 setInternalStatus(clientPostedWrongParametersStatus);
             }
@@ -484,86 +497,4 @@ public class SvmTrainer extends AbstractTrainer {
 
 
     }
-
-    /**
-     *
-     * @param scaledPath Path to the scaled DSD data file.
-     * @param modelPath Model Destination.
-     * @return
-     */
-    private String[] getSvmOptions(String scaledPath, String modelPath) {
-        String[] options = {""};
-
-
-        String ker = "";
-        if (kernel.equalsIgnoreCase("linear")) {
-            ker = "0";
-        } else if (kernel.equalsIgnoreCase("polynomial")) {
-            ker = "1";
-        } else if (kernel.equalsIgnoreCase("rbf")) {
-            ker = "2";
-        } else if (kernel.equalsIgnoreCase("sigmoid")) {
-            ker = "3";
-        } else {
-            ker = "2";
-        }
-
-
-        if (ker.equalsIgnoreCase("0")) {
-            String[] ops = {
-                "-s", "3",// epsilon-SVr
-                "-t", "0",
-                "-c", cost,
-                "-e", tolerance,
-                "-q",
-                scaledPath,
-                modelPath
-            };
-            options =
-                    ops;
-        } else if (ker.equalsIgnoreCase("1")) {
-            String[] ops = {
-                "-s", "3",// epsilon-SVr
-                "-t", ker,
-                "-c", cost,
-                "-g", gamma,
-                "-d", degree,
-                "-r", coeff0,
-                "-e", tolerance,
-                "-q",
-                scaledPath,
-                modelPath
-            };
-            options =
-                    ops;
-        } else if (ker.equalsIgnoreCase("2")) {
-            String[] ops = {
-                "-s", "3",// epsilon-SVr
-                "-t", ker,
-                "-c", cost,
-                "-g", gamma,
-                "-e", tolerance,
-                "-q",
-                scaledPath,
-                modelPath
-            };
-            options =
-                    ops;
-        } else if (ker.equalsIgnoreCase("3")) {
-            String[] ops = {
-                "-s", "3",// epsilon-SVr
-                "-t", ker,
-                "-c", cost,
-                "-g", gamma,
-                "-e", tolerance,
-                "-q",
-                scaledPath,
-                modelPath
-            };
-            options =
-                    ops;
-        }
-        return options;
-    }
 }
-

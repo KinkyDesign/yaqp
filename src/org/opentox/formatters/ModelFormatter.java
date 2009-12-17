@@ -30,7 +30,7 @@ public class ModelFormatter extends AbstractModelFormatter {
     @Override
     public StringRepresentation getStringRepresentation(MediaType mediatype) {
         Representation rep = null;
-        if (
+        if (    (MediaType.TEXT_PLAIN.equals(mediatype))||
                 (MediaType.APPLICATION_RDF_XML.equals(mediatype))||
                 (MediaType.APPLICATION_RDF_TURTLE.equals(mediatype))||
                 (OpenToxMediaType.TEXT_TRIPLE.equals(mediatype))||

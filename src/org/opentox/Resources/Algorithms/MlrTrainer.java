@@ -1,12 +1,6 @@
 package org.opentox.Resources.Algorithms;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.Individual;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.vocabulary.DC;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +17,6 @@ import org.opentox.Resources.AbstractResource.Directories;
 import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
-import org.opentox.ontology.OT;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;

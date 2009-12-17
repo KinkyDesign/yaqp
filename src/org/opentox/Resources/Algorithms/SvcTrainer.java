@@ -3,17 +3,21 @@ package org.opentox.Resources.Algorithms;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.*;
 import org.opentox.Resources.AbstractResource.Directories;
+import org.opentox.Resources.AbstractResource.URIs;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.opentox.client.opentoxClient;
@@ -22,6 +26,9 @@ import org.opentox.util.libSVM.svm_train;
 import org.opentox.util.libSVM.svm_scale;
 import org.restlet.data.Form;
 import weka.core.Instances;
+import org.opentox.database.FeaturesDB;
+import org.opentox.database.ModelsDB;
+import org.opentox.ontology.Model;
 
 /**
  *
@@ -43,6 +50,7 @@ public class SvcTrainer extends AbstractTrainer{
     private double d;
     private int i;
     private Instances dataInstances;
+    private String targetAttribute;
 
      public SvcTrainer(Form form){
         super(form);
@@ -51,28 +59,49 @@ public class SvcTrainer extends AbstractTrainer{
 
     @Override
     public Representation train() {
+
+        /**TARTOUFO: you have used modelstack+1 as the id of the model that's
+         * gonna be created but if something goes wrong then you'll have
+         * stored wrong data in db and wrong files
+         *
+         * How do we get instances now???
+         */
         
+<<<<<<< HEAD
         model_id = ModelsDB.getModelsStack() + 1;
+=======
+        //dataInstances = opentoxClient.getInstances(dataseturi);
 
-        Representation representation = checkParameters();
-        dataInstances = opentoxClient.getInstances(dataseturi);
+        /**
+         * 1. Check the parameters posted by the client.
+         */
+        Representation rep = checkParameters();
+>>>>>>> abf75da3aa239f1ae37aca4d27e1951912dea030
+
+        /**
+         * 2. Remove String attributes
+         */
         Preprocessing.removeStringAtts(dataInstances);
-        weka.core.converters.LibSVMSaver saver = new weka.core.converters.LibSVMSaver();
-        saver.setInstances(new Instances(dataInstances));
 
-        File tempDsdFile = new File(Directories.dataDSDDir + "/" + CreateARandomFilename());
-        while (tempDsdFile.exists()) {
-            tempDsdFile = new File(Directories.dataDSDDir + "/" + CreateARandomFilename());
+        /**
+         * 3. Register the list of features in the database.
+         */
+        model_id = ModelsDB.getModelsStack() + 1;
+        List<String> listOfFeatures = new ArrayList<String>();
+        for (int k = 0; k < dataInstances.numAttributes(); k++) {
+            listOfFeatures.add(dataInstances.attribute(k).name());
         }
-        try {
-            saver.setFile(tempDsdFile);
-            saver.writeBatch();
+        FeaturesDB.registerFeatureList(model_id, listOfFeatures);
 
-            //Scaling data and saving a temp scaled data file (dsd format)
-            svm_scale scaler = new svm_scale();
-            String[] scalingOptions = {"-l", "-1", "-u", "1", "-s",
-             Directories.dataRangesDir + "/" + model_id, tempDsdFile.getPath()};
+        /**
+         * !!!! Some important definitions
+         */
+        String dataDSDFile = Directories.dataDSDDir + "/" + model_id,
+                scaledFile = Directories.dataScaledDir + "/" + model_id,
+                rangeFile = Directories.dataRangesDir + "/" + model_id,
+                modelDSDFile = Directories.modelRawDir + "/" + model_id;
 
+<<<<<<< HEAD
             File tempScaledFile = new File(Directories.dataScaledDir + "/" + CreateARandomFilename());
             while (tempScaledFile.exists()) {
                 tempScaledFile = new File(Directories.dataScaledDir + "/" + CreateARandomFilename());
@@ -82,14 +111,37 @@ public class SvcTrainer extends AbstractTrainer{
             } catch (IOException ex) {
                 //
             }
+=======
+        /**
+         * 4. Store the DSD representation of the dataset in DSD format.
+         */
+        org.opentox.util.converters.Converter converter =
+                new org.opentox.util.converters.Converter();
+        converter.convert(dataInstances, new File(dataDSDFile));
+>>>>>>> abf75da3aa239f1ae37aca4d27e1951912dea030
 
-
-            String[] options = getSvcOptions(tempDsdFile.toString(), Directories.modelRdfDir + "/" + model_id);
+        /**
+         * 5. Scale the DSD file using libSVM (svm_scale)
+         */
+        String[] scalingOptions = {
+            "-l", "-1",
+            "-u", "1",
+            "-s", rangeFile,
+            Directories.dataDSDDir + "/" + model_id
+        };
+        svm_scale scaler = new svm_scale();
+        try {
+            scaler.scale(scalingOptions, scaledFile);
 
             /**
-             * If all the posted parameters (kernel type, cost, gamma, etc)
-             * are acceptable the the status is 202.
+             * 6. Train the model and store its DSD representation
              */
+            svm_train.main(getSvcOptions(scaledFile, modelDSDFile));
+
+            /**
+             * 7. Check if the model was indeed generated
+             */
+<<<<<<< HEAD
             if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
                 try {
 
@@ -147,16 +199,50 @@ public class SvcTrainer extends AbstractTrainer{
                     }
                 } catch (IOException ex) {
                     OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+=======
+            if (new File(modelDSDFile).exists()) {
+
+                /**
+                 * 8. Generate the RDF representation of the model and
+                 * store it in a file.
+                 */
+                List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
+                paramList.add(ConstantParameters.COEFF0(Double.parseDouble(coeff0)));
+                paramList.add(ConstantParameters.COST(Double.parseDouble(cost)));
+                paramList.add(ConstantParameters.TARGET(targetAttribute));
+                paramList.add(ConstantParameters.DEGREE(Integer.parseInt(degree)));
+                paramList.add(ConstantParameters.KERNEL(kernel));
+                paramList.add(ConstantParameters.EPSILON(Double.parseDouble(epsilon)));
+
+                Model opentoxModel = new Model();
+                System.out.println(Integer.toString(model_id));
+                System.out.println(paramList.get(0).paramName);
+                System.out.println(Directories.modelRdfDir + "/" + model_id);
+
+                opentoxModel.createModel(Integer.toString(model_id),
+                        dataseturi.toString(),
+                        targetAttribute,
+                        dataInstances,
+                        paramList,
+                        new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
+                setInternalStatus(opentoxModel.internalStatus);
+
+                if (Status.SUCCESS_OK.equals(internalStatus)) {
+                    // if status is OK(200), register the new model in the database and
+                    // return the URI to the client.
+                    rep = new StringRepresentation(URIs.modelURI + "/" + ModelsDB.registerNewModel(URIs.mlrAlgorithmURI) + "\n");
+                } else {
+                    rep = new StringRepresentation(internalStatus.toString());
+>>>>>>> abf75da3aa239f1ae37aca4d27e1951912dea030
                 }
             }
 
+
         } catch (IOException ex) {
-            Logger.getLogger(SvcTrainer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-
-
-        return representation;
+        return rep;
     }
 
     private String xmlString() {

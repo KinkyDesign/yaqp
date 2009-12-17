@@ -4,10 +4,12 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.OWL;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.MediaTypes.OpenToxMediaType;
+import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.Algorithms.*;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
@@ -55,10 +57,27 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             // set the title and the identifier for the algorithm:
             algorithm.addLiteral(DC.title,
                     jenaModel.createTypedLiteral(metainf.title,XSDDatatype.XSDstring));
+            algorithm.addLiteral(DC.creator,
+                    jenaModel.createTypedLiteral(AbstractResource.URIs.baseURI,XSDDatatype.XSDanyURI));
+            algorithm.addLiteral(DC.source,
+                    jenaModel.createTypedLiteral(AbstractResource.URIs.baseURI,XSDDatatype.XSDanyURI));
+            algorithm.addLiteral(DC.publisher,
+                    jenaModel.createTypedLiteral(AbstractResource.URIs.baseURI,XSDDatatype.XSDanyURI));
+            algorithm.addLiteral(DC.contributor,
+                    jenaModel.createTypedLiteral(AbstractResource.URIs.OpentoxUri,XSDDatatype.XSDanyURI));
+            algorithm.addLiteral(DC.relation,
+                    jenaModel.createTypedLiteral(AbstractResource.URIs.OpentoxUri,XSDDatatype.XSDanyURI));
+            algorithm.addLiteral(DC.rights,
+                    jenaModel.createTypedLiteral(AbstractResource.URIs.licenceUri,XSDDatatype.XSDanyURI));
+            algorithm.addLiteral(DC.date,
+                    jenaModel.createTypedLiteral("2009/16/12",XSDDatatype.XSDdate));
+           algorithm.addLiteral(DC.description,
+                    jenaModel.createTypedLiteral(metainf.description,XSDDatatype.XSDanyURI));
             algorithm.addLiteral(DC.identifier,
                     jenaModel.createTypedLiteral(metainf.identifier,XSDDatatype.XSDanyURI));
 
             algorithm.addProperty(OT.isA, metainf.algorithmType.createProperty(jenaModel));
+            algorithm.addProperty(OWL.sameAs, metainf.algorithmType.createProperty(jenaModel));
 
             Individual iparam;
                     for (int i=0;i<metainf.Parameters.size();i++){

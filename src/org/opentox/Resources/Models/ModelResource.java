@@ -15,7 +15,6 @@ import org.opentox.Applications.OpenToxApplication;
 import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.Algorithms.Preprocessing;
 import org.opentox.client.opentoxClient;
-import org.opentox.database.InHouseDB;
 import org.opentox.database.ModelsDB;
 import org.opentox.formatters.ModelFormatter;
 import org.opentox.ontology.Dataset;
@@ -29,6 +28,8 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
+import org.restlet.service.MetadataService;
+import weka.classifiers.functions.LibSVM;
 import weka.classifiers.pmml.consumer.PMMLClassifier;
 import weka.core.Attribute;
 import weka.core.Instances;
@@ -73,9 +74,10 @@ public class ModelResource extends AbstractResource {
         variants.add(new Variant(MediaType.APPLICATION_RDF_TURTLE));
         variants.add(new Variant(OpenToxMediaType.TEXT_TRIPLE));
         variants.add(new Variant(OpenToxMediaType.TEXT_N3));
-        variants.add(new Variant(MediaType.APPLICATION_XML));
+       // variants.add(new Variant(MediaType.APPLICATION_XML));
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
+        
     }
 
     /**
@@ -98,7 +100,7 @@ public class ModelResource extends AbstractResource {
         Form form = new Form(entity);
 
         try {
-            URI d_set = new URI(form.getFirstValue("dataset"));
+            URI d_set = new URI(form.getFirstValue("dataset_uri"));
 
             HttpURLConnection.setFollowRedirects(false);
             HttpURLConnection con = null;
@@ -145,6 +147,8 @@ public class ModelResource extends AbstractResource {
                 /********* SVM ********/
                 
                 else if (ModelsDB.isModel(model_id, "svm")){
+
+
 
                 }
 

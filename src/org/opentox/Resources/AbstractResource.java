@@ -30,6 +30,11 @@ public abstract class AbstractResource extends ServerResource {
     public static final class URIs {
 
         /**
+         * Opentox Project URI
+         */
+        public static final String OpentoxUri = "http://opentox.org/";
+
+        /**
          * Server Port on which the services are available.
          */
         public static final int port = 3000;
@@ -74,7 +79,7 @@ public abstract class AbstractResource extends ServerResource {
      *      |--> /model
      *      |       |-->/rdf
      *      |       |-->/pmml
-     *      |       |-->/raw
+     *      |       |-->/weka
      *      |-->/data
      *            |-->/scaled
      *            |-->/ranges
@@ -107,24 +112,12 @@ public abstract class AbstractResource extends ServerResource {
         /**
          * Folder where all RAW (dsd-like) files are stored.
          */
-        public static final String modelRawDir = modelDir + "/raw";
+        public static final String modelWekaDir = modelDir + "/weka";
         /**
          * Directory of data files.
          */
-        private static final String dataDir = baseDir + "/data";
-        /**
-         * Directory where DSD data files are stored.
-         */
-        public static final String dataDSDDir = dataDir + "/dsd";
-        /**
-         * Directory where all Scaled data are stored.
-         */
-        public static final String dataScaledDir = dataDir + "/scaled";
-        /**
-         * Directory where all scaling parameters are stored.
-         */
-        public static final String dataRangesDir = dataDir + "/ranges";
-
+        public static final String dataDir = baseDir + "/data";
+        
         /**
          * Checks if the necessary directories already exist.
          */
@@ -133,15 +126,12 @@ public abstract class AbstractResource extends ServerResource {
                 new File(modelDir).mkdirs();
                 new File(modelRdfDir).mkdirs();
                 new File(modelPmmlDir).mkdirs();
-                new File(modelRawDir).mkdirs();
+                new File(modelWekaDir).mkdirs();
                 OpenToxApplication.opentoxLogger.warning("No Model Folders Found and they were created!");
             }
 
             if (!(new File(dataDir)).exists()) {
-                new File(dataDir).mkdirs();
-                new File(dataDSDDir).mkdirs();
-                new File(dataRangesDir).mkdirs();
-                new File(dataScaledDir).mkdirs();
+                new File(dataDir).mkdirs();        
                 OpenToxApplication.opentoxLogger.warning("No Model Folders Found and they were created!");
             }
         }

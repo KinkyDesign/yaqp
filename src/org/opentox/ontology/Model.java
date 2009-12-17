@@ -92,6 +92,7 @@ public class Model extends RDFParser{
             OT.Class.Feature.createOntClass(jenaModel);
             OT.Class.Algorithm.createOntClass(jenaModel);
             OT.Class.Parameter.createOntClass(jenaModel);
+            OT.Class.Model.createOntClass(jenaModel);
 
 
             Individual ot_model = jenaModel.createIndividual(
@@ -100,6 +101,7 @@ public class Model extends RDFParser{
             ot_model.addProperty(DC.identifier, URIs.modelURI + "/" + model_id);
             ot_model.addProperty(DC.creator, AbstractResource.baseURI);
             ot_model.addProperty(DC.date, java.util.GregorianCalendar.getInstance().getTime().toString());
+            ot_model.addProperty(OT.isA, OT.Class.Model.getResource());
 
             //the algorithm
             Individual algorithm = jenaModel.createIndividual(

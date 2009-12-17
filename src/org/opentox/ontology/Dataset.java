@@ -345,28 +345,30 @@ public class Dataset extends RDFParser{
      */
     public static void main(String[] args) throws IOException, URISyntaxException {
 
-        URI d_set = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/6");
-        
-        //URI d_set = new URI("http://localhost/files/1.rdf");
-        HttpURLConnection.setFollowRedirects(false);
-        HttpURLConnection con = null;
-        try {
-            con = (HttpURLConnection) d_set.toURL().openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.addRequestProperty("Accept", "application/rdf+xml");
+        createNewDataset(2, 2, System.out, null);
 
-            Dataset data = new Dataset(con.getInputStream());
-            //Dataset data = new Dataset(new FileInputStream(System.getProperty("user.home")+"/Files/myDs.rdf"));
-            ///// Instances wekaData = data.getWekaDataset();
-            Set<String > set = data.setOfFeatures();
-            Iterator<String> it = set.iterator();
-            while (it.hasNext()){
-                System.out.println(it.next());
-            }
-
-        } catch (IOException ex) {
-        }
+//        URI d_set = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/6");
+//
+//        //URI d_set = new URI("http://localhost/files/1.rdf");
+//        HttpURLConnection.setFollowRedirects(false);
+//        HttpURLConnection con = null;
+//        try {
+//            con = (HttpURLConnection) d_set.toURL().openConnection();
+//            con.setDoInput(true);
+//            con.setDoOutput(true);
+//            con.setUseCaches(false);
+//            con.addRequestProperty("Accept", "application/rdf+xml");
+//
+//            Dataset data = new Dataset(con.getInputStream());
+//            //Dataset data = new Dataset(new FileInputStream(System.getProperty("user.home")+"/Files/myDs.rdf"));
+//            ///// Instances wekaData = data.getWekaDataset();
+//            Set<String > set = data.setOfFeatures();
+//            Iterator<String> it = set.iterator();
+//            while (it.hasNext()){
+//                System.out.println(it.next());
+//            }
+//
+//        } catch (IOException ex) {
+//        }
     }
 }
