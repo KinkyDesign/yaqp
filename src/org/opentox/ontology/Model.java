@@ -66,7 +66,7 @@ public class Model extends RDFParser{
      * @param out The output stream used to store the model.
      */
     public void createModel(String model_id, String dataseturi, String targeturi, Instances data,
-            List<AlgorithmParameter> algorithmParameters, OutputStream out){
+            List<AlgorithmParameter> algorithmParameters, String AlgorithmURI, OutputStream out){
             try {
             jenaModel = org.opentox.ontology.Namespace.createModel();
 
@@ -87,7 +87,7 @@ public class Model extends RDFParser{
 
             //the algorithm
             Individual algorithm = jenaModel.createIndividual(
-                    AbstractResource.URIs.mlrAlgorithmURI, OT.Class.Algorithm.getOntClass(jenaModel));
+                    AlgorithmURI, OT.Class.Algorithm.getOntClass(jenaModel));
             ot_model.addProperty(OT.algorithm, algorithm);
 
             //assign training dataset (same as above)

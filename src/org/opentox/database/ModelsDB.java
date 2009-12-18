@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import org.restlet.data.ReferenceList;
 import org.opentox.Applications.OpenToxApplication;
+import org.opentox.Resources.Algorithms.AlgorithmEnum;
 
 /**
  *
@@ -172,6 +173,25 @@ public class ModelsDB extends InHouseDB {
     }
 
     /**
+     * Returns an {@link org.opentox.Resources.Algorithms.AlgorithmEnum }
+     * characterization of a given model.
+     * @param ID
+     * @return
+     */
+    public static AlgorithmEnum getAlgorithm(String ID){
+        AlgorithmEnum algorithm = AlgorithmEnum.unknown;
+        if (isModel(ID, "svm")){
+            algorithm = AlgorithmEnum.svm;
+        }else if (isModel(ID, "mlr")){
+            algorithm = AlgorithmEnum.mlr;
+        }else if (isModel(ID, "svc")){
+            algorithm = AlgorithmEnum.svc;
+        }
+        return algorithm;
+    }
+
+
+    /**
      *
      * @return
      */
@@ -194,16 +214,7 @@ public class ModelsDB extends InHouseDB {
         return list;
     }
 
-    public ReferenceList getClassificationModelsAsReferenceList() {
-        return getReferenceListFromAlgId(
-                org.opentox.Resources.AbstractResource.baseURI + "/algorithm/learning/classification/");
-    }
-
-    public ReferenceList getRegressionModelsAsReferenceList() {
-        return getReferenceListFromAlgId(
-                org.opentox.Resources.AbstractResource.baseURI + "/algorithm/learning/regression/");
-    }
-
+    
     /**
      * Returns a reference list for the models that where trained usign a
      * specific

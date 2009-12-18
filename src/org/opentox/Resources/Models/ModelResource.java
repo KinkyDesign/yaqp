@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.MediaTypes.OpenToxMediaType;
+import org.opentox.Resources.Algorithms.AlgorithmEnum;
 import org.opentox.Resources.Algorithms.Preprocessing;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
@@ -56,6 +57,7 @@ public class ModelResource extends AbstractResource {
 
     private static final long serialVersionUID = 26047187263491246L;
     private String model_id;
+    private AlgorithmEnum algorithm;
 
     /**
      * Default Class Constructor.Available MediaTypes of Variants: TEXT_XML
@@ -79,7 +81,8 @@ public class ModelResource extends AbstractResource {
         // variants.add(new Variant(MediaType.APPLICATION_XML));
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
-
+        algorithm = ModelsDB.getAlgorithm(model_id);
+        System.out.println("ALGORITHM IS :"+algorithm);
     }
 
     /**
@@ -88,94 +91,41 @@ public class ModelResource extends AbstractResource {
      * @return StringRepresentation
      */
     @Override
-    public Representation get(Variant variant) {
+    protected Representation get(Variant variant) {
         ModelFormatter modelFormatter = new ModelFormatter(Integer.parseInt(model_id));
         return modelFormatter.getStringRepresentation(variant.getMediaType());
 
     }
 
     @Override
-    public Representation post(Representation entity) {
-        Representation result = null;
+    protected Representation post(Representation entity) {
+        Representation rep = null;
 
         /** Get the posted parameters **/
         Form form = new Form(entity);
 
-        try {
-            URI d_set = new URI(form.getFirstValue("dataset_uri"));
-
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = null;
-
-            con = (HttpURLConnection) d_set.toURL().openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.addRequestProperty("Accept", "application/rdf+xml");
-
-            Dataset wekaData = new Dataset(con.getInputStream());
-            Instances testData = wekaData.getWekaDataset(null, false);
-            Preprocessing.removeStringAtts(testData);
-
-            testData.setClass(testData.attribute("http://sth.com/feature/1"));
-
-
-            /**
-             * Check if all features of the model are contained in the features of the dataset.
-             */
-            if (wekaData.setOfFeatures().
-                    containsAll((Collection<?>) new Model(
-                    new FileInputStream(AbstractResource.Directories.modelRdfDir + "/" + model_id)).setOfFeatures())) {
-
-                /***** MLR *****/
-                if (ModelsDB.isModel(model_id, "mlr")) {
-                    try {
-                        PMMLModel mlrModel = PMMLFactory.getPMMLModel(
-                                new File(Directories.modelPmmlDir + "/" + model_id));
-                        if (mlrModel instanceof PMMLClassifier) {
-                            Attribute att = testData.attribute(
-                                    mlrModel.getMiningSchema().getFieldsAsInstances().classAttribute().name());
-                            testData.setClass(att);
-                            PMMLClassifier classifier = (PMMLClassifier) mlrModel;
-                            // list of predicted values...
-                            String predictions = "";
-                            for (int i = 0; i < testData.numInstances(); i++) {
-                                predictions = predictions + classifier.classifyInstance(testData.instance(i)) + "\n";
-                            }
-                            result = new StringRepresentation(predictions, MediaType.TEXT_PLAIN);
-                        }
-                    } catch (Exception ex) {
-                        Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }// end of MLR prediction
-                /********* SVM ********/
-                else if (ModelsDB.isModel(model_id, "svm")) {
-                    try {
-                        SVMreg wekaModel = (SVMreg) SerializationHelper.read(Directories.modelWekaDir + "/" + model_id);
-                        String predictions = "";
-                        for (int k = 0; k < testData.numInstances(); k++) {
-                            predictions = predictions + "Instance: "+testData.instance(k)+" ----> " +
-                                    wekaModel.classifyInstance(testData.instance(k)) + "\n";
-                        }
-                        result = new StringRepresentation(predictions, MediaType.TEXT_PLAIN);
-
-                    } catch (Exception ex) {
-                        Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-
-            }
-
-        } catch (IOException ex) {
-            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+        Predictor predictor = null;
+        switch (algorithm){
+            case svc:
+                predictor = new SvcPredictor();
+                break;
+            case svm:
+                predictor = new SvmPredictor();
+                break;
+            case mlr:
+                predictor = new MlrPredictor();
+                break;
         }
-        return result;
+        rep = predictor.predict(form, model_id);
+
+        return rep;
     }
 
+
+
+
     @Override
-    public Representation delete() {
+    protected Representation delete() {
         String responseText = null;
         try {
             if (opentoxClient.IsMimeAvailable(new URI("http://localhost:3000/model/" + model_id),

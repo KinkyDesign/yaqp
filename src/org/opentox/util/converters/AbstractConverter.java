@@ -10,8 +10,7 @@ import weka.core.Instances;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class AbstractConverter {
-    private static final long serialVersionUID = -9023148768327107L;
+public interface AbstractConverter {
 
     /**
      * Converts an Instances object into a DSD file.

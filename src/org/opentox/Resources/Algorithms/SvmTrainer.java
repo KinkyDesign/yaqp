@@ -22,12 +22,10 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import weka.classifiers.Evaluation;
-import weka.classifiers.functions.LibSVM;
 import weka.classifiers.functions.SVMreg;
 import weka.classifiers.functions.supportVector.Kernel;
 import weka.classifiers.functions.supportVector.PolyKernel;
 import weka.classifiers.functions.supportVector.RBFKernel;
-import weka.classifiers.functions.supportVector.RegSMOImproved;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 
@@ -39,12 +37,10 @@ import weka.core.converters.ArffSaver;
  */
 public class SvmTrainer extends AbstractTrainer {
 
-    private static final long serialVersionUID = -7842803451125769693L;
-    /**
-     * The id of the regression algorithm.
-     * This can be either mlr or svm.
-     */
+    private static final long serialVersionUID = -1522085945071581484L;
+    
     private int i;
+
     private double d;
     /**
      * The name of the target attribute which normally is the
@@ -197,6 +193,7 @@ public class SvmTrainer extends AbstractTrainer {
                             targetAttribute,
                             dataInstances,
                             paramList,
+                            URIs.svmAlgorithmURI,
                             new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
                     setInternalStatus(opentoxModel.internalStatus);
 

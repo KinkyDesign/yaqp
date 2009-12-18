@@ -12,6 +12,7 @@ public class OT extends Namespace {
 
     private static final long serialVersionUID = 8498366532297574L;
 
+
     public static class Class extends Namespace.Class {
 
         public Class(Resource resource) {

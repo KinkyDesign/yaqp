@@ -1,15 +1,5 @@
 package org.opentox.util.converters;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.util.FileManager;
 import java.io.File;
 import java.io.FileWriter;
@@ -17,7 +7,6 @@ import java.io.InputStream;
 import weka.core.Instances;
 import java.io.BufferedWriter;
 import org.opentox.Resources.Algorithms.Preprocessing;
-import org.opentox.ontology.Dataset;
 /**
 *
 * @author OpenTox - http://www.opentox.org
@@ -25,7 +14,7 @@ import org.opentox.ontology.Dataset;
 * @author Sarimveis Harry
 * @author Kolotouros Dimitris
 */
-public class Converter extends AbstractConverter{
+public class Converter implements  AbstractConverter{
 
     private static final long serialVersionUID = 85251113527439L;
 
@@ -85,6 +74,11 @@ public class Converter extends AbstractConverter{
     }
 
 
+    /**
+     * Will be supported in some next version.
+     * @param dsdFile
+     * @param instances
+     */
     @Override
     public void convert(final File dsdFile, Instances instances) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -94,19 +88,9 @@ public class Converter extends AbstractConverter{
 
     @Override
     public void convert(InputStream input_RDF_file, Instances instances) {
-        Dataset dataset = new Dataset(input_RDF_file);
-        instances = dataset.getWekaDataset();
-        
-
+        throw new UnsupportedOperationException("Not Supported yet!");
     }
 
-
-    public static void main(String[] args){
-         InputStream in = FileManager.get().
-                 open(System.getProperty("user.home")+"/Desktop/data.rdf");
-         Converter cvrtr = new Converter();
-         cvrtr.convert(in, null);
-    }
-
+    
 
 }

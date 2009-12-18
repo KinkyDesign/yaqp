@@ -27,7 +27,7 @@ import org.opentox.ontology.*;
  */
 public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
 
-    private static final long serialVersionUID = 52795861750765264L;
+    private static final long serialVersionUID = 5082315122564986995L;
 
     /**
      * Class Constructor.

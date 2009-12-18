@@ -28,7 +28,7 @@ public abstract class AbstractTrainer {
      * Constructor.
      * @param form The set of posted parameters.
      */
-    public AbstractTrainer(Form form){
+    public AbstractTrainer(final Form form){
         this.form=form;
     }
 

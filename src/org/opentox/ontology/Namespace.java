@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Superclass for all Namespaces introduced in opentox such as {@link org.opentox.ontology.AlgorithmTypes }
+ * and {@link org.opentox.ontology.OT }
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
@@ -26,10 +27,20 @@ public abstract class Namespace {
 
     public static final String NS = String.format(_NS, "");
 
-    /** <p>The RDF model that holds the vocabulary terms</p> */
-    protected static Model m_model = ModelFactory.createDefaultModel();
+    
+    // protected static Model m_model = ModelFactory.createDefaultModel();
+    /**
+     * TODO: Check if this change (From ModelFactory.createDefaultModel() to
+     * this.createModel() solves the issue of validation as OWL-DL...
+     */
+    protected static Model m_model = createModel();
 
-    public static OntModel createModel() throws Exception {
+    /**
+     * Creates an OWL-DL Ontological Model which includes the definition
+     * of some Namespace prefices such as ot, dc and owl.
+     * @return
+     */
+    public static OntModel createModel()  {
         OntModel jenaModel = ModelFactory.createOntologyModel(
                 OntModelSpec.OWL_DL_MEM, null);
         Map<String, String> prefixesMap = new HashMap<String, String>();
@@ -45,6 +56,9 @@ public abstract class Namespace {
     public static final Resource NAMESPACE =
             m_model.createResource(NS);
 
+    /**
+     * Class Resources of the Namespace.
+     */
     public static class Class {
 
         protected Resource resource;
@@ -56,22 +70,47 @@ public abstract class Namespace {
             this.resource = resource;
         }
 
+        /**
+         * Returns the URI of the class
+         * @return class URI
+         */
         public String getURI() {
             return resource.getURI();
         }
 
+        /**
+         * Returns the corresponding Ontological Class (i.e. an instance of
+         * {@link com.hp.hpl.jena.ontology.OntClass } )
+         * @param model The ontological model
+         * @return the ontological class of the model
+         */
         public OntClass getOntClass(final OntModel model) {
             return model.getOntClass(getURI());
         }
 
+        /**
+         * Creates a new Ontological class for an Ontological Model.
+         * @param model The ontological model.
+         * @return The generated ontological class.
+         */
         public OntClass createOntClass(final OntModel model) {
             return model.createClass(getURI());
         }
 
+        /**
+         * Generates a property out of a given model.
+         * @param model An ontological model.
+         * @return The corresponding property.
+         */
         public Property createProperty(final OntModel model) {
             return model.createProperty(getURI());
         }
 
+        /**
+         * Returns the Resource of this class
+         * ( {@link org.opentox.ontology.Namespace.Class } ).
+         * @return
+         */
         public Resource getResource(){
             return this.resource;
         }

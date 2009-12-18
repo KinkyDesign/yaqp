@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.AbstractResource.Directories;
+import org.opentox.Resources.AbstractResource.URIs;
 import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
@@ -101,6 +102,7 @@ public class MlrTrainer extends AbstractTrainer {
                             targeturi.toString(),
                             data,
                             paramList,
+                            URIs.mlrAlgorithmURI,
                             new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
                     setInternalStatus(model.internalStatus);
                     // return the URI of generated model:
