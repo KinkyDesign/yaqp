@@ -110,7 +110,6 @@ public class Algorithm extends AbstractResource {
                     break;
             }
         }
-
         return representation;
     }
 

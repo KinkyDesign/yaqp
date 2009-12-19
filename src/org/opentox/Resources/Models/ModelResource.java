@@ -1,25 +1,17 @@
 package org.opentox.Resources.Models;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentox.Resources.*;
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.Algorithms.AlgorithmEnum;
-import org.opentox.Resources.Algorithms.Preprocessing;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
 import org.opentox.formatters.ModelFormatter;
-import org.opentox.ontology.Dataset;
-import org.opentox.ontology.Model;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -29,22 +21,9 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import org.restlet.service.MetadataService;
-import weka.classifiers.functions.LibSVM;
-import weka.classifiers.functions.SVMreg;
-import weka.classifiers.pmml.consumer.PMMLClassifier;
-import weka.core.Attribute;
-import weka.core.Instances;
-import weka.core.SerializationHelper;
-import weka.core.pmml.PMMLFactory;
-import weka.core.pmml.PMMLModel;
 
 /**
- * GET the representation of a model given its id. The corresponding URIs have
- * the structure: http://opentox.ntua.gr:3000/OpenToxServices/models/classification/{algorithm_id}/{model_id} and
- * http://opentox.ntua.gr:3000/OpenToxServices/models/classification/{algorithm_id}/{model_id}
- * where algorithm_id in case of classification is one of svm, knn, j48 or pls and in case of
- * regression is one of mlr, pls or svm.
+ * 
  *
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
@@ -82,7 +61,6 @@ public class ModelResource extends AbstractResource {
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
         algorithm = ModelsDB.getAlgorithm(model_id);
-        System.out.println("ALGORITHM IS :"+algorithm);
     }
 
     /**

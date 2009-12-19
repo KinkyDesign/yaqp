@@ -57,23 +57,11 @@ public class MlrTrainer extends AbstractTrainer {
             /**
              * Retrive the Dataset (RDF), parse it and generate the corresponding
              * weka.core.Instances object.
-             */
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = null;
-            try {
-                con = (HttpURLConnection) dataseturi.toURL().openConnection();
-                con.setDoInput(true);
-                con.setDoOutput(true);
-                con.setUseCaches(false);
-                con.addRequestProperty("Accept", "application/rdf+xml");
-
-                Dataset dataset = new Dataset(con.getInputStream());
+             */                       
+            
+                Dataset dataset = new Dataset(dataseturi);
                 data = dataset.getWekaDataset(null, false);
-
-              
-            } catch (IOException ex) {
-            }
-
+          
             
             try {
                 data.setClass(data.attribute(targeturi.toString()));

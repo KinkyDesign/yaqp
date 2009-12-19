@@ -3,10 +3,8 @@ package org.opentox.Resources.Algorithms;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,6 +24,7 @@ import weka.classifiers.functions.SMO;
 import weka.classifiers.functions.supportVector.Kernel;
 import weka.classifiers.functions.supportVector.PolyKernel;
 import weka.classifiers.functions.supportVector.RBFKernel;
+import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 
@@ -38,6 +37,7 @@ import weka.core.converters.ArffSaver;
 public class SvcTrainer extends AbstractTrainer {
 
     private static final long serialVersionUID = -6751396783635831385L;
+
     private int i;
     private double d;
     /**
@@ -129,9 +129,10 @@ public class SvcTrainer extends AbstractTrainer {
                 dataSaver.writeBatch();
 
                 // 6. Build the Classification Model:
-                weka.classifiers.functions.SMO classifier = new SMO();
-                classifier.setEpsilon(Double.parseDouble(epsilon));
-                classifier.setToleranceParameter(Double.parseDouble(tolerance));
+                
+                 weka.classifiers.functions.SMO classifier = new SMO();
+                 classifier.setEpsilon(Double.parseDouble(epsilon));
+                 classifier.setToleranceParameter(Double.parseDouble(tolerance));
 
                 Kernel svc_kernel = null;
                 if (this.kernel.equalsIgnoreCase("rbf")) {
@@ -145,16 +146,14 @@ public class SvcTrainer extends AbstractTrainer {
                     poly_kernel.setCacheSize(Integer.parseInt(cacheSize));
                     poly_kernel.setUseLowerOrder(true);
                     svc_kernel = poly_kernel;
-                } else if (this.kernel.equalsIgnoreCase("linear")) {
+                } else if (this.kernel.equalsIgnoreCase("linear")) {                    
                     PolyKernel linear_kernel = new PolyKernel();
-                    PolyKernel poly_kernel = new PolyKernel();
-                    poly_kernel.setExponent((double) 1.0);
-                    poly_kernel.setCacheSize(Integer.parseInt(cacheSize));
-                    poly_kernel.setUseLowerOrder(true);
-                    svc_kernel = poly_kernel;
+                    linear_kernel.setExponent((double) 1.0);
+                    linear_kernel.setCacheSize(Integer.parseInt(cacheSize));
+                    linear_kernel.setUseLowerOrder(true);
+                    svc_kernel = linear_kernel;
                 }                
-                classifier.setKernel(svc_kernel);
-                
+                classifier.setKernel(svc_kernel);                
 
                 String[] generalOptions = {
                     "-c", Integer.toString(dataInstances.classIndex() + 1),
@@ -292,18 +291,8 @@ public class SvcTrainer extends AbstractTrainer {
          * a URI. If yes, obtain the Instances.
          */
         try {
-            dataseturi = new URI(form.getFirstValue("dataset_uri"));
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = null;
-
-            con = (HttpURLConnection) dataseturi.toURL().openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.addRequestProperty("Accept", "application/rdf+xml");
-
-            Dataset data = new Dataset(con.getInputStream());
-            
+            dataseturi = new URI(form.getFirstValue("dataset_uri"));            
+            Dataset data = new Dataset(dataseturi);
             dataInstances = data.getWekaDataset(targetAttribute, true);
 
 
@@ -315,14 +304,6 @@ public class SvcTrainer extends AbstractTrainer {
             setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "* [Wrong Posted Parameter ] The dataset URI"
                     + " you POSTed seems not to be valid: " + dataseturi + "\n";
-        } catch (UnknownHostException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "* [Wrong Posted Parameter ] Unknown host: "
-                    + dataseturi.getHost() + "\n";
-        } catch (IOException ex) {
-            setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [Internal Error ] Internal Error. "
-                    + "The following exception was thrown: " + ex + "\n";
         } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;

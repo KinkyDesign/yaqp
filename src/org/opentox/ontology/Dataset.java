@@ -14,11 +14,11 @@ import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import weka.core.Instances;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import javax.net.ssl.HttpsURLConnection;
 import org.restlet.data.Status;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -43,6 +44,30 @@ public class Dataset extends RDFParser {
 
     public Dataset(InputStream in) {
         super(in);
+    }
+
+    public Dataset(URI dataset_uri) {
+        super();
+        HttpURLConnection.setFollowRedirects(false);
+        HttpURLConnection con = null;
+        try {
+            con = (HttpURLConnection) dataset_uri.toURL().openConnection();
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setUseCaches(false);
+
+            con.addRequestProperty("Accept", "application/rdf+xml");
+            jenaModel = OT.createModel();
+            jenaModel.read(con.getInputStream(), null);
+        } catch (IOException ex) {
+        } catch (Exception ex) {
+            Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
+            internalStatus = Status.SERVER_ERROR_INTERNAL;
+        }
+    }
+
+    public Dataset(URL dataset_url) throws URISyntaxException {
+        this(dataset_url.toURI());
     }
 
     public Dataset() {
@@ -355,25 +380,11 @@ public class Dataset extends RDFParser {
      */
     public static void main(String[] args) throws IOException, URISyntaxException {
 
-
-//        URI d_set = new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/dataset/6");
-//
-        URI d_set = new URI("http://localhost/files/ds.rdf");
-        HttpURLConnection.setFollowRedirects(false);
-        HttpURLConnection con = null;
-        try {
-            con = (HttpURLConnection) d_set.toURL().openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.addRequestProperty("Accept", "application/rdf+xml");
-
-            Dataset data = new Dataset(con.getInputStream());
-            //Dataset data = new Dataset(new FileInputStream(System.getProperty("user.home")+"/Files/myDs.rdf"));
+            URI d_set = new URI("http://localhost/X.rdf");
+            Dataset data = new Dataset(d_set);
             Instances wekaData = data.getWekaDataset("http://sth.com/feature/1", true);
             System.out.println(wekaData);
 
-        } catch (IOException ex) {
-        }
+        
     }
 }

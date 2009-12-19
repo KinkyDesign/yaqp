@@ -277,18 +277,9 @@ public class SvmTrainer extends AbstractTrainer {
          * a URI. If yes, obtain the Instances.
          */
         try {
-            dataseturi = new URI(form.getFirstValue("dataset_uri"));
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = null;
-
-            con = (HttpURLConnection) dataseturi.toURL().openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.addRequestProperty("Accept", "application/rdf+xml");
-
-            Dataset data = new Dataset(con.getInputStream());
-
+            dataseturi = new URI(form.getFirstValue("dataset_uri"));            
+            Dataset data = new Dataset(dataseturi);
+            
             dataInstances = data.getWekaDataset(null, false);
 
 
@@ -301,14 +292,6 @@ public class SvmTrainer extends AbstractTrainer {
             setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "* [Wrong Posted Parameter ] The dataset URI"
                     + " you POSTed seems not to be valid: " + dataseturi + "\n";
-        } catch (UnknownHostException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "* [Wrong Posted Parameter ] Unknown host: "
-                    + dataseturi.getHost() + "\n";
-        } catch (IOException ex) {
-            setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [Internal Error ] Internal Error. "
-                    + "The following exception was thrown: " + ex + "\n";
         } catch (Throwable thr) {
             setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
