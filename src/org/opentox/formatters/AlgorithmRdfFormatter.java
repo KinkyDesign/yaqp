@@ -49,47 +49,55 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             // defines Algorithm and Parameter classes:
             
             OT.Class.Parameter.createOntClass(jenaModel);
+            OT.Class.Algorithm.createOntClass(jenaModel);
+
+
 
             // Create an Individual for the algorithm resource:
             Individual algorithm = jenaModel.createIndividual(metainf.identifier,
-                    OT.Class.Algorithm.getOntClass(jenaModel));
+                    jenaModel.createOntResource(OT.Class.Algorithm.getURI()));
 
             // set the title and the identifier for the algorithm:
-            algorithm.addLiteral(DC.title,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.title.getURI()),
                     jenaModel.createTypedLiteral(metainf.title,XSDDatatype.XSDstring));
-            algorithm.addLiteral(DC.creator,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.creator.getURI()),
                     jenaModel.createTypedLiteral(AbstractResource.URIs.baseURI,XSDDatatype.XSDanyURI));
-            algorithm.addLiteral(DC.source,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.source.getURI()),
                     jenaModel.createTypedLiteral(AbstractResource.URIs.baseURI,XSDDatatype.XSDanyURI));
-            algorithm.addLiteral(DC.publisher,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.publisher.getURI()),
                     jenaModel.createTypedLiteral(AbstractResource.URIs.baseURI,XSDDatatype.XSDanyURI));
-            algorithm.addLiteral(DC.contributor,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.contributor.getURI()),
                     jenaModel.createTypedLiteral(AbstractResource.URIs.OpentoxUri,XSDDatatype.XSDanyURI));
-            algorithm.addLiteral(DC.relation,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.relation.getURI()),
                     jenaModel.createTypedLiteral(AbstractResource.URIs.OpentoxUri,XSDDatatype.XSDanyURI));
-            algorithm.addLiteral(DC.rights,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.rights.getURI()),
                     jenaModel.createTypedLiteral(AbstractResource.URIs.licenceUri,XSDDatatype.XSDanyURI));
-            algorithm.addLiteral(DC.date,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.date.getURI()),
                     jenaModel.createTypedLiteral("2009/16/12",XSDDatatype.XSDdate));
-           algorithm.addLiteral(DC.description,
+           algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.description.getURI()),
                     jenaModel.createTypedLiteral(metainf.description,XSDDatatype.XSDanyURI));
-            algorithm.addLiteral(DC.identifier,
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.identifier.getURI()),
                     jenaModel.createTypedLiteral(metainf.identifier,XSDDatatype.XSDanyURI));
 
-            algorithm.addProperty(OT.isA, metainf.algorithmType.createProperty(jenaModel));
-            algorithm.addProperty(OWL.sameAs, metainf.algorithmType.createProperty(jenaModel));
+//            algorithm.addProperty(jenaModel.createAnnotationProperty(OT.isA.getURI()),
+//                    jenaModel.createOntResource(metainf.algorithmType.getURI()) );
+
+            algorithm.setSameAs(jenaModel.createResource(metainf.algorithmType.getURI(), OT.Class.Algorithm.getResource() ));
+            
 
             Individual iparam;
                     for (int i=0;i<metainf.Parameters.size();i++){
                         iparam = jenaModel.createIndividual(OT.Class.Parameter.getOntClass(jenaModel));
-                        iparam.addProperty(DC.title, metainf.Parameters.get(i).paramName);
-                        iparam.addLiteral(OT.paramValue, jenaModel.createTypedLiteral(
+                        iparam.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()),
+                                metainf.Parameters.get(i).paramName);
+                        iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramValue.getURI()),
+                                jenaModel.createTypedLiteral(
                                 metainf.Parameters.get(i).paramValue.toString(),
                                 metainf.Parameters.get(i).dataType));
-                        iparam.addLiteral(OT.paramScope, jenaModel.
-                                createTypedLiteral(metainf.Parameters.get(i).paramScope,
+                        iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramScope.getURI()),
+                                jenaModel.createTypedLiteral(metainf.Parameters.get(i).paramScope,
                                 XSDDatatype.XSDstring));
-                        algorithm.addProperty(OT.parameters, iparam);
+                        algorithm.addProperty(jenaModel.createAnnotationProperty(OT.parameters.getURI()), iparam);
                     }
                     ByteArrayOutputStream outStream = new ByteArrayOutputStream();
                     String Lang="RDF/XML";
