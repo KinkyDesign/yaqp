@@ -79,8 +79,8 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.identifier.getURI()),
                     jenaModel.createTypedLiteral(metainf.identifier,XSDDatatype.XSDanyURI));
 
-//            algorithm.addProperty(jenaModel.createAnnotationProperty(OT.isA.getURI()),
-//                    jenaModel.createOntResource(metainf.algorithmType.getURI()) );
+            algorithm.addProperty(jenaModel.createAnnotationProperty(OT.isA.getURI()),
+                    jenaModel.createOntResource(metainf.algorithmType.getURI()) );
 
             algorithm.setSameAs(jenaModel.createResource(metainf.algorithmType.getURI(), OT.Class.Algorithm.getResource() ));
             

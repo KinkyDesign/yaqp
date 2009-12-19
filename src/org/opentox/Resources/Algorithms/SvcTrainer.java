@@ -24,7 +24,6 @@ import weka.classifiers.functions.SMO;
 import weka.classifiers.functions.supportVector.Kernel;
 import weka.classifiers.functions.supportVector.PolyKernel;
 import weka.classifiers.functions.supportVector.RBFKernel;
-import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 

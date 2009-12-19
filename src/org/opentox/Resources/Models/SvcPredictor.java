@@ -37,7 +37,12 @@ public class SvcPredictor implements Predictor{
             Instances testData = wekaData.getWekaDataset(null, false);
             Preprocessing.removeStringAtts(testData);
 
+
+            /****
+             * TODO: Fix the following line:
+             */
             testData.setClass(testData.attribute("http://sth.com/feature/1"));
+
 
 
             /**

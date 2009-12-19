@@ -8,7 +8,7 @@ import org.restlet.representation.StringRepresentation;
  *
  * @author chung
  */
-public abstract class AbstractModelFormatter {
+public abstract class AbstractModelFormatter implements Formatter{
 
     protected int model_id;
     public Status internal_status = Status.SUCCESS_OK;

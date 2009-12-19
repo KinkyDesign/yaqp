@@ -79,33 +79,33 @@ public class Model extends RDFParser{
 
             Individual ot_model = jenaModel.createIndividual(
             URIs.modelURI + "/" + model_id, OT.Class.Model.getOntClass(jenaModel));
-            ot_model.addProperty(DC.title, "Model " + model_id);
-            ot_model.addProperty(DC.identifier, URIs.modelURI + "/" + model_id);
-            ot_model.addProperty(DC.creator, AbstractResource.baseURI);
-            ot_model.addProperty(DC.date, java.util.GregorianCalendar.getInstance().getTime().toString());
-            ot_model.addProperty(OT.isA, OT.Class.Model.getResource());
+            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), "Model " + model_id);
+            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.identifier.getURI()), URIs.modelURI + "/" + model_id);
+            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.creator.getURI()), AbstractResource.baseURI);
+            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.date.getURI()), java.util.GregorianCalendar.getInstance().getTime().toString());
+            ot_model.addProperty(jenaModel.createAnnotationProperty(OT.isA.getURI()), OT.Class.Model.getResource());
 
             //the algorithm
             Individual algorithm = jenaModel.createIndividual(
                     AlgorithmURI, OT.Class.Algorithm.getOntClass(jenaModel));
-            ot_model.addProperty(OT.algorithm, algorithm);
+            ot_model.addProperty(jenaModel.createAnnotationProperty(OT.algorithm.getURI()), algorithm);
 
             //assign training dataset (same as above)
-            Individual dataset = jenaModel.createIndividual(dataseturi.toString(), OT.Class.Dataset.getOntClass(jenaModel));
-            ot_model.addProperty(OT.trainingDataset, dataset);
+            Individual dataset = jenaModel.createIndividual(dataseturi.toString(), jenaModel.createOntResource(OT.Class.Dataset.getURI()));
+            ot_model.addProperty(jenaModel.createAnnotationProperty(OT.trainingDataset.getURI()), dataset);
 
             // Add all parameters:
             Individual iparam;
                     for (int i=0;i<algorithmParameters.size();i++){
                         iparam = jenaModel.createIndividual(OT.Class.Parameter.getOntClass(jenaModel));
-                        iparam.addProperty(DC.title, algorithmParameters.get(i).paramName);
-                        iparam.addLiteral(OT.paramValue, jenaModel.createTypedLiteral(
+                        iparam.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), algorithmParameters.get(i).paramName);
+                        iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramValue.getURI()), jenaModel.createTypedLiteral(
                                 algorithmParameters.get(i).paramValue.toString(),
                                 algorithmParameters.get(i).dataType));
-                        iparam.addLiteral(OT.paramScope, jenaModel.
+                        iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramScope.getURI()), jenaModel.
                                 createTypedLiteral(algorithmParameters.get(i).paramScope,
                                 XSDDatatype.XSDstring));
-                        ot_model.addProperty(OT.parameters, iparam);
+                        ot_model.addProperty(jenaModel.createAnnotationProperty(OT.parameters.getURI()), iparam);
                     }
 
             Individual feature = null;
@@ -115,11 +115,11 @@ public class Model extends RDFParser{
                 if (targeturi.toString().equals(data.attribute(i).name())) {
                     feature = jenaModel.createIndividual(targeturi.toString(),
                             OT.Class.Feature.getOntClass(jenaModel));
-                    ot_model.addProperty(OT.dependentVariables, feature);
+                    ot_model.addProperty(jenaModel.createAnnotationProperty(OT.dependentVariables.getURI()), feature);
                 } else {
                     feature = jenaModel.createIndividual(data.attribute(i).name(),
                             OT.Class.Feature.getOntClass(jenaModel));
-                    ot_model.addProperty(OT.independentVariables, feature);
+                    ot_model.addProperty(jenaModel.createAnnotationProperty(OT.independentVariables.getURI()), feature);
                 }
             }
             jenaModel.write(out);

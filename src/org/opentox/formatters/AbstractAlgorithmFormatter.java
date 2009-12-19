@@ -10,7 +10,7 @@ import org.restlet.representation.StringRepresentation;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class AbstractAlgorithmFormatter {
+public abstract class AbstractAlgorithmFormatter implements Formatter{
 
     public AlgorithmMetaInf metainf;
 
