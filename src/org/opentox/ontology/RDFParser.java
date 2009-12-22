@@ -5,14 +5,10 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Resources.ErrorSource;
-import org.opentox.Resources.ErrorRepresentation;
 import org.restlet.data.Status;
-import org.restlet.resource.ServerResource;
 
 /**
  *

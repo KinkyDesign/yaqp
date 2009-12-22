@@ -4,20 +4,19 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang.UnhandledException;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.AbstractResource.Directories;
 import org.opentox.Resources.AbstractResource.URIs;
 import org.opentox.Resources.ErrorRepresentation;
-import org.opentox.Resources.ErrorRepresentationFactory;
-import org.opentox.Resources.ErrorSource;
+import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
@@ -45,7 +44,6 @@ public class MlrTrainer extends AbstractTrainer {
         super(form, resource);
     }
 
-
     /**
      * Returns
      * @return
@@ -68,73 +66,70 @@ public class MlrTrainer extends AbstractTrainer {
              * weka.core.Instances object.
              */
             Dataset dataset = new Dataset(dataseturi);
-            data = dataset.getWekaDatasetForTraining(null, false);
+            Model model = new Model();
+
 
 
             try {
+                data = dataset.getWekaDatasetForTraining(null, false);
                 data.setClass(data.attribute(targeturi.toString()));
                 Preprocessing.removeStringAtts(data);
                 LinearRegression linreg = new LinearRegression();
                 String[] linRegOptions = {"-S", "1", "-C"};
 
+
+
+                linreg.setOptions(linRegOptions);
+                linreg.buildClassifier(data);
+                generatePMML(linreg.coefficients(), model_id);
+
+                List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
+                paramList.add(ConstantParameters.TARGET(targeturi.toString()));
+
                 /**
-                 * Train the model using Weka...
+                 * Store the model as RDF...
                  */
-                try {
-
-                    linreg.setOptions(linRegOptions);
-                    linreg.buildClassifier(data);
-                    generatePMML(linreg.coefficients(), model_id);
-
-                    List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
-                    paramList.add(ConstantParameters.TARGET(targeturi.toString()));
-
-                    /**
-                     * Store the model as RDF...
-                     */
-                    Model model = new Model();
-                    model.createModel(Integer.toString(model_id),
-                            dataseturi.toString(),
-                            targeturi.toString(),
-                            data,
-                            paramList,
-                            URIs.mlrAlgorithmURI,
-                            new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
+                
+                model.createModel(Integer.toString(model_id),
+                        dataseturi.toString(),
+                        targeturi.toString(),
+                        data,
+                        paramList,
+                        URIs.mlrAlgorithmURI,
+                        new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
 
 
-                    // return the URI of generated model:
-                    if (model.errorRep.errorLevel()==0) {
-                        
-                        representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
-                                + ModelsDB.registerNewModel(
-                                AbstractResource.URIs.mlrAlgorithmURI) + "\n");
-                    } else {
-                        errorRep.append(model.errorRep);
-                        Throwable throwable = new UnhandledException(new Throwable());
-                    }
+                // return the URI of generated model:
+                if (model.errorRep.errorLevel() == 0) {
 
-                } catch (Exception ex) {
-                    OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n"
-                            + "Details :" + ex.getMessage() + "\n");
-                    errorRep.append(ex, "Severe Error while trying to build an MLR model.", Status.SERVER_ERROR_INTERNAL);
-                }
+                    representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
+                            + ModelsDB.registerNewModel(
+                            AbstractResource.URIs.mlrAlgorithmURI) + "\n");
+
+                }                
+
             } catch (NullPointerException ex) {
-                OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n"
-                        + "Details :" + ex.getMessage() + "\n");
+                OpenToxApplication.opentoxLogger.severe(ex.toString());
                 errorRep.append(ex, "Probably this exception is thrown "
-                        + "because the dataset or target uri you provided is not valid or some other internal"
-                        + "server error happened!\n", Status.SERVER_ERROR_INTERNAL);
-                System.out.println(errorRep.getStatus());
+                        + "because the dataset or target uri you provided is not valid or some other internal "
+                        + "server error happened! Please verify that the target uri you specified is an " +
+                        "attribute of the dataset and is not of type 'string'!", Status.SERVER_ERROR_INTERNAL);
+            } catch (Exception ex) {
+                OpenToxApplication.opentoxLogger.severe(ex.toString());
+                errorRep.append(ex, "Severe Error while trying to build an MLR model.", Status.SERVER_ERROR_INTERNAL);
             } catch (Throwable thr) {
-                OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n"
-                        + "Details :" + thr.getMessage() + "\n");
-                errorRep.append(thr, "An unexpected exception or error was thrown while"
-                        + "training an MLR model. Please contact the system admnistrator for further information!\n",
+                OpenToxApplication.opentoxLogger.severe(thr.toString());
+                errorRep.append(thr, "An unexpected exception or error was thrown while "
+                        + "training an MLR model. Please contact the system admnistrator for further information!",
                         Status.SERVER_ERROR_INTERNAL);
+            }finally{
+                errorRep.append(model.errorRep);
+                errorRep.append(dataset.errorRep);
             }
         }
-        
-        return errorRep.errorLevel()==0 ? representation : errorRep;
+
+
+        return errorRep.errorLevel() == 0 ? representation : errorRep;
     }
 
     /**
@@ -147,28 +142,53 @@ public class MlrTrainer extends AbstractTrainer {
      */
     @Override
     public ErrorRepresentation checkParameters() {
-        MediaType errorMediaType = MediaType.TEXT_PLAIN;
         Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
         String errorDetails = "";
 
 
+        /**
+         * Check the dataset_uri parameter.........
+         */
         try {
-            dataseturi = new URI(form.getFirstValue("dataset_uri"));
+            dataseturi = new URI(form.getFirstValue("dataset_uri"));            
+            dataseturi.toURL();
+            if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))){
+                errorRep.append(new Exception(), "The dataset uri that client provided " +
+                        "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
+            }
+        } catch (MalformedURLException ex) {
+            errorDetails = "The client did not post a valid URI for the dataset";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         } catch (URISyntaxException ex) {
-            errorDetails = "[Wrong Posted Parameter ]: The client did"
-                    + " not post a valid URI for the dataset";
+            errorDetails = "The client did not post a valid URI for the dataset";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+        } catch (IllegalArgumentException ex){
+            errorDetails = "The client did not post a valid URI for the dataset";
             errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
+
+
+        /**
+         * Check the target parameter.........
+         */
         try {
             targeturi = new URI(form.getFirstValue("target"));
+            targeturi.toURL();
+        } catch (MalformedURLException ex) {
+            errorDetails = "[Wrong Posted Parameter ]: The client did"
+                    + " not post a valid URI for the target feature";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         } catch (URISyntaxException ex) {
             errorDetails = "[Wrong Posted Parameter ]: The client did"
                     + " not post a valid URI for the target feature";
             errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
+
         return errorRep;
     }
 
+
+    
     /**
      * Generates the PMML representation of the model and stores in the hard
      * disk.
@@ -246,7 +266,7 @@ public class MlrTrainer extends AbstractTrainer {
             writer.flush();
             writer.close();
         } catch (IOException ex) {
-            errorRep.append(ex, "(MLR-Trainer ) Iunput/Output Exception while generating a PMML "
+            errorRep.append(ex, "Input/Output Exception while generating a PMML "
                     + "representation for an MLR model. Probably the destination does not exist.",
                     Status.SERVER_ERROR_INTERNAL);
             Logger.getLogger(MlrTrainer.class.getName()).log(Level.SEVERE, null, ex);

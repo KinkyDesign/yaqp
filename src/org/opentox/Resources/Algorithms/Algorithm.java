@@ -123,11 +123,13 @@ public class Algorithm extends AbstractResource {
     @Override
     protected Representation post(Representation entity)
             throws ResourceException {
+
         Representation representation = null;
         Status status = Status.SUCCESS_ACCEPTED;
 
         AbstractTrainer trainer = null;
-
+        
+        
 
 
         switch (algorithm) {
@@ -147,9 +149,12 @@ public class Algorithm extends AbstractResource {
                 representation = new StringRepresentation("Unknown Algorithm (404)!\n",
                         MediaType.TEXT_PLAIN);
                 status = Status.CLIENT_ERROR_NOT_FOUND;
+                getResponse().setStatus(status);
+                return new StringRepresentation("Algorithm Not Found!\n");
         }
 
-        getResponse().setStatus(trainer.errorRep.getStatus());
+
+        getResponse().setStatus(trainer.errorRep.getStatus().getCode()==202 ? Status.SUCCESS_OK : trainer.errorRep.getStatus());
         return representation;
     }
 }

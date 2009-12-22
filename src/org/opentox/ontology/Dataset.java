@@ -17,6 +17,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import weka.core.Instances;
@@ -64,26 +65,36 @@ public class Dataset extends RDFParser {
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection con = null;
         try {
-            con = (HttpURLConnection) dataset_uri.toURL().openConnection();
+            URL dataset_url = dataset_uri.toURL();
+            con = (HttpURLConnection) dataset_url.openConnection();
             con.setDoInput(true);
             con.setDoOutput(true);
             con.setUseCaches(false);
-
             con.addRequestProperty("Accept", "application/rdf+xml");
             jenaModel = OT.createModel();
             jenaModel.read(con.getInputStream(), null);
+        } catch (MalformedURLException ex){
+            System.out.println("X1");
+             errorRep.append(ex, "The dataset_uri cannot be cast as a valid URL!", Status.CLIENT_ERROR_BAD_REQUEST);
+        } catch (IllegalArgumentException ex){
+            System.out.println("X2");
+            errorRep.append(ex, "Check the dataset URI you posted !", Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (SecurityException ex) {
-            errorRep.append(ex, "(Dataset Parser) A security exception occured! It is possible that a resource" +
+            System.out.println("X3");
+            errorRep.append(ex, "A security exception occured! It is possible that a resource" +
                     "requires user authentication.", Status.SERVER_ERROR_INTERNAL);
         } catch (IllegalStateException ex) {
-            errorRep.append(ex, "(Dataset Parser) HTTP connection cannot be configured correctly!",
+            System.out.println("X4");
+            errorRep.append(ex, "HTTP connection cannot be configured correctly!",
                     Status.SERVER_ERROR_INTERNAL);
         } catch (IOException ex) {
-            errorRep.append(ex, "(Dataset Parser) Input/Output Error while trying to open a connection.\n"
+            System.out.println("X5");
+            errorRep.append(ex, "Input/Output Error while trying to open a connection.\n"
                     + "Seems to be a network connection problem!", Status.SERVER_ERROR_INTERNAL);
         } catch (Exception ex) {
-            errorRep.append(ex, "(Dataset Parser) Error while trying to parse the given dataset!",
-                    Status.SERVER_ERROR_INTERNAL);
+            System.out.println("X6");
+            errorRep.append(ex, "The dataset uri you provided seems that does not correspond to an existing resource!",
+                    Status.CLIENT_ERROR_BAD_REQUEST);
             Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -158,9 +169,20 @@ public class Dataset extends RDFParser {
      * be nominal.
      * @return The Instances object which encapsulates the data in the RDF document.
      */
-    public Instances getWekaDatasetForTraining(String target, boolean isClassNominal) {
+    public Instances getWekaDatasetForTraining(String target, boolean isClassNominal) throws Exception{
+
+        /**
+         * Check if some error occured while constructing the
+         * Dataset object.
+         */
+        if (errorRep.errorLevel()>0){
+            throw new Exception();
+        }
+        
+
 
         // A1. Some initial definitions:
+
         Resource dataEntryResource = OT.Class.DataEntry.getOntClass(jenaModel),
                 dataSetResource = OT.Class.Dataset.getOntClass(jenaModel),
                 featureResource = OT.Class.Feature.getOntClass(jenaModel);
@@ -266,7 +288,16 @@ public class Dataset extends RDFParser {
 
 
                 if (numericXSDtypes().contains(featureTypeMap.get(jenaModel.createResource(atName)))) {
-                    vals[data.attribute(atName).index()] = Double.parseDouble(atVal);
+                    try{
+                        vals[data.attribute(atName).index()] = Double.parseDouble(atVal);
+                        /**
+                         * The following catch rule, handles cases where some values are declared
+                         * as numeric (double, float etc) but their value cannot be cast as
+                         * double.
+                         */
+                    } catch (NumberFormatException ex){
+                        
+                    }
                 } else if (stringXSDtypes().contains(featureTypeMap.get(jenaModel.createResource(atName)))) {
                     vals[data.attribute(atName).index()] = data.attribute(atName).addStringValue(atVal);
                 } else if (XSDDatatype.XSDdate.getURI().equals(atName)) {
@@ -317,9 +348,7 @@ public class Dataset extends RDFParser {
 
         return data;
 
-    }
-
-    ;
+    };
 
     /**
      * Similar to {@link org.opentox.ontology.Dataset#getWekaDataset(java.lang.String, boolean) }
@@ -463,7 +492,7 @@ public class Dataset extends RDFParser {
      * @see Dataset#getWekaDatasetForTraining(java.lang.String, boolean)
      * @see Dataset#getWekaDatasetForPrediction(java.lang.String)
      */
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException, URISyntaxException, Exception {
 
 
         URI d_set = new URI("http://localhost/X.rdf");

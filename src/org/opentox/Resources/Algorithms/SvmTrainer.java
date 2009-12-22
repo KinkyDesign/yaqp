@@ -3,6 +3,7 @@ package org.opentox.Resources.Algorithms;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Resources.AbstractResource.Directories;
 import org.opentox.Resources.AbstractResource.URIs;
+import org.opentox.Resources.ErrorRepresentation;
+import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
@@ -224,13 +227,11 @@ public class SvmTrainer extends AbstractTrainer {
      * @return
      */
     @Override
-    public Representation checkParameters() {
+    public ErrorRepresentation checkParameters() {
         // Some initial definitions:
-        Representation rep = null;
         MediaType errorMediaType = MediaType.TEXT_PLAIN;
         Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
         String errorDetails = "";
-        setInternalStatus(Status.SUCCESS_ACCEPTED);
 
         /**
          * Assign default values to the parameters that where not
@@ -270,57 +271,55 @@ public class SvmTrainer extends AbstractTrainer {
             cacheSize = "50";
         }
 
+
         /**
-         * Get and Check the posted dataset_uri parameter.
-         * Check whether the posted dataset_uri parameter is indeed
-         * a URI. If yes, obtain the Instances.
+         * Check the dataset_uri parameter.........
          */
         try {
-            dataseturi = new URI(form.getFirstValue("dataset_uri"));            
-            Dataset data = new Dataset(dataseturi);
-            
-            dataInstances = data.getWekaDatasetForTraining(null, false);
-
-
-
+            dataseturi = new URI(form.getFirstValue("dataset_uri"));
+            dataseturi.toURL();
+            if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))){
+                errorRep.append(new Exception(), "The dataset uri that client provided " +
+                        "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
+            }
+        } catch (MalformedURLException ex) {
+            errorDetails = "The client did not post a valid URI for the dataset";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         } catch (URISyntaxException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "[Wrong Posted Parameter ] The client did"
-                    + " not post a valid URI for the dataset\n";
-        } catch (IllegalArgumentException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "* [Wrong Posted Parameter ] The dataset URI"
-                    + " you POSTed seems not to be valid: " + dataseturi + "\n";
-        } catch (Throwable thr) {
-            setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
+            errorDetails = "The client did not post a valid URI for the dataset";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+        } catch (IllegalArgumentException ex){
+            errorDetails = "The client did not post a valid URI for the dataset";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
 
 
-
         /**
-         * Check the consistency of the target.
+         * Check the target parameter.........
          */
-        targetAttribute = form.getFirstValue("target");
         try {
-            new URI(targetAttribute);
+            targeturi = new URI(form.getFirstValue("target"));
+            targeturi.toURL();
+        } catch (MalformedURLException ex) {
+            errorDetails = "[Wrong Posted Parameter ]: The client did"
+                    + " not post a valid URI for the target feature";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         } catch (URISyntaxException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "* [Wrong Posted Parameter ] The target URI"
-                    + " you POSTed seems not to be valid: " + dataseturi + "\n";
-        } catch (Throwable thr) {
-            setInternalStatus(Status.SERVER_ERROR_INTERNAL);
-            errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
+            errorDetails = "[Wrong Posted Parameter ]: The client did"
+                    + " not post a valid URI for the target feature";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
+
+
 
         try {
             dataInstances.setClass(dataInstances.attribute(targetAttribute));
         } catch (NullPointerException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
+           // setInternalStatus(clientPostedWrongParametersStatus);
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] "
                     + "The target you posted in not a feature of the dataset: " + targetAttribute + "\n";
         } catch (Throwable thr) {
-            setInternalStatus(Status.SERVER_ERROR_INTERNAL);
+           // setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
@@ -329,7 +328,7 @@ public class SvmTrainer extends AbstractTrainer {
                 || (kernel.equalsIgnoreCase("rbf"))
                 || (kernel.equalsIgnoreCase("sigmoid")))) {
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] Invalid Kernel Type!\n";
-            setInternalStatus(clientPostedWrongParametersStatus);
+            // setInternalStatus(clientPostedWrongParametersStatus);
         }
 
         /**
@@ -342,15 +341,15 @@ public class SvmTrainer extends AbstractTrainer {
             if (d <= 0) {
                 System.out.println("x2");
                 errorDetails = errorDetails + "* [Inacceptable Parameter Value] The cost should be strictly positive\n";
-                setInternalStatus(clientPostedWrongParametersStatus);
+               // setInternalStatus(clientPostedWrongParametersStatus);
             }
         } catch (NumberFormatException e) {
             errorDetails = errorDetails
                     + "* [Inacceptable Parameter Value]  The cost should be Double type, while you specified "
                     + "a non double value : " + cost + "\n";
-            setInternalStatus(clientPostedWrongParametersStatus);
+            // setInternalStatus(clientPostedWrongParametersStatus);
         } catch (Throwable thr) {
-            setInternalStatus(Status.SERVER_ERROR_INTERNAL);
+            // setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
@@ -363,13 +362,13 @@ public class SvmTrainer extends AbstractTrainer {
             d = Double.parseDouble(epsilon);
             if (d <= 0) {
                 errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be strictly positive!\n";
-                setInternalStatus(clientPostedWrongParametersStatus);
+               // setInternalStatus(clientPostedWrongParametersStatus);
             }
         } catch (NumberFormatException e) {
             errorDetails = errorDetails + "* [Inacceptable Parameter Value] Epsilon must be a striclty positive number!\n";
-            setInternalStatus(clientPostedWrongParametersStatus);
+           // setInternalStatus(clientPostedWrongParametersStatus);
         } catch (Throwable thr) {
-            setInternalStatus(Status.SERVER_ERROR_INTERNAL);
+          //  setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             errorDetails = errorDetails + "* [SEVERE] Severe Internal Error! Excpeption: " + thr;
         }
 
@@ -469,15 +468,7 @@ public class SvmTrainer extends AbstractTrainer {
         }
 
 
-        if (!(errorDetails.equalsIgnoreCase(""))) {
-            rep = new StringRepresentation("Error Code : " + clientPostedWrongParametersStatus.toString() + "\n"
-                    + "Error Code Desription : The request could not be understood by the server due to "
-                    + "malformed syntax.\nThe client SHOULD NOT repeat the request without modifications.\n"
-                    + "Error Explanation :\n" + errorDetails + "\n", errorMediaType);
-            return rep;
-        } else {
-            return null;
-        }
+        return errorRep;
 
 
     }

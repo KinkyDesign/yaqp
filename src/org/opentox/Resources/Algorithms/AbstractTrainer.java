@@ -4,7 +4,6 @@ import java.net.URI;
 import org.opentox.Resources.ErrorRepresentation;
 import org.opentox.Resources.ErrorSource;
 import org.restlet.data.Form;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
 

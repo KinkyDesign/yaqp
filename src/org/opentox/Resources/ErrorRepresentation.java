@@ -5,12 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -117,7 +114,7 @@ public class ErrorRepresentation extends StreamRepresentation {
     public ErrorRepresentation updateStatus(Status newStatus){
         if (
                 (this.internalStatus.getCode()<300) ||
-                ((internalStatus.getCode()>=400)&&(internalStatus.getCode()<500)&&newStatus.getCode()>=400)
+                ((newStatus.getCode()>=400)&&(newStatus.getCode()<500)&&internalStatus.getCode()>=400)
                 )
            {
             this.internalStatus = newStatus;
@@ -137,13 +134,21 @@ public class ErrorRepresentation extends StreamRepresentation {
     public String getText() {
 
         if (MediaType.TEXT_PLAIN.equals(getMediaType())) {
-            String outputMessage = "";
+
+            String outputMessage = "Error Report.\n" +
+                    "TimeStamp: " + GregorianCalendar.getInstance().getTime()+"\n\n";
             int i=0;
                       
             for (Map.Entry<String, Throwable> e : map.entrySet()){
-                outputMessage = outputMessage + ("Error Report #"+(++i)+"\n");
+                outputMessage = outputMessage + ("Error #"+(++i)+"\n");
                 outputMessage = outputMessage + ("Exception Details: "+e.getValue()+"\n");
-                outputMessage = outputMessage + ("Explanation: "+e.getKey()+"\n\n");
+                outputMessage = outputMessage + ("Explanation: "+e.getKey()+"\n");
+                outputMessage = outputMessage + ("For debugging reasons we provide a brief list of the exceptions: \n");
+                StackTraceElement[] ste = e.getValue().getStackTrace();
+                for (int j=0;j<4;j++){
+                    outputMessage = outputMessage + "- " +ste[j].toString()+"\n";
+                }
+                outputMessage = outputMessage + "\n\n";
             }
             return outputMessage;
         }
