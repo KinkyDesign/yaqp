@@ -1,6 +1,7 @@
 package org.opentox.Resources.Models;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -12,21 +13,30 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.Resources.AbstractResource;
+import org.opentox.Resources.ErrorSource;
 import org.opentox.ontology.Namespace;
 import org.opentox.ontology.OT;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.ReferenceList;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
 /**
- *
- * @author chung
+ * This resource return meta information about a model such as its dependent variables
+ * , its independent and predicted variables.
+ * @author OpenTox - http://www.opentox.org/
+ * @author Sopasakis Pantelis
+ * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class ModelInfoResource extends AbstractResource{
+public class ModelInfoResource extends AbstractResource {
+
+
+    private Status internalStatus = Status.SUCCESS_ACCEPTED;
 
     private String model_id, info;
 
@@ -52,7 +62,7 @@ public class ModelInfoResource extends AbstractResource{
     }
 
     /**
-     *
+     * Returns a text/uri list which corresponds to the requested meta-information.
      * @param variant
      * @return StringRepresentation
      */
@@ -62,23 +72,27 @@ public class ModelInfoResource extends AbstractResource{
         try {
             FileInputStream in = new FileInputStream(Directories.modelRdfDir + "/" + model_id);
             OntModel jenaModel = Namespace.createModel();
-            jenaModel.read(in,null);
+            jenaModel.read(in, null);
             StmtIterator stmtIt = null;
             ReferenceList uri_list = new ReferenceList();
-            if (info.equalsIgnoreCase("dependent")){
-                stmtIt = jenaModel.listStatements(new SimpleSelector(null, OT.dependentVariables, (Resource) null));
-            }else if (info.equalsIgnoreCase("independent")){
-                stmtIt = jenaModel.listStatements(new SimpleSelector(null, OT.independentVariables, (Resource) null));
+            Property prop = null;
+            if (info.equalsIgnoreCase("dependent")) {
+                prop = OT.dependentVariables;
+            } else if (info.equalsIgnoreCase("independent")) {
+                prop = OT.independentVariables;
+            } else if (info.equalsIgnoreCase("predicted")) {
+                prop = OT.predictedVariables;
             }
-            while (stmtIt.hasNext()){
+            stmtIt = jenaModel.listStatements(new SimpleSelector(null, prop, (Resource) null));
+            while (stmtIt.hasNext()) {
                 uri_list.add(new Reference(new URI(stmtIt.next().getObject().as(Resource.class).getURI())));
             }
 
-            if (MediaType.TEXT_URI_LIST.equals(variant.getMediaType())){
+            if (MediaType.TEXT_URI_LIST.equals(variant.getMediaType())) {
                 rep = uri_list.getTextRepresentation();
-            }else if (MediaType.TEXT_HTML.equals(variant.getMediaType())){
+            } else if (MediaType.TEXT_HTML.equals(variant.getMediaType())) {
                 rep = uri_list.getWebRepresentation();
-            }            
+            }
         } catch (Exception ex) {
             Logger.getLogger(ModelInfoResource.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -21,36 +21,41 @@ import weka.core.Instances;
  *
  * @author Sopasakis Pantelis
  */
-public class Model extends RDFParser{
+public class Model extends RDFParser {
 
     private static final long serialVersionUID = -4754250023818796913L;
-     
 
-    public Model(){
+    public Model() {
         super();
     }
 
-
-    public Model(InputStream in){
+    public Model(InputStream in) {
         super(in);
     }
-
-
 
     /**
      * Returns the set of features in the Model (RDF representation).
      * @return
      */
-    public Set<String> setOfFeatures(){
+    public Set<String> setOfFeatures() {
         Set<String> set = new HashSet<String>();
         OntClass myClass = OT.Class.Feature.getOntClass(jenaModel);
-        ExtendedIterator<? extends OntResource> featureIterator = myClass.listInstances() ;
-        while (featureIterator.hasNext()){
+        ExtendedIterator<? extends OntResource> featureIterator = myClass.listInstances();
+        while (featureIterator.hasNext()) {
             set.add(featureIterator.next().getURI());
         }
         return set;
     }
-    
+
+    /**
+     * Get the URI of a new feature from a feature service
+     * @param featureService URI of a feature service
+     * @return
+     */
+    private String getPredictedFeatureUri(String featureService) {
+
+        return null;
+    }
 
     /**
      * Creates the RDF representation for an OpenTox model given its name, the uri
@@ -66,8 +71,8 @@ public class Model extends RDFParser{
      * @param out The output stream used to store the model.
      */
     public void createModel(String model_id, String dataseturi, String targeturi, Instances data,
-            List<AlgorithmParameter> algorithmParameters, String AlgorithmURI, OutputStream out){
-            try {
+            List<AlgorithmParameter> algorithmParameters, String AlgorithmURI, OutputStream out) {
+        try {
             jenaModel = org.opentox.ontology.Namespace.createModel();
 
             OT.Class.Dataset.createOntClass(jenaModel);
@@ -78,7 +83,7 @@ public class Model extends RDFParser{
 
 
             Individual ot_model = jenaModel.createIndividual(
-            URIs.modelURI + "/" + model_id, OT.Class.Model.getOntClass(jenaModel));
+                    URIs.modelURI + "/" + model_id, OT.Class.Model.getOntClass(jenaModel));
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), "Model " + model_id);
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.identifier.getURI()), URIs.modelURI + "/" + model_id);
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.creator.getURI()), AbstractResource.baseURI);
@@ -96,17 +101,16 @@ public class Model extends RDFParser{
 
             // Add all parameters:
             Individual iparam;
-                    for (int i=0;i<algorithmParameters.size();i++){
-                        iparam = jenaModel.createIndividual(OT.Class.Parameter.getOntClass(jenaModel));
-                        iparam.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), algorithmParameters.get(i).paramName);
-                        iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramValue.getURI()), jenaModel.createTypedLiteral(
-                                algorithmParameters.get(i).paramValue.toString(),
-                                algorithmParameters.get(i).dataType));
-                        iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramScope.getURI()), jenaModel.
-                                createTypedLiteral(algorithmParameters.get(i).paramScope,
-                                XSDDatatype.XSDstring));
-                        ot_model.addProperty(jenaModel.createAnnotationProperty(OT.parameters.getURI()), iparam);
-                    }
+            for (int i = 0; i < algorithmParameters.size(); i++) {
+                iparam = jenaModel.createIndividual(OT.Class.Parameter.getOntClass(jenaModel));
+                iparam.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), algorithmParameters.get(i).paramName);
+                iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramValue.getURI()), jenaModel.createTypedLiteral(
+                        algorithmParameters.get(i).paramValue.toString(),
+                        algorithmParameters.get(i).dataType));
+                iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramScope.getURI()), jenaModel.createTypedLiteral(algorithmParameters.get(i).paramScope,
+                        XSDDatatype.XSDstring));
+                ot_model.addProperty(jenaModel.createAnnotationProperty(OT.parameters.getURI()), iparam);
+            }
 
             Individual feature = null;
 
@@ -116,6 +120,12 @@ public class Model extends RDFParser{
                     feature = jenaModel.createIndividual(targeturi.toString(),
                             OT.Class.Feature.getOntClass(jenaModel));
                     ot_model.addProperty(jenaModel.createAnnotationProperty(OT.dependentVariables.getURI()), feature);
+                    //Add the predicted variable...
+                    {
+                        Individual predicted = jenaModel.createIndividual(targeturi.toString() + "-predicted-" + model_id,
+                                OT.Class.Feature.getOntClass(jenaModel));
+                        ot_model.addProperty(jenaModel.createAnnotationProperty(OT.predictedVariables.getURI()), predicted);
+                    }
                 } else {
                     feature = jenaModel.createIndividual(data.attribute(i).name(),
                             OT.Class.Feature.getOntClass(jenaModel));
@@ -125,11 +135,8 @@ public class Model extends RDFParser{
             jenaModel.write(out);
 
         } catch (Exception ex) {
-            internalStatus = Status.SERVER_ERROR_INTERNAL;
+            errorRep.append(ex, "Severe Error while parsing a Model!", Status.SERVER_ERROR_INTERNAL);
         }
 
     }
-
-    
-
 }

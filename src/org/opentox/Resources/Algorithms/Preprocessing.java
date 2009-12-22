@@ -10,8 +10,11 @@ import weka.filters.unsupervised.attribute.Normalize;
 
 /**
  *
- * @author tartoufo1973
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
+ * @author Kolotouros Dimitris
+ * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class Preprocessing {
 

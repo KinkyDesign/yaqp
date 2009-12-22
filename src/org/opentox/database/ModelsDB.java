@@ -38,6 +38,11 @@ public class ModelsDB extends InHouseDB {
      * |      *       |
      * |      *       |
      * </pre>
+     *
+     * @see ModelsDB#createModelInfoTable()
+     * @see ModelsDB#isModel(java.lang.String, java.lang.String)
+     * @see ModelsDB#registerNewModel(java.lang.String)
+     * @see ModelsDB#removeModel(java.lang.String)
      */
     @CreateTable
     protected static void createModelsStackTable() {
@@ -76,6 +81,12 @@ public class ModelsDB extends InHouseDB {
      * |        *       |        *        |          *          |
      *
      * </pre>
+     *
+     * @see ModelsDB#createModelsStackTable()
+     * @see ModelsDB#IncreaseModelStack()
+     * @see ModelsDB#isModel(java.lang.String, java.lang.String)
+     * @see ModelsDB#registerNewModel(java.lang.String)
+     * @see ModelsDB#removeModel(java.lang.String)
      */
     @CreateTable
     protected static void createModelInfoTable() {
@@ -93,6 +104,11 @@ public class ModelsDB extends InHouseDB {
         }
     }
 
+    /**
+     * Increases the model stack. This method is invoked after a successful training
+     * of a new model when the model is registered in the database.
+     * @see ModelsDB#registerNewModel(java.lang.String)
+     */
     private static void IncreaseModelStack() {
         String increaseValue = "update " + MODELS_STACK_TABLE + " set STACK = " + (modelsStack + 1) +
                 " where STACK = " + modelsStack;
@@ -105,6 +121,10 @@ public class ModelsDB extends InHouseDB {
         modelsStack++;
     }
 
+    /**
+     * Returns the number of models currently in the database.
+     * @return
+     */
     public static int getModelsStack() {
         return modelsStack;
     }
@@ -113,6 +133,8 @@ public class ModelsDB extends InHouseDB {
      * Registers a new trained model in database
      * @param AlgID URI of the algorithm used to train the model
      * @return New model's ID
+     * @see ModelsDB#IncreaseModelStack()
+     * @see ModelsDB#removeModel(java.lang.String)
      */
     @Registration
     public static int registerNewModel(String AlgID) {
@@ -133,7 +155,8 @@ public class ModelsDB extends InHouseDB {
 
     /**
      * This method is used to delete a model registered in the database.
-     * @param ID
+     * @param ID The ID of the model to be deleted
+     * @see ModelsDB#registerNewModel(java.lang.String) 
      */
     @Removal
     public static void removeModel(String ID){
@@ -153,7 +176,10 @@ public class ModelsDB extends InHouseDB {
      * returns true if the model with ID = 10 is an SVM model.
      * @param ID the id of the model.
      * @param Model
-     * @return
+     * @return The logical value of the answer to the submitted query.
+     * @see ModelsDB#registerNewModel(java.lang.String)
+     * @see ModelsDB#removeModel(java.lang.String)
+     * @see ModelsDB#getAlgorithm(java.lang.String)
      */
     public static boolean isModel(String ID, String Model){
         boolean result = false;
@@ -177,6 +203,7 @@ public class ModelsDB extends InHouseDB {
      * characterization of a given model.
      * @param ID
      * @return
+     * @see ModelsDB#isModel(java.lang.String, java.lang.String)
      */
     public static AlgorithmEnum getAlgorithm(String ID){
         AlgorithmEnum algorithm = AlgorithmEnum.unknown;

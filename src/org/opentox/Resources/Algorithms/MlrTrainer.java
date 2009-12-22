@@ -4,17 +4,20 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.UnhandledException;
 import org.opentox.Applications.OpenToxApplication;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.Resources.AbstractResource.Directories;
 import org.opentox.Resources.AbstractResource.URIs;
+import org.opentox.Resources.ErrorRepresentation;
+import org.opentox.Resources.ErrorRepresentationFactory;
+import org.opentox.Resources.ErrorSource;
 import org.opentox.database.ModelsDB;
 import org.opentox.ontology.Dataset;
 import org.opentox.ontology.Model;
@@ -23,23 +26,30 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.ServerResource;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
 
 /**
- *
- * @author OpenTox - http://www.opentox.org
+ * Trainer for MLR models.
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class MlrTrainer extends AbstractTrainer {
 
     protected Instances data;
 
-    public MlrTrainer(Form form) {
-        super(form);
+    public MlrTrainer(Form form, ServerResource resource) {
+        super(form, resource);
     }
 
+
+    /**
+     * Returns
+     * @return
+     */
     @Override
     public synchronized Representation train() {
         Representation representation = null;
@@ -47,22 +57,20 @@ public class MlrTrainer extends AbstractTrainer {
         model_id = ModelsDB.getModelsStack() + 1;
 
 
-        Representation errorRep = checkParameters();
-        if (errorRep != null) {
-            representation = errorRep;
-        }
+        errorRep = (ErrorRepresentation) checkParameters();
 
-        if (Status.SUCCESS_ACCEPTED.equals(internalStatus)) {
+        if (errorRep.errorLevel() > 0) {
+            representation = errorRep;
+        } else {
 
             /**
              * Retrive the Dataset (RDF), parse it and generate the corresponding
              * weka.core.Instances object.
-             */                       
-            
-                Dataset dataset = new Dataset(dataseturi);
-                data = dataset.getWekaDataset(null, false);
-          
-            
+             */
+            Dataset dataset = new Dataset(dataseturi);
+            data = dataset.getWekaDatasetForTraining(null, false);
+
+
             try {
                 data.setClass(data.attribute(targeturi.toString()));
                 Preprocessing.removeStringAtts(data);
@@ -92,36 +100,41 @@ public class MlrTrainer extends AbstractTrainer {
                             paramList,
                             URIs.mlrAlgorithmURI,
                             new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
-                    setInternalStatus(model.internalStatus);
+
+
                     // return the URI of generated model:
-                    if (Status.SUCCESS_OK.equals(internalStatus)) {
-                        // if status is OK(200), register the new model in the database and
-                        // return the URI to the client.
+                    if (model.errorRep.errorLevel()==0) {
+                        
                         representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
                                 + ModelsDB.registerNewModel(
                                 AbstractResource.URIs.mlrAlgorithmURI) + "\n");
                     } else {
-                        representation = new StringRepresentation(internalStatus.toString());
+                        errorRep.append(model.errorRep);
+                        Throwable throwable = new UnhandledException(new Throwable());
                     }
 
                 } catch (Exception ex) {
                     OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n"
                             + "Details :" + ex.getMessage() + "\n");
-                    representation = new StringRepresentation("Severe Error while trying to build an MLR model.\n"
-                            + "Details :" + ex + "\n");
-                    setInternalStatus(Status.SERVER_ERROR_INTERNAL);
+                    errorRep.append(ex, "Severe Error while trying to build an MLR model.", Status.SERVER_ERROR_INTERNAL);
                 }
             } catch (NullPointerException ex) {
                 OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n"
                         + "Details :" + ex.getMessage() + "\n");
-                representation = new StringRepresentation("Probably this exception is thrown"
+                errorRep.append(ex, "Probably this exception is thrown "
                         + "because the dataset or target uri you provided is not valid or some other internal"
-                        + "server error happened!\n"
-                        + "Exception Details: " + ex + "\n");
-                setInternalStatus(Status.SERVER_ERROR_INTERNAL);
+                        + "server error happened!\n", Status.SERVER_ERROR_INTERNAL);
+                System.out.println(errorRep.getStatus());
+            } catch (Throwable thr) {
+                OpenToxApplication.opentoxLogger.severe("Severe Error while trying to build an MLR model.\n"
+                        + "Details :" + thr.getMessage() + "\n");
+                errorRep.append(thr, "An unexpected exception or error was thrown while"
+                        + "training an MLR model. Please contact the system admnistrator for further information!\n",
+                        Status.SERVER_ERROR_INTERNAL);
             }
         }
-        return representation;
+        
+        return errorRep.errorLevel()==0 ? representation : errorRep;
     }
 
     /**
@@ -133,39 +146,27 @@ public class MlrTrainer extends AbstractTrainer {
      * is defined accordingly.
      */
     @Override
-    public Representation checkParameters() {
-        Representation rep = null;
+    public ErrorRepresentation checkParameters() {
         MediaType errorMediaType = MediaType.TEXT_PLAIN;
         Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
         String errorDetails = "";
-        setInternalStatus(Status.SUCCESS_ACCEPTED);
 
 
         try {
             dataseturi = new URI(form.getFirstValue("dataset_uri"));
         } catch (URISyntaxException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "[Wrong Posted Parameter ]: The client did"
+            errorDetails = "[Wrong Posted Parameter ]: The client did"
                     + " not post a valid URI for the dataset";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
         try {
             targeturi = new URI(form.getFirstValue("target"));
         } catch (URISyntaxException ex) {
-            setInternalStatus(clientPostedWrongParametersStatus);
-            errorDetails = errorDetails + "[Wrong Posted Parameter ]: The client did"
+            errorDetails = "[Wrong Posted Parameter ]: The client did"
                     + " not post a valid URI for the target feature";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
-        if (!(errorDetails.equalsIgnoreCase(""))) {
-            rep = new StringRepresentation(
-                    "Error Code            : " + clientPostedWrongParametersStatus.toString() + "\n"
-                    + "Error Code Desription : The request could not be understood by the server due to "
-                    + "malformed syntax.\nThe client SHOULD NOT repeat the request without modifications.\n"
-                    + "Error Explanation     :\n" + errorDetails + "\n", errorMediaType);
-            return rep;
-        } else {
-            setInternalStatus(Status.SUCCESS_ACCEPTED);
-            return null;
-        }
+        return errorRep;
     }
 
     /**
@@ -245,6 +246,9 @@ public class MlrTrainer extends AbstractTrainer {
             writer.flush();
             writer.close();
         } catch (IOException ex) {
+            errorRep.append(ex, "(MLR-Trainer ) Iunput/Output Exception while generating a PMML "
+                    + "representation for an MLR model. Probably the destination does not exist.",
+                    Status.SERVER_ERROR_INTERNAL);
             Logger.getLogger(MlrTrainer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -12,10 +12,10 @@ import org.opentox.Applications.OpenToxApplication;
 
 /**
  * Every Resource of the package extends this class.
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.5 (Last Update: Nov 23, 2009)
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public abstract class AbstractResource extends ServerResource {
 

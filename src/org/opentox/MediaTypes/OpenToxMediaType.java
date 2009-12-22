@@ -10,9 +10,10 @@ import org.restlet.data.MediaType;
 /**
  * This class owns the representations of the media types adopted by opentox
  * which are not standard RFC media types.
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class OpenToxMediaType {
     

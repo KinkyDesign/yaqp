@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.net.ssl.HttpsURLConnection;
+import org.opentox.Resources.ErrorRepresentation;
 import org.restlet.data.Status;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -42,10 +42,23 @@ public class Dataset extends RDFParser {
 
     private static final long serialVersionUID = -920482801546239926L;
 
+    /**
+     * Initializes a new Dataset object given an input stream which can either
+     * correspond to a file on the disk or some web resource.
+     * @param in
+     * @see Dataset#Dataset(java.net.URI)
+     * @see Dataset#Dataset(java.net.URL)
+     */
     public Dataset(InputStream in) {
         super(in);
     }
 
+    /**
+     * Initializes a Dataset given a URI.
+     * @param dataset_uri
+     * @see Dataset#Dataset(java.net.URL)
+     * @see Dataset#Dataset(java.io.InputStream)
+     */
     public Dataset(URI dataset_uri) {
         super();
         HttpURLConnection.setFollowRedirects(false);
@@ -59,17 +72,40 @@ public class Dataset extends RDFParser {
             con.addRequestProperty("Accept", "application/rdf+xml");
             jenaModel = OT.createModel();
             jenaModel.read(con.getInputStream(), null);
+        } catch (SecurityException ex) {
+            errorRep.append(ex, "(Dataset Parser) A security exception occured! It is possible that a resource" +
+                    "requires user authentication.", Status.SERVER_ERROR_INTERNAL);
+        } catch (IllegalStateException ex) {
+            errorRep.append(ex, "(Dataset Parser) HTTP connection cannot be configured correctly!",
+                    Status.SERVER_ERROR_INTERNAL);
         } catch (IOException ex) {
+            errorRep.append(ex, "(Dataset Parser) Input/Output Error while trying to open a connection.\n"
+                    + "Seems to be a network connection problem!", Status.SERVER_ERROR_INTERNAL);
         } catch (Exception ex) {
+            errorRep.append(ex, "(Dataset Parser) Error while trying to parse the given dataset!",
+                    Status.SERVER_ERROR_INTERNAL);
             Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
-            internalStatus = Status.SERVER_ERROR_INTERNAL;
         }
     }
 
+    /**
+     * Initialized a Dataset object given a URL.
+     * @param dataset_url
+     * @throws URISyntaxException
+     * @see Dataset(java.net.URI)
+     * @see Dataset#Dataset(java.io.InputStream)
+     */
     public Dataset(URL dataset_url) throws URISyntaxException {
         this(dataset_url.toURI());
     }
 
+    /**
+     * Initialized a void Dataset object; invokes a call to the super-class constructor
+     * @see RDFParser
+     * @see Dataset#Dataset(java.io.InputStream)
+     * @see Dataset#Dataset(java.net.URI)
+     * @see Dataset#Dataset(java.net.URL) 
+     */
     public Dataset() {
         super();
     }
@@ -93,9 +129,36 @@ public class Dataset extends RDFParser {
      * This method is used to encapsulate the data of the RDF document in a
      * weka.core.Instances object which can be used to create Regression and
      * classification models using weka algorithms.
+     *
+     * <!-- SCOPE -->
+     * <p>
+     * <b>Description:</b><br/>
+     * This method was developed to
+     * generate datasets (as Instances) in order to be used as input to training
+     * algorithms of weka.
+     * </p>
+     *
+     * <!-- MORE INFO -->
+     * <p>
+     * <b>Characteristics of generated Instances:</b><br/>
+     * The relation name of the generated instances is the same with the identifier of
+     * the dataset. If no identifier is available, then this is set to some arbitraty URI.
+     * If <tt>isClassNominal</tt> is set to false, the class attribute is not defined in
+     * this method but it can be set externally (from the method that calls getWekaDataset).
+     * If <tt>isClassNominal</tt> is set to true, the target of the datset is defined by the
+     * first agument of the method (String target).<br/>
+     * The attributes of the Instances object coincides with the set of features of the
+     * dataset in RDF format.
+     * </p>
+     * @param target URI of the target feature of the dataset. It is optional (you
+     * may leave it null) if you are going to use the Instances for regression models
+     * and isClassNominal is set to false, otherwise you have to specify a valid feature
+     * URI.
+     * @param isClassNominal Set to true if the class attribute should be considered to
+     * be nominal.
      * @return The Instances object which encapsulates the data in the RDF document.
      */
-    public Instances getWekaDataset(String target, boolean isClassNominal) {
+    public Instances getWekaDatasetForTraining(String target, boolean isClassNominal) {
 
         // A1. Some initial definitions:
         Resource dataEntryResource = OT.Class.DataEntry.getOntClass(jenaModel),
@@ -210,7 +273,6 @@ public class Dataset extends RDFParser {
                     try {
                         vals[data.attribute(atName).index()] = data.attribute(atName).parseDate(atVal);
                     } catch (ParseException ex) {
-                        internalStatus = Status.SERVER_ERROR_INTERNAL;
                         Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -230,6 +292,8 @@ public class Dataset extends RDFParser {
         }
         dataEntryIterator.close();
 
+
+        // C. Handle Nominal Class Attributes...
         if (isClassNominal) {
             NumericToNominal filter = new NumericToNominal();
             try {
@@ -237,10 +301,14 @@ public class Dataset extends RDFParser {
                 int[] filtered_attributes = {data.attribute(target).index()};
                 filter.setAttributeIndicesArray(filtered_attributes);
                 data = new Instances(NumericToNominal.useFilter(data, filter));
+                data.setRelationName(relationName);
             } catch (NullPointerException ex) {
-                // The specified attribute is not valid!
-                // Do nothing!
+                errorRep.append(ex, "(Dataset Parser) The target you specified seems not to be valid!",
+                        Status.CLIENT_ERROR_BAD_REQUEST);
             } catch (Exception ex) {
+                errorRep.append(ex, "(Dataset Parser) Internal Error occured while trying to " +
+                        "parse the given dataset. The target could not be converted to nominal!",
+                        Status.SERVER_ERROR_INTERNAL);
                 Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -250,6 +318,20 @@ public class Dataset extends RDFParser {
         return data;
 
     }
+
+    ;
+
+    /**
+     * Similar to {@link org.opentox.ontology.Dataset#getWekaDataset(java.lang.String, boolean) }
+     * but the generated Instances is constructed with respect to a certain model.
+     * @param model_id
+     * @return
+     */
+    public Instances getWekaDatasetForPrediction(String model_id) {
+        return null;
+    }
+
+    ;
 
     /**
      * The set of XSD data types that should be cast as numeric.
@@ -317,7 +399,7 @@ public class Dataset extends RDFParser {
      * @param Lang The prefered language of the representation. Choose among
      * "RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE" and "N3"
      */
-    public static void createNewDataset(int numOfCompounds, int numOfFeatures,
+    public static void createRandomDataset(int numOfCompounds, int numOfFeatures,
             OutputStream out, String Lang) {
         OntModel datasetModel;
         try {
@@ -377,14 +459,17 @@ public class Dataset extends RDFParser {
      * This main method is for testing purposes only and will be removed.
      * @param args
      * @throws Exception
+     * @see Dataset#Dataset(java.net.URI) 
+     * @see Dataset#getWekaDatasetForTraining(java.lang.String, boolean)
+     * @see Dataset#getWekaDatasetForPrediction(java.lang.String)
      */
     public static void main(String[] args) throws IOException, URISyntaxException {
 
-            URI d_set = new URI("http://localhost/X.rdf");
-            Dataset data = new Dataset(d_set);
-            Instances wekaData = data.getWekaDataset("http://sth.com/feature/1", true);
-            System.out.println(wekaData);
 
-        
+        URI d_set = new URI("http://localhost/X.rdf");
+        Dataset data = new Dataset(d_set);
+        Instances wekaData = data.getWekaDatasetForTraining("http://sth.com/feature/10", true);
+        System.out.println(data.errorRep.getText());
+
     }
 }

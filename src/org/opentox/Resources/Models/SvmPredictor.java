@@ -21,8 +21,10 @@ import weka.core.Instances;
 import weka.core.SerializationHelper;
 
 /**
- *
- * @author chung
+ * @author OpenTox - http://www.opentox.org/
+ * @author Sopasakis Pantelis
+ * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class SvmPredictor implements Predictor {
 
@@ -41,7 +43,7 @@ public class SvmPredictor implements Predictor {
             con.addRequestProperty("Accept", "application/rdf+xml");
 
             Dataset wekaData = new Dataset(con.getInputStream());
-            Instances testData = wekaData.getWekaDataset(null, false);
+            Instances testData = wekaData.getWekaDatasetForTraining(null, false);
             Preprocessing.removeStringAtts(testData);
 
             testData.setClass(testData.attribute("http://sth.com/feature/1"));

@@ -1,11 +1,12 @@
 package org.opentox.Resources.Algorithms;
 
 /**
- *
- * @author OpenTox - http://www.opentox.org
+ * Enumeration of all available algorithms on the server. If one needs to extend
+ * the services to support one more algorithm,this is the place to start.
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
- * @author Kolotouros Dimitris
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public enum AlgorithmEnum {
     /**

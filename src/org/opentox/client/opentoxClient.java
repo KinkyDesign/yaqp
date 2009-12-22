@@ -22,7 +22,7 @@ import weka.core.Instances;
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
-public class opentoxClient extends AbstractClient{
+public class opentoxClient implements AbstractClient{
 
     private static final long serialVersionUID = -2394809235191723442L;
 

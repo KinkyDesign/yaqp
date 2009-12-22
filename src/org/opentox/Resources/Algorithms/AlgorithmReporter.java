@@ -1,6 +1,7 @@
 package org.opentox.Resources.Algorithms;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import java.util.List;
 import org.opentox.formatters.AlgorithmYamlFormatter;
 import org.opentox.formatters.AlgorithmXmlFormatter;
 import org.opentox.formatters.AlgorithmRdfFormatter;
@@ -10,15 +11,19 @@ import org.opentox.MediaTypes.OpenToxMediaType;
 import org.opentox.Resources.AbstractResource;
 import org.opentox.ontology.AlgorithmTypes;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.representation.StringRepresentation;
 
 /**
  *
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class AlgorithmReporter extends AbstractAlgorithmReporter {
+
+    private Status internalStatus = Status.SUCCESS_ACCEPTED;
 
     private static ArrayList<String> statisticsSupported(AlgorithmEnum algorithm) {
         ArrayList<String> statisticsSupported = new ArrayList<String>();
@@ -138,4 +143,31 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
         }
         return representation;
     }
+
+
+
+    /**
+     * Suggest a status for the Resource calling the trainer. The status can be
+     * updated only in the following cases:
+     * <ul>
+     * <li>The current status is less than 300, i.e. No errors occured up to the current state</li>
+     * <li>The current status is 4XX and the new status is also
+     * a 4XX or a 5XX status (client or server error).</li>
+     * <li>If the current status is a 5XX (eg 500), it will not be updated</li>
+     * </ul>
+     * @param status The status
+     */
+    public void setInternalStatus(Status status){
+        if ( ((internalStatus.getCode()>=400)&&(internalStatus.getCode()<500)&&status.getCode()>=400)||
+                ((internalStatus.getCode())<300)){
+            this.internalStatus=status;
+        }
+    }
+
+    public Status getInternalStatus(){
+        return this.internalStatus;
+    }
+
+
+
 }

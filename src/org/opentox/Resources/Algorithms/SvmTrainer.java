@@ -3,10 +3,8 @@ package org.opentox.Resources.Algorithms;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,6 +19,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.ServerResource;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SVMreg;
 import weka.classifiers.functions.supportVector.Kernel;
@@ -30,10 +29,11 @@ import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 
 /**
- *
- * @author OpenTox - http://www.opentox.org
+ * Trainer for Support Vector Machine Regression Models.
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class SvmTrainer extends AbstractTrainer {
 
@@ -93,9 +93,8 @@ public class SvmTrainer extends AbstractTrainer {
      * Constructor of the trainer.
      * @param form The posted data.
      */
-    public SvmTrainer(Form form) {
-        super(form);
-        super.form = form;
+    public SvmTrainer(Form form, ServerResource resource) {
+        super(form, resource);
     }
 
     /**
@@ -280,7 +279,7 @@ public class SvmTrainer extends AbstractTrainer {
             dataseturi = new URI(form.getFirstValue("dataset_uri"));            
             Dataset data = new Dataset(dataseturi);
             
-            dataInstances = data.getWekaDataset(null, false);
+            dataInstances = data.getWekaDatasetForTraining(null, false);
 
 
 

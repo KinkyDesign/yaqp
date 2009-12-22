@@ -1,22 +1,9 @@
 package org.opentox.Resources;
 
-import java.util.Collection;
-import java.util.Iterator;
-import org.opentox.util.RepresentationFactory;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.data.ServerInfo;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -25,10 +12,10 @@ import org.restlet.resource.ResourceException;
 /**
  * REST Web Service
  *
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.0 (Last Updated Aug 20, 2009)
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class IndexResource extends AbstractResource {
 

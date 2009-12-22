@@ -24,17 +24,17 @@ import org.restlet.resource.ResourceException;
 
 /**
  * 
- *
+ * This resource, returns a representation of a model and supports the POST operation
+ * for prediction.
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.3 (Last update: Aug 27, 2009)
- * @since 1.1
- *
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class ModelResource extends AbstractResource {
 
     private static final long serialVersionUID = 26047187263491246L;
+    private Status internalStatus = Status.SUCCESS_ACCEPTED;
     private String model_id;
     private AlgorithmEnum algorithm;
 
@@ -57,7 +57,8 @@ public class ModelResource extends AbstractResource {
         variants.add(new Variant(MediaType.APPLICATION_RDF_TURTLE));
         variants.add(new Variant(OpenToxMediaType.TEXT_TRIPLE));
         variants.add(new Variant(OpenToxMediaType.TEXT_N3));
-        // variants.add(new Variant(MediaType.APPLICATION_XML));
+        variants.add(new Variant(MediaType.TEXT_HTML));
+        variants.add(new Variant(MediaType.APPLICATION_XML));
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
         algorithm = ModelsDB.getAlgorithm(model_id);
@@ -70,6 +71,7 @@ public class ModelResource extends AbstractResource {
      */
     @Override
     protected Representation get(Variant variant) {
+        System.out.println(variant.getMediaType());
         ModelFormatter modelFormatter = new ModelFormatter(Integer.parseInt(model_id));
         return modelFormatter.getStringRepresentation(variant.getMediaType());
 
@@ -83,7 +85,7 @@ public class ModelResource extends AbstractResource {
         Form form = new Form(entity);
 
         Predictor predictor = null;
-        switch (algorithm){
+        switch (algorithm) {
             case svc:
                 predictor = new SvcPredictor();
                 break;
@@ -98,8 +100,6 @@ public class ModelResource extends AbstractResource {
 
         return rep;
     }
-
-
 
 
     @Override
@@ -129,6 +129,21 @@ public class ModelResource extends AbstractResource {
                     + "seems to be invalid!");
         }
         return new StringRepresentation(responseText + "\n");
+    }
+
+    public void setInternalStatus(Status status) {
+        if (((internalStatus.getCode() >= 400) && (internalStatus.getCode() < 500) && status.getCode() >= 400)
+                || ((internalStatus.getCode()) < 300)) {
+            this.internalStatus = status;
+        }
+    }
+
+    /**
+     * Returns the status that the trainer suggests.
+     * @return The internal status of the Trainer.
+     */
+    public Status getInternalStatus() {
+        return internalStatus;
     }
 }// End of class
 

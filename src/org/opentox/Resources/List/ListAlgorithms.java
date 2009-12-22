@@ -20,12 +20,12 @@ import org.restlet.resource.ResourceException;
  * URI: /algorithm/<br/>
  * Allowed Methods: GET<br/>
  * Status Codes: 200, 503<br/>
- * Supported Mediatypes: TEXT_URI_LIST
+ * Supported Mediatypes: text/uri-list, text/html
  * </p>
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.1 (Last update: Oct 21, 2009)
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class ListAlgorithms extends AbstractResource {
 

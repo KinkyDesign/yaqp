@@ -34,7 +34,8 @@ public class ModelFormatter extends AbstractModelFormatter {
                 (MediaType.APPLICATION_RDF_XML.equals(mediatype))||
                 (MediaType.APPLICATION_RDF_TURTLE.equals(mediatype))||
                 (OpenToxMediaType.TEXT_TRIPLE.equals(mediatype))||
-                (OpenToxMediaType.TEXT_N3.equals(mediatype))
+                (OpenToxMediaType.TEXT_N3.equals(mediatype))||
+                (MediaType.TEXT_HTML.equals(mediatype))
         ){
             String Lang="RDF/XML";
                     if (MediaType.APPLICATION_RDF_TURTLE.equals(mediatype)){

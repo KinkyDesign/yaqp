@@ -26,7 +26,7 @@ import weka.core.Instances;
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
-public class datasetFox extends Thread {
+public class datasetFox extends Thread implements AbstractClient{
 
     private static final long serialVersionUID = -2854689332253394849L;
 

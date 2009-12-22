@@ -6,10 +6,7 @@ package org.opentox.client;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class AbstractClient {
-
-    private static final long serialVersionUID = 285640017234L;
-
-    
+public interface AbstractClient {
+      
         
 }

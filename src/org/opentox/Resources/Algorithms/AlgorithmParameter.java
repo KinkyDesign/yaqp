@@ -5,9 +5,10 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 /**
  * Algorithm Parameter. An algorithm parameter consists of its name, datatype
  * (according to XSD datatypes classification), its value and its scope.
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class AlgorithmParameter<E> {
 

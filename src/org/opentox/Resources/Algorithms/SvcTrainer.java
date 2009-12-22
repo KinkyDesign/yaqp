@@ -7,8 +7,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentox.Resources.AbstractResource.Directories;
 import org.opentox.Resources.AbstractResource.URIs;
 import org.opentox.database.ModelsDB;
@@ -29,9 +27,10 @@ import weka.core.converters.ArffSaver;
 
 /**
  *
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class SvcTrainer extends AbstractTrainer {
 
@@ -201,11 +200,16 @@ public class SvcTrainer extends AbstractTrainer {
                     }
                 }
             } catch (AssertionError e) {
-                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, e);
+                rep = new StringRepresentation("It seems the dataset you posted is void!\n");
+                setInternalStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             } catch (IOException ex) {
-                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
+                rep = new StringRepresentation("Communications error while trainig an SVC model!\n" +
+                        "Error Details: "+ex+"\n");
+                setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             } catch (Exception ex) {
-                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
+                rep = new StringRepresentation("The traing was terminated unexpectedly\n" +
+                        "Error Details: "+ex+"\n");
+                setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             }
         }
         return rep;
@@ -292,7 +296,7 @@ public class SvcTrainer extends AbstractTrainer {
         try {
             dataseturi = new URI(form.getFirstValue("dataset_uri"));            
             Dataset data = new Dataset(dataseturi);
-            dataInstances = data.getWekaDataset(targetAttribute, true);
+            dataInstances = data.getWekaDatasetForTraining(targetAttribute, true);
 
 
         } catch (URISyntaxException ex) {

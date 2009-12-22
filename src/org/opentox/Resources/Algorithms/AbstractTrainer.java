@@ -1,20 +1,23 @@
 package org.opentox.Resources.Algorithms;
 
 import java.net.URI;
+import org.opentox.Resources.ErrorRepresentation;
+import org.opentox.Resources.ErrorSource;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
 
 
 /**
- *
- * @author OpenTox - http://www.opentox.org
+ * Abstract Algorithm Trainer.
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public abstract class AbstractTrainer {
-
-    protected Status internalStatus = Status.SUCCESS_ACCEPTED;
+public abstract class AbstractTrainer extends ErrorSource{
+    
 
     protected URI targeturi;
 
@@ -22,14 +25,18 @@ public abstract class AbstractTrainer {
 
     protected Form form;
 
+    protected ServerResource resource = null;
+
 
     
     /**
      * Constructor.
      * @param form The set of posted parameters.
+     * @param resource The resource that calls the trainer.
      */
-    public AbstractTrainer(final Form form){
-        this.form=form;
+    public AbstractTrainer(final Form form, final ServerResource resource){
+        this.form = form;
+        this.resource = resource;
     }
 
     /**
@@ -53,35 +60,9 @@ public abstract class AbstractTrainer {
      * @return A null Representation if the posted parameters are consistent,
      * or an Error Message otherwise.
      */
-    public abstract Representation checkParameters();
+    public abstract ErrorRepresentation checkParameters();
 
 
-    /**
-     * Suggest a status for the Resource calling the trainer. The status can be
-     * updated only in the following cases:
-     * <ul>
-     * <li>The current status is less than 300, i.e. No errors occured up to the current state</li>
-     * <li>The current status is 4XX and the new status is also
-     * a 4XX or a 5XX status (client or server error).</li>
-     * <li>If the current status is a 5XX (eg 500), it will not be updated</li>
-     * </ul>
-     * @param status The status
-     */
-    protected void setInternalStatus(Status status){
-        if ( ((internalStatus.getCode()>=400)&&(internalStatus.getCode()<500)&&status.getCode()>=400)||
-                ((internalStatus.getCode())<300)){
-            this.internalStatus=status;
-        }
-    }
-
-
-    /**
-     * Returns the status that the trainer suggests.
-     * @return The internal status of the Trainer.
-     */
-    public Status getInternalStatus() {
-        return internalStatus;
-    }
-
+    
 
 }

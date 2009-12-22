@@ -33,7 +33,9 @@ public abstract class Namespace {
      * TODO: Check if this change (From ModelFactory.createDefaultModel() to
      * this.createModel() solves the issue of validation as OWL-DL...
      */
-    protected static Model m_model = createModel();
+    protected static OntModel m_model = createModel();
+
+
 
     /**
      * Creates an OWL-DL Ontological Model which includes the definition
@@ -48,7 +50,6 @@ public abstract class Namespace {
         prefixesMap.put("owl", OWL.NS);
         prefixesMap.put("dc", DC.NS);
         jenaModel.setNsPrefixes(prefixesMap);
-        
         return jenaModel;
     }
 

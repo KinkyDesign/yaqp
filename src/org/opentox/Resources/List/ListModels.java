@@ -16,10 +16,10 @@ import org.restlet.resource.ResourceException;
 /**
  * Lists all classificantion and regression models - returns a text/uri-list
  * representation for that list.
- * @author OpenTox Team, http://www.opentox.org/
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.1 (Last update: Aug 27, 2009)
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class ListModels extends AbstractResource {
 

@@ -20,9 +20,10 @@ import org.restlet.resource.ResourceException;
 
 /**
  *
- * @author OpenTox - http://www.opentox.org
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class Algorithm extends AbstractResource {
 
@@ -131,19 +132,16 @@ public class Algorithm extends AbstractResource {
 
         switch (algorithm) {
             case mlr:
-                trainer = new MlrTrainer(new Form(entity));
+                trainer = new MlrTrainer(new Form(entity), this);
                 representation = trainer.train();
-                status = trainer.getInternalStatus();
                 break;
             case svm:
-                trainer = new SvmTrainer(new Form(entity));
+                trainer = new SvmTrainer(new Form(entity), this);
                 representation = trainer.train();
-                status = trainer.getInternalStatus();
                 break;
             case svc:
                 trainer = new SvcTrainer(new Form(entity));
                 representation = trainer.train();
-                status = trainer.getInternalStatus();
                 break;
             default:
                 representation = new StringRepresentation("Unknown Algorithm (404)!\n",
@@ -151,8 +149,7 @@ public class Algorithm extends AbstractResource {
                 status = Status.CLIENT_ERROR_NOT_FOUND;
         }
 
-
-        getResponse().setStatus(status);
+        getResponse().setStatus(trainer.errorRep.getStatus());
         return representation;
     }
 }

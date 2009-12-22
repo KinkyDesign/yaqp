@@ -22,7 +22,6 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
 import org.opentox.database.Priviledges;
-import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.routing.Router;
@@ -54,11 +53,10 @@ import org.restlet.security.Verifier;
  *  along with this program.  If not, see <a href=http://www.gnu.org/licenses/>http://www.gnu.org/licenses/</a>.
  *  </p>
  *
- * @author OpenTox Team - http://www.opentox.org/
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.4 (Last Update: Aug 27, 2009)
- *
+ * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class OpenToxApplication extends Application {
 
@@ -109,10 +107,10 @@ public class OpenToxApplication extends Application {
                     return super.authorize(request, response);                
             }
         };
+
         authorizer.getAuthenticatedMethods().add(Method.DELETE);
         authorizer.getAuthenticatedMethods().add(Method.GET);
-        authorizer.getAuthenticatedMethods().add(Method.POST);
-        
+        authorizer.getAuthenticatedMethods().add(Method.POST);        
 
                 
         // Create a Guard
@@ -212,8 +210,8 @@ public class OpenToxApplication extends Application {
         router.attach("/algorithm/{id}", Algorithm.class);
 
         router.attach("/model", ListModels.class);
-        router.attach("/model/{model_id}", modelKerberos);
-        // The deletion of models is guarded!!!
+        router.attach("/model/{model_id}", modelKerberos);  // The deletion of models is guarded!!!
+
         router.attach("/model/{model_id}/{info}", ModelInfoResource.class);
 
 

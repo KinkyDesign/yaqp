@@ -24,6 +24,10 @@ public class InHouseDB implements DataBaseAccess {
     
 
     private static Driver myDriver = null;
+
+    /**
+     * Static Connection to the databse.
+     */
     protected static Connection connection = null;
 
     /**

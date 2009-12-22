@@ -5,32 +5,34 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opentox.Resources.ErrorSource;
+import org.opentox.Resources.ErrorRepresentation;
 import org.restlet.data.Status;
+import org.restlet.resource.ServerResource;
 
 /**
  *
  * @author Sopasakis Pantelis
  */
-public abstract class RDFParser {
+public abstract class RDFParser extends ErrorSource{
 
     private static final long serialVersionUID = 6602541954910338287L;
-
-
+    
     /**
      * The Jena Ontological Model used to read/write/modify
      * an RDF document.
      */
     public OntModel jenaModel;
-
-    public Status internalStatus = Status.SUCCESS_OK;
+    
 
     /**
      * Void constructor - to be handled by subclasses.
      */
-    public RDFParser(){
-
+    public RDFParser() {
     }
 
     /**
@@ -44,7 +46,7 @@ public abstract class RDFParser {
             jenaModel.read(in, null);
         } catch (Exception ex) {
             Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
-            internalStatus = Status.SERVER_ERROR_INTERNAL;
+            errorRep.append(ex, "Severe Error while reading from input stream!", Status.SERVER_ERROR_INTERNAL);
         }
     }
 
@@ -74,8 +76,7 @@ public abstract class RDFParser {
         return jenaModel;
     }
 
-
-
+    
 }
 
 

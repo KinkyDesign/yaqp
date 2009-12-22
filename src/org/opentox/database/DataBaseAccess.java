@@ -7,6 +7,7 @@ import java.lang.annotation.Inherited;
  * @author Sopasakis Pantelis
  */
 public interface DataBaseAccess {
+    
     final static String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
     final static String DATABASENAME = "modelsDb";
     final static String DB_URL = "jdbc:derby:" + DATABASENAME;
