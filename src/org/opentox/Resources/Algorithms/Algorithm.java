@@ -1,5 +1,8 @@
 package org.opentox.Resources.Algorithms;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.restlet.data.Reference;
 import org.restlet.data.ReferenceList;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StreamRepresentation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
@@ -124,11 +128,11 @@ public class Algorithm extends AbstractResource {
     protected Representation post(Representation entity)
             throws ResourceException {
 
+        
         Representation representation = null;
         Status status = Status.SUCCESS_ACCEPTED;
 
-        AbstractTrainer trainer = null;
-        
+        AbstractTrainer trainer = null;        
         
 
 

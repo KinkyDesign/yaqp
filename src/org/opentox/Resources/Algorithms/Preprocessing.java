@@ -49,13 +49,5 @@ public class Preprocessing {
         }
     }
 
-    public static void main(String[] a) throws FileNotFoundException, IOException, Exception{
-        Instances mydata = new Instances(
-                new BufferedReader(
-                new FileReader(System.getProperty("user.home")+"/Documents/RESTfulWebServices/uploads/data/arff/dataSet-8")));
-        mydata.setClassIndex(10);
-        removeStringAtts(mydata);
-        mydata = scale(mydata);
-        System.out.println(mydata);
-    }
+    
 }

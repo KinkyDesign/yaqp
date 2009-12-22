@@ -3,7 +3,7 @@ package org.opentox.ontology;
 import com.hp.hpl.jena.rdf.model.*;
 
 /**
- *
+ * Namespaces used in this project.
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
@@ -11,7 +11,6 @@ import com.hp.hpl.jena.rdf.model.*;
 public class OT extends Namespace {
 
     private static final long serialVersionUID = 8498366532297574L;
-
 
     public static class Class extends Namespace.Class {
 

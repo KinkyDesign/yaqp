@@ -15,6 +15,7 @@ import org.opentox.Resources.List.ListModels;
 import org.opentox.Resources.List.ListAlgorithms;
 import org.opentox.Resources.IndexResource;
 import org.opentox.Resources.Models.ModelInfoResource;
+import org.opentox.Resources.TestResource;
 import org.opentox.database.CredentialsVerifier;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -213,6 +214,8 @@ public class OpenToxApplication extends Application {
         router.attach("/model/{model_id}", modelKerberos);  // The deletion of models is guarded!!!
 
         router.attach("/model/{model_id}/{info}", ModelInfoResource.class);
+
+        router.attach("/test", TestResource.class);
 
 
         return router;

@@ -57,7 +57,7 @@ public class MlrTrainer extends AbstractTrainer {
 
         errorRep = (ErrorRepresentation) checkParameters();
 
-        if (errorRep.errorLevel() > 0) {
+        if (errorRep.getErrorLevel() > 0) {
             representation = errorRep;
         } else {
 
@@ -100,7 +100,7 @@ public class MlrTrainer extends AbstractTrainer {
 
 
                 // return the URI of generated model:
-                if (model.errorRep.errorLevel() == 0) {
+                if (model.errorRep.getErrorLevel() == 0) {
 
                     representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
                             + ModelsDB.registerNewModel(
@@ -113,7 +113,7 @@ public class MlrTrainer extends AbstractTrainer {
                 errorRep.append(ex, "Probably this exception is thrown "
                         + "because the dataset or target uri you provided is not valid or some other internal "
                         + "server error happened! Please verify that the target uri you specified is an " +
-                        "attribute of the dataset and is not of type 'string'!", Status.SERVER_ERROR_INTERNAL);
+                        "attribute of the dataset and is not of type 'string'!", Status.CLIENT_ERROR_BAD_REQUEST);
             } catch (Exception ex) {
                 OpenToxApplication.opentoxLogger.severe(ex.toString());
                 errorRep.append(ex, "Severe Error while trying to build an MLR model.", Status.SERVER_ERROR_INTERNAL);
@@ -129,7 +129,7 @@ public class MlrTrainer extends AbstractTrainer {
         }
 
 
-        return errorRep.errorLevel() == 0 ? representation : errorRep;
+        return errorRep.getErrorLevel() == 0 ? representation : errorRep;
     }
 
     /**
@@ -165,6 +165,9 @@ public class MlrTrainer extends AbstractTrainer {
         } catch (IllegalArgumentException ex){
             errorDetails = "The client did not post a valid URI for the dataset";
             errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+        } catch (NullPointerException ex){
+            errorDetails = "It seems you forgot to post the dataset_uri parameter!";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
 
 
@@ -181,6 +184,12 @@ public class MlrTrainer extends AbstractTrainer {
         } catch (URISyntaxException ex) {
             errorDetails = "[Wrong Posted Parameter ]: The client did"
                     + " not post a valid URI for the target feature";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+        } catch (IllegalArgumentException ex){
+            errorDetails = "The client did not post a valid URI for the target";
+            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+        } catch (NullPointerException ex){
+            errorDetails = "It seems you forgot to post the target parameter!";
             errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
         }
 

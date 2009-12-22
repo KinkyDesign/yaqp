@@ -18,10 +18,13 @@ import org.restlet.data.Status;
 import weka.core.Instances;
 
 /**
- *
+ * This class is used to parse and generate RDF representations of Models.
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
+ * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 23, 2009)
  */
-public class Model extends RDFParser {
+public class Model extends RDFHandler {
 
     private static final long serialVersionUID = -4754250023818796913L;
 
@@ -53,8 +56,7 @@ public class Model extends RDFParser {
      * @return
      */
     private String getPredictedFeatureUri(String featureService) {
-
-        return null;
+        throw new UnsupportedOperationException("Not Supported yet!");
     }
 
     /**

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.StreamRepresentation;
 
 /**
@@ -19,9 +20,9 @@ import org.restlet.representation.StreamRepresentation;
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.3.3 (Last update: Dec 20, 2009)
+ * @version 1.3.3 (Last update: Dec 24, 2009)
  */
-public class ErrorRepresentation extends StreamRepresentation {
+public class ErrorRepresentation extends OutputRepresentation {
 
 
     /**
@@ -38,11 +39,22 @@ public class ErrorRepresentation extends StreamRepresentation {
 
 
 
+    /**
+     * Constructor for a new ErrorRepresentation. Sets the MediaType of the
+     * representation to text/plain.
+     */
     public ErrorRepresentation() {
         super(MediaType.TEXT_PLAIN);
     }
 
-    
+
+    /**
+     * Constructs a new ErrorRepresentation, given a set of Trowable-Explanation
+     * pairs, materialized by a {@link Map } and a {@link Status } characterization
+     * of the Representation, i.e. the status that fits this representation.
+     * @param map Map of Explanatory Messages to Error Causes (Throwables)
+     * @param status The corresponding status .
+     */
     public ErrorRepresentation(
             Map<String, Throwable> map,
             Status status) {
@@ -51,6 +63,17 @@ public class ErrorRepresentation extends StreamRepresentation {
         updateStatus(status);
     }
 
+
+    /**
+     * Constructs a new ErrorRepresentation given a {@link Throwable } - the error
+     * or exception - a {@link Status } and an explanatory message that contains
+     * instructions to the client such as if it is recommended that the client
+     * repeats the same request etc.
+     * @param throwable The cause of the error/exception.
+     * @param message An explanatory message that the client shall receive along with
+     * the ErrorRepresentation.
+     * @param status The corresponding status that accompanies the ErrorRepresentation.
+     */
     public ErrorRepresentation(
             Throwable throwable,
             String message,
@@ -65,8 +88,8 @@ public class ErrorRepresentation extends StreamRepresentation {
     /**
      * Concatenates two Error Representations by mixing together their explanatory
      * messages and their lists of Throwables.
-     * @param other
-     * @return
+     * @param other Some other error representation.
+     * @return The ErrorRepresentation that occurs from this concatenation.
      */
     public ErrorRepresentation append(ErrorRepresentation other) {
         ErrorRepresentation rep = this;
@@ -76,6 +99,16 @@ public class ErrorRepresentation extends StreamRepresentation {
     }
 
 
+    /**
+     * Adds a {@link Throwable } and an explanatory message for it to the current
+     * ErrorRepresentation. The status of the new ErrorRepresentation comes up as
+     * a function of the current status and the new one accoriding to the method
+     * {@link ErrorRepresentation#updateStatus(org.restlet.data.Status) }.
+     * @param throwable The new throwable to be added.
+     * @param message An explanatory message for the error.
+     * @param status The new status.
+     * @return The produced ErrorRepresentation.
+     */
     public ErrorRepresentation append(Throwable throwable, String message, Status status){
         this.append(new ErrorRepresentation(throwable, message, status));
         return this;
@@ -85,7 +118,7 @@ public class ErrorRepresentation extends StreamRepresentation {
      * The Error Level is defined to be the number of Error or exception in this
      * object.
      */
-    public int errorLevel(){
+    public int getErrorLevel(){
         return map.size();
     }
     
@@ -104,17 +137,20 @@ public class ErrorRepresentation extends StreamRepresentation {
      * updated only in the following cases:
      * <ul>
      * <li>The current status is less than 300, i.e. No errors occured up to the current state</li>
-     * <li>The current status is 4XX and the new status is also
+     * <li>The new status is 4XX and the current status is also
      * a 4XX or a 5XX status (client or server error).</li>
      * <li>If the current status is a 5XX (eg 500), it will not be updated</li>
+     * <li>If the new Status is 502</li>
      * </ul>
-     * @param newStatus
-     * @return
+     * @param newStatus The new status.
+     * @return The new ErrorRepresentation
+     * @see ErrorRepresentation#getStatus()
      */
     public ErrorRepresentation updateStatus(Status newStatus){
         if (
                 (this.internalStatus.getCode()<300) ||
-                ((newStatus.getCode()>=400)&&(newStatus.getCode()<500)&&internalStatus.getCode()>=400)
+                ((newStatus.getCode()>=400)&&(newStatus.getCode()<500)&&internalStatus.getCode()>=400)||
+                (newStatus.getCode()==502)
                 )
            {
             this.internalStatus = newStatus;
@@ -122,6 +158,12 @@ public class ErrorRepresentation extends StreamRepresentation {
         return this;
     }
 
+
+    /**
+     * Returns the status that accompanies the ErrorRepresentaiton.
+     * @return The status or the ErrorRepresentation.
+     * @see ErrorRepresentation#updateStatus(org.restlet.data.Status)
+     */
     public Status getStatus(){
         return this.internalStatus;
     }
@@ -145,7 +187,7 @@ public class ErrorRepresentation extends StreamRepresentation {
                 outputMessage = outputMessage + ("Explanation: "+e.getKey()+"\n");
                 outputMessage = outputMessage + ("For debugging reasons we provide a brief list of the exceptions: \n");
                 StackTraceElement[] ste = e.getValue().getStackTrace();
-                for (int j=0;j<4;j++){
+                for (int j=0;j<Math.min(4, ste.length);j++){
                     outputMessage = outputMessage + "- " +ste[j].toString()+"\n";
                 }
                 outputMessage = outputMessage + "\n\n";

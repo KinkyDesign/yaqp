@@ -14,6 +14,7 @@ import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -27,7 +28,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.opentox.Resources.ErrorRepresentation;
 import org.restlet.data.Status;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -39,7 +39,7 @@ import weka.filters.unsupervised.attribute.NumericToNominal;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class Dataset extends RDFParser {
+public class Dataset extends RDFHandler {
 
     private static final long serialVersionUID = -920482801546239926L;
 
@@ -74,25 +74,20 @@ public class Dataset extends RDFParser {
             jenaModel = OT.createModel();
             jenaModel.read(con.getInputStream(), null);
         } catch (MalformedURLException ex){
-            System.out.println("X1");
              errorRep.append(ex, "The dataset_uri cannot be cast as a valid URL!", Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (IllegalArgumentException ex){
-            System.out.println("X2");
             errorRep.append(ex, "Check the dataset URI you posted !", Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (SecurityException ex) {
-            System.out.println("X3");
             errorRep.append(ex, "A security exception occured! It is possible that a resource" +
                     "requires user authentication.", Status.SERVER_ERROR_INTERNAL);
         } catch (IllegalStateException ex) {
-            System.out.println("X4");
             errorRep.append(ex, "HTTP connection cannot be configured correctly!",
                     Status.SERVER_ERROR_INTERNAL);
+        } catch (FileNotFoundException ex){
+            errorRep.append(ex, "The requested dataset resource could not be found!", Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (IOException ex) {
-            System.out.println("X5");
-            errorRep.append(ex, "Input/Output Error while trying to open a connection.\n"
-                    + "Seems to be a network connection problem!", Status.SERVER_ERROR_INTERNAL);
+            errorRep.append(ex, "Input/Output Error while trying to open a connection!", Status.SERVER_ERROR_INTERNAL);
         } catch (Exception ex) {
-            System.out.println("X6");
             errorRep.append(ex, "The dataset uri you provided seems that does not correspond to an existing resource!",
                     Status.CLIENT_ERROR_BAD_REQUEST);
             Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
@@ -175,7 +170,7 @@ public class Dataset extends RDFParser {
          * Check if some error occured while constructing the
          * Dataset object.
          */
-        if (errorRep.errorLevel()>0){
+        if (errorRep.getErrorLevel()>0){
             throw new Exception();
         }
         
