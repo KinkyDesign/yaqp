@@ -1,39 +1,42 @@
-==================================================================================
+============================================================================================
 YAQP - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
 Copyright 2009 - Yet Antother Qsar Project
-http://opentox.ntua.gr:3000/
-==================================================================================
+http://opentox.ntua.gr:3000
+============================================================================================
 
 This Project is under development!
 
-This is the version 1.3.2 (pre-alpha) of the web service yaqp 
+This is the version 1.3.3 (pre-alpha) of the web service yaqp 
 (yet another qsar project) and brings the following features:
 
 - 100% Restful Architecture of services.
 - Services based on the RDF format for data exchange between different servers
   which is a W3C recommendation.
+- All RDF documents are compliant with OWL-DL ( http://www.mygrid.org.uk/OWL/Validator )
 
 We put effort so that our services be compliant with the OpenTox specifications 
 according to the API 1.1.
 
 
 
-==================================================================================
+============================================================================================
 Summary
-==================================================================================
+============================================================================================
 Project Name      : YAQP (under OpenTox)
 Programming Lang. : Java
 Project Type      : Restful WebServices
 Developed by      : Sopasakis Pantelis
                     Kolotouros Dimitris
-Home Page         : http://opentox.ntua.gr/
+Home Page         : https://opentox.ntua.gr
+Documentation     : https://opentox.ntua.gr/index.php?p=guide
+                    http://opentox.org/dev/testing/testtoxservices
 Licence           : GNU General Public Licence, version 3.0
 Services Running  @ http://opentox.ntua.gr:3000
 
 
 This project (YAQP) is developed under OpenTox (http://opentox.org) 
 to serve as a web service for QSAR model training and validation. 
-The service runs at http://opentox.ntua.gr:3000/ as a standalone application, 
+The service runs at http://opentox.ntua.gr:3000 as a standalone application, 
 but you can also download and compile the source code and run it locally. 
 
 
@@ -41,9 +44,9 @@ Enjoy YAQP !
 
 
 
-==================================================================================
+============================================================================================
 ONLINE WEB SERVICES
-==================================================================================
+============================================================================================
 
 A server has been set up that supports the services at http://opentox.ntua.gr:3000/
 You can use the well known program cURL to consume these services. If cURL is not 
@@ -51,14 +54,17 @@ installed on your system, install it typing:
 
 sudo apt-get install curl
 
-Find a complete guide for usign curl at http://opentox.ntua.gr/guide. Feel free
-to contact us via email at chvng[at]mail[dot]ntua[dot]gr.
+Find a complete guide for usign curl at https://opentox.ntua.gr/index.php?p=guide. Feel free
+to contact us via email at chvng[at]mail[dot]ntua[dot]gr. 
+
+A clone of this repository is also available at https://opentox.ntua.gr/git/yaqp.git. 
+Download the latest version of the source code 
 
 
 
-==================================================================================
+============================================================================================
 Compilation
-==================================================================================
+============================================================================================
 
 You can download and compile the source code on your local machine. The libraries 
 you need are listed below:
@@ -78,6 +84,6 @@ you need are listed below:
 
 
 
-Copyright 2009 - YAQP (part of OpenTox - http://www.opentox.org)
+Copyright 2009 - YAQP ( part of OpenTox - http://www.opentox.org )
 This project is licensed under the GNU General Public Licence v.3 
 
