@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentox.MediaTypes.OpenToxMediaType;
+import org.opentox.media.OpenToxMediaType;
 import org.restlet.data.MediaType;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;

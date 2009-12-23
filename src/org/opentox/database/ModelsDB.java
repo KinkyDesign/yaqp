@@ -3,8 +3,8 @@ package org.opentox.database;
 import java.sql.*;
 import java.util.logging.Level;
 import org.restlet.data.ReferenceList;
-import org.opentox.Applications.OpenToxApplication;
-import org.opentox.Resources.Algorithms.AlgorithmEnum;
+import org.opentox.OpenToxApplication;
+import org.opentox.algorithm.AlgorithmEnum;
 
 /**
  *
@@ -139,7 +139,7 @@ public class ModelsDB extends InHouseDB {
     @Registration
     public static int registerNewModel(String AlgID) {
         int id = getModelsStack() + 1;
-        String uri = org.opentox.Resources.AbstractResource.baseURI + "/model/" + id;
+        String uri = org.opentox.resource.AbstractResource.baseURI + "/model/" + id;
         String CreateValue = "INSERT INTO " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
         Statement stmt;
         try {

@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import weka.core.Instances;
 import java.io.BufferedWriter;
-import org.opentox.Resources.Algorithms.Preprocessing;
+import org.opentox.algorithm.dataprocessing.DataCleanUp;
 /**
 *
 * @author OpenTox - http://www.opentox.org

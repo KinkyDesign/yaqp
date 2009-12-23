@@ -3,7 +3,7 @@ package org.opentox.database;
 
 import java.sql.*;
 import java.util.logging.Level;
-import org.opentox.Applications.OpenToxApplication;
+import org.opentox.OpenToxApplication;
 
 
 /**

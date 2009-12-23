@@ -1,10 +1,11 @@
 
 package org.opentox.formatters;
 
+import org.opentox.algorithm.AlgorithmMetaInf;
 import org.opentox.Resources.Algorithms.*;
 import org.opentox.formatters.AbstractAlgorithmFormatter;
 import java.util.ArrayList;
-import org.opentox.MediaTypes.OpenToxMediaType;
+import org.opentox.media.OpenToxMediaType;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
