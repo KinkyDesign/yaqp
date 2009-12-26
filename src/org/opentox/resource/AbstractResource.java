@@ -195,7 +195,7 @@ public abstract class AbstractResource extends ServerResource {
      * <code>
      * Set&lt;String&gt; ClassificationIdsSet= getAlgorithmIdsAsMap().get("classification");<br/>
      * </code>
-     * @return
+     * @return All algorithms as a map.
      */
     protected Map<String, Set<String>> getAlgorithmIdsAsMap() {
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();

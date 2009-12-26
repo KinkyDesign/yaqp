@@ -40,7 +40,7 @@ public class datasetFox extends Thread implements AbstractClient{
     /**
      * Once a datasetFox object is created, it is examined whether the server is alive
      * and the dataset is valid. Otherwise an exception is thrown.
-     * @param serverURL the URL of the server including the port. The base URL of
+     * @param serverURI the URL of the server including the port. The base URL of
      * the server, e.g. "http://ambit.uni-plovdiv.bg:8080/ambit2"
      * @param id the id of the dataset
      */

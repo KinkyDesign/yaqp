@@ -58,7 +58,7 @@ public final class Priviledges implements AuthorizationHierarchy{
     /**
      * Returns the identifier of a Priviledge. e.g. Priviledges.ADMIN.getLevel() returns
      * the String "user/admin"
-     * @return
+     * @return the error level.
      */
     public String getLevel(){
         return level;
@@ -72,7 +72,7 @@ public final class Priviledges implements AuthorizationHierarchy{
      * Return 0 if the two Priviledges are equal and -1 else. The method returns
      * -2 if no decission is taken...
      * @param other
-     * @return
+     * @return integer used for the comparison.
      */
     @Override
     public int compareTo(AuthorizationHierarchy other) {

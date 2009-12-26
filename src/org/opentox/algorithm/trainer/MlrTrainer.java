@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.OpenToxApplication;
@@ -48,8 +50,9 @@ public class MlrTrainer extends AbstractTrainer {
     }
 
     /**
-     * Returns
-     * @return
+     * Returns an ErrorRepresentation if something goes wrong or a StringRepresentation
+     * with the URI of the created model, if the model is successfully created.
+     * @return representation of the training result.
      */
     @Override
     public synchronized Representation train() {
@@ -92,7 +95,6 @@ public class MlrTrainer extends AbstractTrainer {
                 /**
                  * Store the model as RDF...
                  */
-                
                 model.createModel(Integer.toString(model_id),
                         dataseturi.toString(),
                         targeturi.toString(),
@@ -109,14 +111,14 @@ public class MlrTrainer extends AbstractTrainer {
                             + ModelsDB.registerNewModel(
                             AbstractResource.URIs.mlrAlgorithmURI) + "\n");
 
-                }                
+                }
 
             } catch (NullPointerException ex) {
                 OpenToxApplication.opentoxLogger.severe(ex.toString());
                 errorRep.append(ex, "Probably this exception is thrown "
                         + "because the dataset or target uri you provided is not valid or some other internal "
-                        + "server error happened! Please verify that the target uri you specified is an " +
-                        "attribute of the dataset and is not of type 'string'!", Status.CLIENT_ERROR_BAD_REQUEST);
+                        + "server error happened! Please verify that the target uri you specified is an "
+                        + "attribute of the dataset and is not of type 'string'!", Status.CLIENT_ERROR_BAD_REQUEST);
             } catch (Exception ex) {
                 OpenToxApplication.opentoxLogger.severe(ex.toString());
                 errorRep.append(ex, "Severe Error while trying to build an MLR model.", Status.SERVER_ERROR_INTERNAL);
@@ -125,7 +127,7 @@ public class MlrTrainer extends AbstractTrainer {
                 errorRep.append(thr, "An unexpected exception or error was thrown while "
                         + "training an MLR model. Please contact the system admnistrator for further information!",
                         Status.SERVER_ERROR_INTERNAL);
-            }finally{
+            } finally {
                 errorRep.append(model.errorRep);
                 errorRep.append(dataset.errorRep);
             }
@@ -142,62 +144,87 @@ public class MlrTrainer extends AbstractTrainer {
      */
     @Override
     public ErrorRepresentation checkParameters() {
-        Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
-        String errorDetails = "";
+        final Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
 
 
         /**
          * Check the dataset_uri parameter.........
          */
-        try {
-            dataseturi = new URI(form.getFirstValue("dataset_uri"));            
-            dataseturi.toURL();
-            if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))){
-                errorRep.append(new Exception(), "The dataset uri that client provided " +
-                        "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
-            }
-        } catch (MalformedURLException ex) {
-            errorDetails = "The client did not post a valid URI for the dataset";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (URISyntaxException ex) {
-            errorDetails = "The client did not post a valid URI for the dataset";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (IllegalArgumentException ex){
-            errorDetails = "The client did not post a valid URI for the dataset";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (NullPointerException ex){
-            errorDetails = "It seems you forgot to post the dataset_uri parameter!";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        }
+        Thread check1 = new Thread() {
 
+            @Override
+            public void run() {
+                String errorDetails = "";
+                try {
+                    dataseturi = new URI(form.getFirstValue("dataset_uri"));
+                    dataseturi.toURL();
+                    if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
+                        errorRep.append(new Exception(), "The dataset uri that client provided "
+                                + "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
+                    }
+                } catch (MalformedURLException ex) {
+                    errorDetails = "The client did not post a valid URI for the dataset";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                } catch (URISyntaxException ex) {
+                    errorDetails = "The client did not post a valid URI for the dataset";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                } catch (IllegalArgumentException ex) {
+                    errorDetails = "The client did not post a valid URI for the dataset";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                } catch (NullPointerException ex) {
+                    errorDetails = "It seems you forgot to post the dataset_uri parameter!";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                }
+
+            }
+        };
 
         /**
          * Check the target parameter.........
          */
-        try {
-            targeturi = new URI(form.getFirstValue("target"));
-            targeturi.toURL();
-        } catch (MalformedURLException ex) {
-            errorDetails = "[Wrong Posted Parameter ]: The client did"
-                    + " not post a valid URI for the target feature";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (URISyntaxException ex) {
-            errorDetails = "[Wrong Posted Parameter ]: The client did"
-                    + " not post a valid URI for the target feature";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (IllegalArgumentException ex){
-            errorDetails = "The client did not post a valid URI for the target";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (NullPointerException ex){
-            errorDetails = "It seems you forgot to post the target parameter!";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+        Thread check2 = new Thread() {
+
+            @Override
+            public void run() {
+                String errorDetails;
+                try {
+                    targeturi = new URI(form.getFirstValue("target"));
+                    targeturi.toURL();
+                } catch (MalformedURLException ex) {
+                    errorDetails = "[Wrong Posted Parameter ]: The client did"
+                            + " not post a valid URI for the target feature";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                } catch (URISyntaxException ex) {
+                    errorDetails = "[Wrong Posted Parameter ]: The client did"
+                            + " not post a valid URI for the target feature";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                } catch (IllegalArgumentException ex) {
+                    errorDetails = "The client did not post a valid URI for the target";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                } catch (NullPointerException ex) {
+                    errorDetails = "It seems you forgot to post the target parameter!";
+                    errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
+                }
+
+            }
+        };
+
+
+        ExecutorService checker = Executors.newFixedThreadPool(2);
+        checker.execute(check1);
+        checker.execute(check2);
+        checker.shutdown();
+
+         /**
+         * Wait until all checks are terminated!
+         */
+        while (!checker.isTerminated()){
+            // just wait!
         }
 
         return errorRep;
     }
 
-
-    
     /**
      * Generates the PMML representation of the model and stores in the hard
      * disk.

@@ -152,7 +152,7 @@ public class Algorithm extends AbstractResource {
                 representation = trainer.train();
                 break;
             case svc:
-                trainer = new SvcTrainer(new Form(entity));
+                trainer = new SvcTrainer(new Form(entity), this);
                 representation = trainer.train();
                 break;
             default:

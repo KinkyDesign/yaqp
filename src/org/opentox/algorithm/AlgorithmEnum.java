@@ -41,7 +41,7 @@ public enum AlgorithmEnum {
 
     /**
      * Returns the name of the algorithm.
-     * @return
+     * @return the formal name of the algorithm.
      */
     public String getAlgorithmName(){
         return name;
@@ -51,9 +51,9 @@ public enum AlgorithmEnum {
     /**
      * Returns the AlgorithmEnum enumeration element which has a certain name.
      * If the given name does not correspond to a registered algorithm, it returns
-     * {@link org.opentox.Resources.Algorithms.AlgorithmEnum#UNKNOWN }
-     * @param name
-     * @return
+     * {@link AlgorithmEnum#unknown }
+     * @param name Name of an algorithm (case sensitive)
+     * @return the AlgorithmEnum object for the given name.
      */
     public static AlgorithmEnum getAlgorithmEnum(String name){
         try{

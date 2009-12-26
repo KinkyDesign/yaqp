@@ -1,7 +1,6 @@
 package org.opentox.formatters;
 
 import org.opentox.algorithm.AlgorithmMetaInf;
-import org.opentox.Resources.Algorithms.*;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
@@ -23,7 +22,8 @@ public abstract class AbstractAlgorithmFormatter implements Formatter{
 
     /**
      * Returns the Corresponding Representation.
-     * @return
+     * @return representation in proper media type.
      */
     public abstract StringRepresentation getStringRepresentation(MediaType mediatype);
+    
 }

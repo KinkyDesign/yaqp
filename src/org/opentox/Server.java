@@ -6,6 +6,7 @@ import org.opentox.resource.AbstractResource;
 import org.restlet.Application;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
+import org.restlet.service.LogService;
 
 /**
  * The Server that runs the services.
@@ -20,6 +21,11 @@ public class Server {
 
         // Create a component
         Component component = new Component();
+
+        // Configure the logging service:
+        LogService myLog = new LogService(true);
+        myLog.setLoggerName("org.opentox");
+        component.setLogService(myLog);
 
         component.getServers().add(Protocol.HTTP, Integer.parseInt(AbstractResource.port));
 

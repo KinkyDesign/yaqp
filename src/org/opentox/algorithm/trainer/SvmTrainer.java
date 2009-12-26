@@ -10,6 +10,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.resource.AbstractResource.Directories;
@@ -105,7 +107,7 @@ public class SvmTrainer extends AbstractTrainer {
      * Trains a new SVM model.
      * Stores a serialized version of the weka model and produces an RDF
      * representation which is also stored in a file.
-     * @return
+     * @return representation of training result.
      */
     @Override
     public Representation train() {
@@ -208,8 +210,9 @@ public class SvmTrainer extends AbstractTrainer {
                                 + ModelsDB.registerNewModel(URIs.svmAlgorithmURI) + "\n");
                     }
                 }
-            } catch (AssertionError e) {
-                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, e);
+            } catch (AssertionError ex) {
+                errorRep.append(ex, "Dataset id empty!", Status.CLIENT_ERROR_BAD_REQUEST);
+                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
             } catch (Exception ex) {
@@ -225,13 +228,14 @@ public class SvmTrainer extends AbstractTrainer {
      * Check the consistency of the POSTed svm parameters and assign default
      * values to the parameters that where not posted. The dataInstances are
      * updated according to the dataset uri.
-     * @return
+     * @return representation of the errors that might occur during parameter
+     * checking.
      */
     @Override
     public ErrorRepresentation checkParameters() {
         // Some initial definitions:
-        Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
-        String errorDetails = "";
+        final Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
+
 
         /**
          * Assign default values to the parameters that where not
@@ -275,200 +279,272 @@ public class SvmTrainer extends AbstractTrainer {
         /**
          * Check the dataset_uri parameter.........
          */
-        try {
-            dataseturi = new URI(form.getFirstValue("dataset_uri"));
-            dataseturi.toURL();
-            if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
-                errorRep.append(new Exception(), "The dataset uri that client provided "
-                        + "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
+        Thread check1 = new Thread() {
+
+            @Override
+            public void run() {
+                
+                String message = "";
+                try {
+                    dataseturi = new URI(form.getFirstValue("dataset_uri"));
+                    dataseturi.toURL();
+                    if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
+                        errorRep.append(new Exception(), "The dataset uri that client provided "
+                                + "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
+                    }
+                } catch (MalformedURLException ex) {
+                    message = "The client did not post a valid URI for the dataset";
+                    errorRep.append(ex, message, clientPostedWrongParametersStatus);
+                } catch (URISyntaxException ex) {
+                    message = "The client did not post a valid URI for the dataset";
+                    errorRep.append(ex, message, clientPostedWrongParametersStatus);
+                } catch (IllegalArgumentException ex) {
+                    message = "The client did not post a valid URI for the dataset";
+                    errorRep.append(ex, message, clientPostedWrongParametersStatus);
+                }
+
+
+                
+
+                /**
+                 * Check the target parameter.........
+                 */
+                try {
+                    targeturi = new URI(form.getFirstValue("target"));
+                    targeturi.toURL();
+                    targetAttribute = targeturi.toString();
+                } catch (MalformedURLException ex) {
+                    message = "[Wrong Posted Parameter ]: The client did"
+                            + " not post a valid URI for the target feature";
+                    errorRep.append(ex, message, clientPostedWrongParametersStatus);
+                } catch (URISyntaxException ex) {
+                    message = "[Wrong Posted Parameter ]: The client did"
+                            + " not post a valid URI for the target feature";
+                    errorRep.append(ex, message, clientPostedWrongParametersStatus);
+                }
+
+
+                /**
+                 * Parse the dataset
+                 */
+                Dataset dataset = new Dataset(dataseturi);
+                errorRep.append(dataset.errorRep);
+                try {
+                    dataInstances = dataset.getWekaDatasetForTraining(null, false);
+                    /**
+                     * If the data were successfully parsed, try to set the class attribute.
+                     */
+                    try {
+                        dataInstances.setClass(dataInstances.attribute(targetAttribute));
+                    } catch (NullPointerException ex) {
+                        message = "The target you posted in not a feature of the dataset: " + targetAttribute;
+                        errorRep.append(ex, message, clientPostedWrongParametersStatus);
+                    } catch (Throwable thr) {
+                        errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+                    }
+
+
+                } catch (Exception ex) {
+                    errorRep.append(ex, "Error while trying to parse the dataset!",
+                            clientPostedWrongParametersStatus);
+                }
             }
-        } catch (MalformedURLException ex) {
-            errorDetails = "The client did not post a valid URI for the dataset";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (URISyntaxException ex) {
-            errorDetails = "The client did not post a valid URI for the dataset";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (IllegalArgumentException ex) {
-            errorDetails = "The client did not post a valid URI for the dataset";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        }
+        };
 
 
-        /**
-         * Check the target parameter.........
-         */
-        try {
-            targeturi = new URI(form.getFirstValue("target"));
-            targeturi.toURL();
-            targetAttribute = targeturi.toString();
-        } catch (MalformedURLException ex) {
-            errorDetails = "[Wrong Posted Parameter ]: The client did"
-                    + " not post a valid URI for the target feature";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        } catch (URISyntaxException ex) {
-            errorDetails = "[Wrong Posted Parameter ]: The client did"
-                    + " not post a valid URI for the target feature";
-            errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-        }
+        Thread check2 = new Thread() {
 
-
-        /**
-         * Parse the dataset
-         */
-        Dataset dataset = new Dataset(dataseturi);
-        errorRep.append(dataset.errorRep);
-        try {
-            dataInstances = dataset.getWekaDatasetForTraining(null, false);
-
-            /**
-             * If the data were successfully parsed, try to set the class attribute.
-             */
-            try {
-                dataInstances.setClass(dataInstances.attribute(targetAttribute));
-            } catch (NullPointerException ex) {
-                errorDetails = "The target you posted in not a feature of the dataset: " + targetAttribute;
-                errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);
-            } catch (Throwable thr) {
-                errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+            @Override
+            public void run() {
+                if (!((kernel.equalsIgnoreCase("linear"))
+                        || (kernel.equalsIgnoreCase("polynomial"))
+                        || (kernel.equalsIgnoreCase("rbf"))
+                        || (kernel.equalsIgnoreCase("sigmoid")))) {
+                    errorRep.append(new Exception("Invalid Kernel"), "Invalid Kernel Type", clientPostedWrongParametersStatus);
+                }
             }
+        };
 
+        Thread check3 = new Thread() {
 
-        } catch (Exception ex) {
-            errorRep.append(ex, "Error while trying to parse the dataset!",
-                    clientPostedWrongParametersStatus);
-        }
+            @Override
+            public void run() {
+                /**
+                 * Cost should be convertible to Double and strictly
+                 * positive.
+                 */
+                String message;
+                try {
+                    d = Double.parseDouble(cost);
+                    if (d <= 0) {
+                        errorRep.append(new NumberFormatException("Strictly positive number was expected"),
+                                "The cost should be strictly positive", Status.CLIENT_ERROR_BAD_REQUEST);
+                    }
+                } catch (NumberFormatException e) {
+                    message =
+                            "The cost should be Double type, while you specified "
+                            + "a non double value : " + cost + "\n";
+                    errorRep.append(e, message, Status.CLIENT_ERROR_BAD_REQUEST);
+                } catch (Throwable thr) {
+                    errorRep.append(thr, "Severe Internal Error! Excpeption", Status.SERVER_ERROR_INTERNAL);
 
+                }
 
-
-
-
-
-
-        if (!((kernel.equalsIgnoreCase("linear"))
-                || (kernel.equalsIgnoreCase("polynomial"))
-                || (kernel.equalsIgnoreCase("rbf"))
-                || (kernel.equalsIgnoreCase("sigmoid")))) {
-            errorRep.append(new Exception("Invalid Kernel"), "Invalid Kernel Type", clientPostedWrongParametersStatus);
-        }
-
-        /**
-         * Cost should be convertible to Double and strictly
-         * positive.
-         */
-        try {
-            d = Double.parseDouble(cost);
-            if (d <= 0) {
-                errorRep.append(new NumberFormatException("Strictly positive number was expected"),
-                        "The cost should be strictly positive", Status.CLIENT_ERROR_BAD_REQUEST);
             }
-        } catch (NumberFormatException e) {
-            errorDetails =
-                    "The cost should be Double type, while you specified "
-                    + "a non double value : " + cost + "\n";
-            errorRep.append(e, errorDetails, Status.CLIENT_ERROR_BAD_REQUEST);
-        } catch (Throwable thr) {
-            errorRep.append(thr, "Severe Internal Error! Excpeption", Status.SERVER_ERROR_INTERNAL);
+        };
 
-        }
+        Thread check4 = new Thread() {
 
+            @Override
+            public void run() {
 
-        /**
-         * Epsilon should be convertible to Double and strictly
-         * positive.
-         */
-        try {
-            d = Double.parseDouble(epsilon);
-            if (d <= 0) {
-                errorRep.append(new NumberFormatException("Positive double was expected"),
-                        "Epsilon must be strictly positive!", clientPostedWrongParametersStatus);
+                /**
+                 * Epsilon should be convertible to Double and strictly
+                 * positive.
+                 */
+                try {
+                    d = Double.parseDouble(epsilon);
+                    if (d <= 0) {
+                        errorRep.append(new NumberFormatException("Positive double was expected"),
+                                "Epsilon must be strictly positive!", clientPostedWrongParametersStatus);
+                    }
+                } catch (NumberFormatException e) {
+                    errorRep.append(e, "Epsilon must be a striclty positive number!", clientPostedWrongParametersStatus);
+                } catch (Throwable thr) {
+                    errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+                }
+
             }
-        } catch (NumberFormatException e) {
-            errorRep.append(e, "Epsilon must be a striclty positive number!", clientPostedWrongParametersStatus);
-        } catch (Throwable thr) {
-            errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
-        }
+        };
 
+        Thread check5 = new Thread() {
 
-        /**
-         * Degree should be a strictly positive integer
-         */
-        try {
-            i = Integer.parseInt(degree);
-            if (i <= 0) {
-                errorRep.append(new NumberFormatException(),
-                        "The degree must be a strictly positive integer!",
-                        clientPostedWrongParametersStatus);
+            @Override
+            public void run() {
+                /**
+                 * Degree should be a strictly positive integer
+                 */
+                try {
+                    i = Integer.parseInt(degree);
+                    if (i <= 0) {
+                        errorRep.append(new NumberFormatException(),
+                                "The degree must be a strictly positive integer!",
+                                clientPostedWrongParametersStatus);
+                    }
+                } catch (NumberFormatException e) {
+                    errorRep.append(e, "The degree must be a strictly positive integer!", clientPostedWrongParametersStatus);
+                } catch (Throwable thr) {
+                    errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+                }
+
             }
-        } catch (NumberFormatException e) {
-            errorRep.append(e, "The degree must be a strictly positive integer!", clientPostedWrongParametersStatus);
-        } catch (Throwable thr) {
-            errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
-        }
+        };
+
+        Thread check6 = new Thread() {
+
+            @Override
+            public void run() {
+                /**
+                 * Gamma should be convertible to Double and strictly
+                 * positive.
+                 */
+                try {
+                    d = Double.parseDouble(gamma);
+                    if (d <= 0) {
+                        errorRep.append(new NumberFormatException(),
+                                "gamma must be a strictly positive double!", clientPostedWrongParametersStatus);
+                    }
+                } catch (NumberFormatException e) {
+                    errorRep.append(e, "gamma must be a strictly positive double!", clientPostedWrongParametersStatus);
+                } catch (Throwable thr) {
+                    errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+                }
 
 
-
-        /**
-         * Gamma should be convertible to Double and strictly
-         * positive.
-         */
-        try {
-            d = Double.parseDouble(gamma);
-            if (d <= 0) {
-                errorRep.append(new NumberFormatException(),
-                        "gamma must be a strictly positive double!", clientPostedWrongParametersStatus);
             }
-        } catch (NumberFormatException e) {
-            errorRep.append(e, "gamma must be a strictly positive double!", clientPostedWrongParametersStatus);
-        } catch (Throwable thr) {
-            errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
-        }
+        };
 
+        Thread check7 = new Thread() {
 
-        /**
-         * coeff0 should be convertible to Double.
-         */
-        try {
-            d = Double.parseDouble(coeff0);
-        } catch (NumberFormatException e) {
-            errorRep.append(e, "coeff must be a double!", clientPostedWrongParametersStatus);
-        } catch (Throwable thr) {
-            errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
-        }
-
-
-        /**
-         * Tolerance
-         */
-        try {
-            d = Double.parseDouble(tolerance);
-            if (d <= 0) {
-                errorRep.append(new NumberFormatException("A positive double was expected!"),
-                        "Tolerance must be a strictly positive double (preferably small)!", clientPostedWrongParametersStatus);
+            @Override
+            public void run() {
+                /**
+                 * coeff0 should be convertible to Double.
+                 */
+                try {
+                    d = Double.parseDouble(coeff0);
+                } catch (NumberFormatException e) {
+                    errorRep.append(e, "coeff must be a double!", clientPostedWrongParametersStatus);
+                } catch (Throwable thr) {
+                    errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+                }
             }
-        } catch (NumberFormatException e) {
-            errorRep.append(e,
-                    "Tolerance must be a strictly positive double (preferably small)!", clientPostedWrongParametersStatus);
-        } catch (Throwable thr) {
-            errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
-        }
+        };
+
+        Thread check8 = new Thread() {
+
+            @Override
+            public void run() {
+                /**
+                 * Tolerance
+                 */
+                try {
+                    d = Double.parseDouble(tolerance);
+                    if (d <= 0) {
+                        errorRep.append(new NumberFormatException("A positive double was expected!"),
+                                "Tolerance must be a strictly positive double (preferably small)!", clientPostedWrongParametersStatus);
+                    }
+                } catch (NumberFormatException e) {
+                    errorRep.append(e,
+                            "Tolerance must be a strictly positive double (preferably small)!", clientPostedWrongParametersStatus);
+                } catch (Throwable thr) {
+                    errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+                }
+            }
+        };
+
+        Thread check9 = new Thread() {
+
+            @Override
+            public void run() {
+                /**
+                 * cache size
+                 */
+                try {
+                    i = Integer.parseInt(cacheSize);
+                    if (i <= 0) {
+                        errorRep.append(new NumberFormatException("A positive integer was expected!"),
+                                "cacheSize must be a strictly positive integer!", clientPostedWrongParametersStatus);
+                    }
+                } catch (NumberFormatException e) {
+                    errorRep.append(e, "cacheSize should be an integer!", clientPostedWrongParametersStatus);
+                } catch (Throwable thr) {
+                    errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+                }
+
+            }
+        };
+        
 
 
+        ExecutorService checker = Executors.newFixedThreadPool(9);
+        checker.execute(check1);
+        checker.execute(check2);
+        checker.execute(check3);
+        checker.execute(check4);
+        checker.execute(check5);
+        checker.execute(check6);
+        checker.execute(check7);
+        checker.execute(check8);
+        checker.execute(check9);
+        checker.shutdown();
 
         /**
-         * cache size
+         * Wait until all checks are terminated!
          */
-        try {
-            i = Integer.parseInt(cacheSize);
-            if (i <= 0) {
-                errorRep.append(new NumberFormatException("A positive integer was expected!"),
-                        "cacheSize must be a strictly positive integer!", clientPostedWrongParametersStatus);
-            }
-        } catch (NumberFormatException e) {
-            errorRep.append(e, "cacheSize should be an integer!", clientPostedWrongParametersStatus);
-        } catch (Throwable thr) {
-            errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
+        while (!checker.isTerminated()){
+            // just wait!
         }
-
 
         return errorRep;
 

@@ -51,9 +51,8 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
     /**
      * This method is used to add a new user to the USERS table. The username,
      * the password
-     * @param UserName
-     * @param PassWord
-     * @param Priviledges
+     * @param UserName username
+     * @param PassWord password
      */
     @Registration
     public static void addUser(String UserName, String PassWord, Priviledges priviledges){
@@ -113,7 +112,6 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
      * and given provilegdes is valid.
      * @param userName The user name.
      * @param password character array of the password.
-     * @param priviledges User authorization level.
      * @return true/false.
      */
     public static boolean verifyCredentials(String userName, String password){
@@ -139,7 +137,7 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
     /**
      * Returns a Map&lt;String,char[]&gt; for the credentials of a given authorization level.
      * @param priviledges
-     * @return
+     * @return All credentials as a Map.
      */
     public static Map<String,char[] > getCredentialsAsMap(Priviledges priviledges){
         Map<String, char[]> secret = new HashMap<String, char[]>();

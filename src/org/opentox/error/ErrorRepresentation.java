@@ -125,7 +125,7 @@ public class ErrorRepresentation extends OutputRepresentation {
 
     /**
      * The explanatory messages about the errors.
-     * @return
+     * @return set of explanatory messages.
      */
     public Set<String> getMessages() {
         return (Set<String>)map.keySet();
@@ -170,7 +170,7 @@ public class ErrorRepresentation extends OutputRepresentation {
 
     /**
      * Returns the representation as plain text.
-     * @return
+     * @return the ErrorRepresentation as String.
      */
     @Override
     public String getText() {

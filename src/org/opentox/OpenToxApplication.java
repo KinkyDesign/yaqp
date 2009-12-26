@@ -216,6 +216,7 @@ public class OpenToxApplication extends Application {
         router.attach("/model/{model_id}/{info}", ModelInfoResource.class);
 
         router.attach("/test", TestResource.class);
+        
 
 
         return router;

@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Superclass for all Namespaces introduced in opentox such as {@link org.opentox.ontology.AlgorithmTypes }
- * and {@link org.opentox.ontology.OT }
+ * Superclass for all Namespaces introduced in opentox such as {@link org.opentox.namespaces.AlgorithmTypes }
+ * and {@link org.opentox.namespaces.OT }
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
@@ -104,8 +104,8 @@ public abstract class Namespace {
 
         /**
          * Returns the Resource of this class
-         * ( {@link org.opentox.ontology.Namespace.Class } ).
-         * @return
+         * ( {@link org.opentox.namespaces.Namespace.Class } ).
+         * @return the corresponding jena resource.
          */
         public Resource getResource(){
             return this.resource;

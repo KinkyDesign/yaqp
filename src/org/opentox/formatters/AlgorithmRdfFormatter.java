@@ -11,10 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.resource.AbstractResource;
-import org.opentox.Resources.Algorithms.*;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
-import org.opentox.ontology.*;
 
 /**
  * Build an RDF representation for an Algorithm.

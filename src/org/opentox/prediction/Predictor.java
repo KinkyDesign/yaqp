@@ -18,7 +18,7 @@ public interface Predictor {
      * @param form Parameters of the client's request that contain information
      * about the test dataset resource.
      * @param model_id The id of the model.
-     * @return
+     * @return representation of the prediction result.
      */
     public abstract Representation predict(Form form, String model_id);
 

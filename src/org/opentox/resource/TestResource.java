@@ -1,25 +1,16 @@
 package org.opentox.resource;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.IOUtils;
-import org.opentox.media.OpenToxMediaType;
 import org.opentox.resource.*;
 
 import org.opentox.algorithm.reporting.AlgorithmReporter.*;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Reference;
-import org.restlet.data.ReferenceList;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -58,7 +49,19 @@ public class TestResource extends AbstractResource {
     }
 
     @Override
-    protected Representation get(Variant variant) throws ResourceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    protected Representation get(Variant variant) throws ResourceException {    
+        
+
+        try {
+            getResponse().setEntity(new StringRepresentation("1"));
+            Thread.sleep(1000);
+            getResponse().setEntity(new StringRepresentation("2"));
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        
+        return getResponseEntity();
     }
 }

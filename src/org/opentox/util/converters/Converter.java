@@ -25,15 +25,15 @@ public class Converter implements  AbstractConverter{
     /**
      * Saves a given Instances object in a DSD file. The given Instances should have <b>no
      * string attributes</b>. <br/><br/>Consider applying
-     * {@link org.opentox.Resources.Algorithms.Preprocessing#removeStringAtts(Instances)}
+     * {@link org.opentox.algorithm.dataprocessing.DataCleanUp#removeStringAtts(Instances) }
      * before using this method. The columns of the produced DSD file have exactly
      * the same ordering with the attributes of the Instances. For example, if the
      * attributes are x1, x2, x3, ..., xn, then the DSD file will have n columns
      * , and precisely x1,x2,...,xn (with the same ordering). Make sure that the
      * Instances has only numeric attributes!
-     * @param instances {@link weka.core.Instances} object which has only numeric
+     * @param instances {@link weka.core.Instances } object which has only numeric
      * attributes!
-     * @param dsdFile Destination {@link java.io.File} where the result is stored.
+     * @param dsdFile Destination {@link java.io.File } where the result is stored.
      */
 
     @Override

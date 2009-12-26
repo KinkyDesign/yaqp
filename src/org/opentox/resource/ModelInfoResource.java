@@ -41,10 +41,8 @@ public class ModelInfoResource extends AbstractResource {
     private String model_id, info;
 
     /**
-     * Default Class Constructor.Available MediaTypes of Variants: TEXT_XML
-     * @param context
-     * @param request
-     * @param response
+     * Initialized the resource. Allowed HTTP operations and available MIMEs are
+     * defined here.
      */
     @Override
     public void doInit() throws ResourceException {

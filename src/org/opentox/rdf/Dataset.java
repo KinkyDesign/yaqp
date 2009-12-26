@@ -99,7 +99,7 @@ public class Dataset extends RDFHandler {
      * Initialized a Dataset object given a URL.
      * @param dataset_url
      * @throws URISyntaxException
-     * @see Dataset#set(java.net.URI)
+     * @see Dataset#Dataset(java.net.URI)
      * @see Dataset#Dataset(java.io.InputStream)
      */
     public Dataset(URL dataset_url) throws URISyntaxException {
@@ -108,7 +108,7 @@ public class Dataset extends RDFHandler {
 
     /**
      * Initialized a void Dataset object; invokes a call to the super-class constructor
-     * @see RDFParser
+     * @see RDFHandler
      * @see Dataset#Dataset(java.io.InputStream)
      * @see Dataset#Dataset(java.net.URI)
      * @see Dataset#Dataset(java.net.URL) 
@@ -119,7 +119,7 @@ public class Dataset extends RDFHandler {
 
     /**
      * Returns the set of features in the dataset.
-     * @return
+     * @return the set of all features in the dataset.
      */
     public Set<String> setOfFeatures() {
         Set<String> set = new HashSet<String>();
@@ -347,10 +347,10 @@ public class Dataset extends RDFHandler {
     };
 
     /**
-     * Similar to {@link org.opentox.ontology.Dataset#getWekaDataset(java.lang.String, boolean) }
+     * Similar to {@link org.opentox.rdf.Dataset#getWekaDatasetForTraining(java.lang.String, boolean)  }
      * but the generated Instances is constructed with respect to a certain model.
      * @param model_id
-     * @return
+     * @return Instances for prediction using a given model.
      */
     public Instances getWekaDatasetForPrediction(String model_id) {
         return null;
@@ -360,7 +360,7 @@ public class Dataset extends RDFHandler {
 
     /**
      * The set of XSD data types that should be cast as numeric.
-     * @return
+     * @return the set of XSD datatypes that should be considered as numeric.
      */
     private static Set<String> numericXSDtypes() {
         Set<String> numericXSDtypes = new HashSet<String>();
@@ -383,7 +383,7 @@ public class Dataset extends RDFHandler {
 
     /**
      * The set of XSD data types that should be cast as string.
-     * @return
+     * @return the set of XSD datatypes that should be considered as strings.
      */
     private static Set<String> stringXSDtypes() {
         Set<String> stringXSDtypes = new HashSet<String>();

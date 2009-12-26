@@ -18,7 +18,7 @@ public class DataCleanUp implements Preprocessing{
     /**
      * Scales the data producing a dataset whose values lie within [-1,1]
      * @param data
-     * @return
+     * @return the scaled Instances.
      */
     public static Instances scale(Instances data){
 

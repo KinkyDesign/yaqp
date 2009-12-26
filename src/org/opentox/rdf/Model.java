@@ -39,7 +39,7 @@ public class Model extends RDFHandler {
 
     /**
      * Returns the set of features in the Model (RDF representation).
-     * @return
+     * @return set of all features or the model.
      */
     public Set<String> setOfFeatures() {
         Set<String> set = new HashSet<String>();
@@ -54,7 +54,7 @@ public class Model extends RDFHandler {
     /**
      * Get the URI of a new feature from a feature service
      * @param featureService URI of a feature service
-     * @return
+     * @return URI of predicted feature.
      */
     private String getPredictedFeatureUri(String featureService) {
         throw new UnsupportedOperationException("Not Supported yet!");

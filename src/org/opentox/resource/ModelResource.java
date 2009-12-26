@@ -43,10 +43,7 @@ public class ModelResource extends AbstractResource {
     private AlgorithmEnum algorithm;
 
     /**
-     * Default Class Constructor.Available MediaTypes of Variants: TEXT_XML
-     * @param context
-     * @param request
-     * @param response
+     * Initializes the resource.
      */
     @Override
     public void doInit() throws ResourceException {

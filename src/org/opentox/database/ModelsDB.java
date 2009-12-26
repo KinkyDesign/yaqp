@@ -109,7 +109,7 @@ public class ModelsDB extends InHouseDB {
      * of a new model when the model is registered in the database.
      * @see ModelsDB#registerNewModel(java.lang.String)
      */
-    private static void IncreaseModelStack() {
+    private static synchronized void IncreaseModelStack() {
         String increaseValue = "update " + MODELS_STACK_TABLE + " set STACK = " + (modelsStack + 1) +
                 " where STACK = " + modelsStack;
         try {
@@ -123,9 +123,9 @@ public class ModelsDB extends InHouseDB {
 
     /**
      * Returns the number of models currently in the database.
-     * @return
+     * @return the first available model id.
      */
-    public static int getModelsStack() {
+    public static synchronized int getModelsStack() {
         return modelsStack;
     }
 
@@ -137,7 +137,7 @@ public class ModelsDB extends InHouseDB {
      * @see ModelsDB#removeModel(java.lang.String)
      */
     @Registration
-    public static int registerNewModel(String AlgID) {
+    public static synchronized int registerNewModel(String AlgID) {
         int id = getModelsStack() + 1;
         String uri = org.opentox.resource.AbstractResource.baseURI + "/model/" + id;
         String CreateValue = "INSERT INTO " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
@@ -159,7 +159,7 @@ public class ModelsDB extends InHouseDB {
      * @see ModelsDB#registerNewModel(java.lang.String) 
      */
     @Removal
-    public static void removeModel(String ID){
+    public static synchronized void removeModel(String ID){
         String removeModel = "DELETE FROM "+MODEL_INFO_TABLE+" WHERE "+COL_MODEL_ID+"="+ID;
         Statement stmt;
         try {
@@ -181,7 +181,7 @@ public class ModelsDB extends InHouseDB {
      * @see ModelsDB#removeModel(java.lang.String)
      * @see ModelsDB#getAlgorithm(java.lang.String)
      */
-    public static boolean isModel(String ID, String Model){
+    public static synchronized boolean isModel(String ID, String Model){
         boolean result = false;
         String searchMLR = "SELECT * FROM "+MODEL_INFO_TABLE+
                 " WHERE "+COL_MODEL_ID+"="+ID+
@@ -199,10 +199,10 @@ public class ModelsDB extends InHouseDB {
     }
 
     /**
-     * Returns an {@link org.opentox.Resources.Algorithms.AlgorithmEnum }
+     * Returns an {@link org.opentox.algorithm.AlgorithmEnum }
      * characterization of a given model.
      * @param ID
-     * @return
+     * @return Algorithm Enumeration Object for the given ID.
      * @see ModelsDB#isModel(java.lang.String, java.lang.String)
      */
     public static AlgorithmEnum getAlgorithm(String ID){
@@ -220,7 +220,7 @@ public class ModelsDB extends InHouseDB {
 
     /**
      *
-     * @return
+     * @return all Models as a list of references.
      */
     public static ReferenceList getModelsAsReferenceList() {
 
@@ -244,9 +244,10 @@ public class ModelsDB extends InHouseDB {
     
     /**
      * Returns a reference list for the models that where trained usign a
-     * specific
+     * specific.
+     * TODO: Change String algorithmId to AlgorithmEnum algorithm
      * @param algorithmId
-     * @return
+     * @return Reference list for the given algorithm id.
      */
     public static ReferenceList getReferenceListFromAlgId(String algorithmId) {
         String SelectAllSvc = "SELECT * FROM " + MODEL_INFO_TABLE +

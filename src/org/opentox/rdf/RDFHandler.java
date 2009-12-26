@@ -65,7 +65,8 @@ public abstract class RDFHandler extends ErrorSource {
      * }
      * </pre>
      * @param someClass
-     * @return
+     * @return An iterator for some class members specified in the arguments of
+     * this method.
      */
     public ExtendedIterator<? extends OntResource> getClassMemberIteratorFor(
             Namespace.Class someClass) {
@@ -75,7 +76,7 @@ public abstract class RDFHandler extends ErrorSource {
 
     /**
      * Returns the jena Model.
-     * @return
+     * @return jena Model.
      */
     public OntModel getJenaModel() {
         return jenaModel;
