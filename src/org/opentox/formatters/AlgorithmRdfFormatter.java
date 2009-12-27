@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.resource.AbstractResource;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
+import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
 /**
@@ -38,8 +40,8 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
     }
 
     @Override
-    public StringRepresentation getStringRepresentation(MediaType mediatype) {
-
+    public Representation getRepresentation(MediaType mediatype) {
+    ByteArrayOutputStream outStream = null;
         OntModel jenaModel;
         try {
             // define a jena model:
@@ -107,7 +109,7 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
                 algorithm.addProperty(jenaModel.createAnnotationProperty(OT.parameters.getURI()), iparam);
             }
 
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            outStream = new ByteArrayOutputStream();
             String Lang = "RDF/XML";
             if (MediaType.APPLICATION_RDF_TURTLE.equals(mediatype)) {
                 Lang = "TTL";
@@ -116,14 +118,13 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             } else if (OpenToxMediaType.TEXT_N3.equals(mediatype)) {
                 Lang = "N3";
             }
-            jenaModel.write(outStream, Lang);
-            return new StringRepresentation(outStream.toString(), mediatype);
+            jenaModel.write(outStream, Lang);            
 
         } catch (Exception ex) {
+            errorRep.append(ex, "Error while formatting and algorithm RDF representation.", Status.SERVER_ERROR_INTERNAL);
             Logger.getLogger(AlgorithmRdfFormatter.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
         }
 
-
+            return errorRep.getErrorLevel()==0 ? new StringRepresentation(outStream.toString(), mediatype) : errorRep;
     }
 }

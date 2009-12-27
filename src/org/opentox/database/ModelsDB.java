@@ -5,24 +5,26 @@ import java.util.logging.Level;
 import org.restlet.data.ReferenceList;
 import org.opentox.OpenToxApplication;
 import org.opentox.algorithm.AlgorithmEnum;
+import org.opentox.database.DataBaseAccess.CreateTable;
+import org.opentox.database.DataBaseAccess.Removal;
 
 /**
  *
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
+ * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 28, 2009)
  */
-public class ModelsDB extends InHouseDB {
+public class ModelsDB implements DataBaseAccess {
 
     protected static int modelsStack;
-
-    protected final static String
-            COL_MODEL_ID = "MODEL_ID",
+    protected final static String COL_MODEL_ID = "MODEL_ID",
             COL_MODEL_URI = "MODEL_URI",
             COL_ALGORITHM_ID = "ALGORITHM_ID",
             MODELS_STACK_TABLE = "MODELS_STACK",
             MODEL_INFO_TABLE = "MODELS";
 
     public ModelsDB() {
-
     }
 
     /**
@@ -51,7 +53,7 @@ public class ModelsDB extends InHouseDB {
         String CreateTable = "create table " + MODELS_STACK_TABLE + "(STACK INTEGER)";
 
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(CreateTable);
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
@@ -60,7 +62,7 @@ public class ModelsDB extends InHouseDB {
         String CreateValue = "insert into " + MODELS_STACK_TABLE + " (\"STACK\")\n"
                 + "values (0)";
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(CreateValue);
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
@@ -97,7 +99,7 @@ public class ModelsDB extends InHouseDB {
                 + COL_MODEL_URI + " VARCHAR(150))";
 
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(CreateTable);
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
@@ -110,11 +112,13 @@ public class ModelsDB extends InHouseDB {
      * @see ModelsDB#registerNewModel(java.lang.String)
      */
     private static synchronized void IncreaseModelStack() {
-        String increaseValue = "update " + MODELS_STACK_TABLE + " set STACK = " + (modelsStack + 1) +
-                " where STACK = " + modelsStack;
+        String increaseValue = "update " + MODELS_STACK_TABLE + " set STACK = " + (modelsStack + 1)
+                + " where STACK = " + modelsStack;
         try {
-            Statement stmt = connection.createStatement();
-            stmt.executeUpdate(increaseValue);
+            Statement stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
+                stmt.executeUpdate(increaseValue);
+            }
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -143,9 +147,11 @@ public class ModelsDB extends InHouseDB {
         String CreateValue = "INSERT INTO " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
         Statement stmt;
         try {
-            stmt = connection.createStatement();
-            stmt.executeUpdate(CreateValue);
-            IncreaseModelStack();
+            stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
+                stmt.executeUpdate(CreateValue);
+                IncreaseModelStack();
+            }
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -159,17 +165,18 @@ public class ModelsDB extends InHouseDB {
      * @see ModelsDB#registerNewModel(java.lang.String) 
      */
     @Removal
-    public static synchronized void removeModel(String ID){
-        String removeModel = "DELETE FROM "+MODEL_INFO_TABLE+" WHERE "+COL_MODEL_ID+"="+ID;
+    public static synchronized void removeModel(String ID) {
+        String removeModel = "DELETE FROM " + MODEL_INFO_TABLE + " WHERE " + COL_MODEL_ID + "=" + ID;
         Statement stmt;
         try {
-            stmt = connection.createStatement();
-            stmt.executeUpdate(removeModel);
+            stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
+                stmt.executeUpdate(removeModel);
+            }
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
     }
-
 
     /**
      * Checks if a model was built with a given algorithm. e.g. isModel(10,"svm")
@@ -181,17 +188,19 @@ public class ModelsDB extends InHouseDB {
      * @see ModelsDB#removeModel(java.lang.String)
      * @see ModelsDB#getAlgorithm(java.lang.String)
      */
-    public static synchronized boolean isModel(String ID, String Model){
+    public static synchronized boolean isModel(String ID, String Model) {
         boolean result = false;
-        String searchMLR = "SELECT * FROM "+MODEL_INFO_TABLE+
-                " WHERE "+COL_MODEL_ID+"="+ID+
-                " AND "+COL_ALGORITHM_ID+" LIKE '%"+Model+"%'";
+        String searchMLR = "SELECT * FROM " + MODEL_INFO_TABLE
+                + " WHERE " + COL_MODEL_ID + "=" + ID
+                + " AND " + COL_ALGORITHM_ID + " LIKE '%" + Model + "%'";
         Statement stmt;
         ResultSet rs = null;
         try {
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery(searchMLR);
-            result=rs.next();
+            stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
+                rs = stmt.executeQuery(searchMLR);
+                result = rs.next();
+            }
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -205,18 +214,17 @@ public class ModelsDB extends InHouseDB {
      * @return Algorithm Enumeration Object for the given ID.
      * @see ModelsDB#isModel(java.lang.String, java.lang.String)
      */
-    public static AlgorithmEnum getAlgorithm(String ID){
+    public static AlgorithmEnum getAlgorithm(String ID) {
         AlgorithmEnum algorithm = AlgorithmEnum.unknown;
-        if (isModel(ID, "svm")){
+        if (isModel(ID, "svm")) {
             algorithm = AlgorithmEnum.svm;
-        }else if (isModel(ID, "mlr")){
+        } else if (isModel(ID, "mlr")) {
             algorithm = AlgorithmEnum.mlr;
-        }else if (isModel(ID, "svc")){
+        } else if (isModel(ID, "svc")) {
             algorithm = AlgorithmEnum.svc;
         }
         return algorithm;
     }
-
 
     /**
      *
@@ -230,18 +238,17 @@ public class ModelsDB extends InHouseDB {
 
         Statement stmt;
         try {
-            stmt = connection.createStatement();
+            stmt = InHouseDB.connection.createStatement();
             rs = stmt.executeQuery(SelectAllModels);
             while (rs.next()) {
                 list.add(rs.getString(COL_MODEL_URI));
             }
         } catch (SQLException ex) {
-            OpenToxApplication.opentoxLogger.log(Level.SEVERE,null,ex);
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
         return list;
     }
 
-    
     /**
      * Returns a reference list for the models that where trained usign a
      * specific.
@@ -250,14 +257,14 @@ public class ModelsDB extends InHouseDB {
      * @return Reference list for the given algorithm id.
      */
     public static ReferenceList getReferenceListFromAlgId(String algorithmId) {
-        String SelectAllSvc = "SELECT * FROM " + MODEL_INFO_TABLE +
-                " WHERE "+COL_ALGORITHM_ID+" LIKE '%" + algorithmId + "%'";
+        String SelectAllSvc = "SELECT * FROM " + MODEL_INFO_TABLE
+                + " WHERE " + COL_ALGORITHM_ID + " LIKE '%" + algorithmId + "%'";
         ResultSet rs = null;
         ReferenceList list = new ReferenceList();
 
         Statement stmt;
         try {
-            stmt = connection.createStatement();
+            stmt = InHouseDB.connection.createStatement();
             rs = stmt.executeQuery(SelectAllSvc);
             while (rs.next()) {
                 list.add(rs.getString(COL_MODEL_URI));

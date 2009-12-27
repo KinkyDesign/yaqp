@@ -9,12 +9,14 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentox.resource.AbstractResource;
 import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.AlgorithmParameter;
+import org.restlet.data.Response;
 import org.restlet.data.Status;
 import weka.core.Instances;
 
@@ -73,7 +75,7 @@ public class Model extends RDFHandler {
      * @param algorithmParameters A List of the tuning parameters of the algorithm.
      * @param out The output stream used to store the model.
      */
-    public void createModel(String model_id, String dataseturi, String targeturi, Instances data,
+    public void createModel(String model_id, String dataseturi, Instances data,
             List<AlgorithmParameter> algorithmParameters, String AlgorithmURI, OutputStream out) {
         try {
             jenaModel = org.opentox.namespaces.Namespace.createModel();
@@ -104,6 +106,7 @@ public class Model extends RDFHandler {
 
             // Add all parameters:
             Individual iparam;
+            String targeturi = null;
             for (int i = 0; i < algorithmParameters.size(); i++) {
                 iparam = jenaModel.createIndividual(OT.Class.Parameter.getOntClass(jenaModel));
                 iparam.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), algorithmParameters.get(i).paramName);
@@ -113,10 +116,32 @@ public class Model extends RDFHandler {
                 iparam.addLiteral(jenaModel.createAnnotationProperty(OT.paramScope.getURI()), jenaModel.createTypedLiteral(algorithmParameters.get(i).paramScope,
                         XSDDatatype.XSDstring));
                 ot_model.addProperty(jenaModel.createAnnotationProperty(OT.parameters.getURI()), iparam);
+                if (algorithmParameters.get(i).paramName.equalsIgnoreCase("target")) {
+                    targeturi = (String) algorithmParameters.get(i).paramValue;
+                }
             }
 
-            Individual feature = null;
 
+            /**
+             * Generate a new feature in AMBIT ( http://ambit.uni-plovdiv.bg:8080/ambit2/feature )....
+             */
+            Feature featurec = new Feature();
+            Response response = featurec.createNewFeature("http://someserver.com/feature/101", new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/feature"));
+
+            System.out.println(response.getEntity());
+
+            if (!(response.getStatus().getCode() == 200)) {
+                System.out.println(targeturi);
+                System.out.println(response.getStatus().getCode());
+                Exception failure = new Exception("Feature Generation Failure!");
+                errorRep.append(failure, "Could not generate a new feaure in AMBIT server",
+                        Status.SERVER_ERROR_BAD_GATEWAY);
+                throw failure;
+            }
+
+
+
+            Individual feature = null;
             for (int i = 0; i < data.numAttributes(); i++) {
                 // for the target attribute...
                 if (targeturi.toString().equals(data.attribute(i).name())) {
@@ -125,7 +150,7 @@ public class Model extends RDFHandler {
                     ot_model.addProperty(jenaModel.createAnnotationProperty(OT.dependentVariables.getURI()), feature);
                     //Add the predicted variable...
                     {
-                        Individual predicted = jenaModel.createIndividual(targeturi.toString() + "-predicted-" + model_id,
+                        Individual predicted = jenaModel.createIndividual(response.getEntity().getText().replaceAll("\\s\\s+|\\n|\\r", ""),
                                 OT.Class.Feature.getOntClass(jenaModel));
                         ot_model.addProperty(jenaModel.createAnnotationProperty(OT.predictedVariables.getURI()), predicted);
                     }

@@ -190,7 +190,6 @@ public class SvcTrainer extends AbstractTrainer {
 
                     opentoxModel.createModel(Integer.toString(model_id),
                             dataseturi.toString(),
-                            targetAttribute,
                             dataInstances,
                             paramList,
                             URIs.svcAlgorithmURI,

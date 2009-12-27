@@ -4,8 +4,6 @@ import org.opentox.algorithm.ConstantParameters;
 import org.opentox.algorithm.AlgorithmParameter;
 import org.opentox.algorithm.AlgorithmMetaInf;
 import org.opentox.algorithm.AlgorithmEnum;
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import java.util.List;
 import org.opentox.formatters.AlgorithmYamlFormatter;
 import org.opentox.formatters.AlgorithmXmlFormatter;
 import org.opentox.formatters.AlgorithmRdfFormatter;
@@ -16,6 +14,7 @@ import org.opentox.resource.AbstractResource;
 import org.opentox.namespaces.AlgorithmTypes;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
 /**
@@ -23,7 +22,7 @@ import org.restlet.representation.StringRepresentation;
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.3.3 (Last update: Dec 20, 2009)
+ * @version 1.3.3 (Last update: Dec 28, 2009)
  */
 public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
@@ -66,33 +65,33 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
         return Parameters;
     }
 
-    private StringRepresentation getStringRepresentationForMetaInf(
+    private Representation getRepresentationForMetaInf(
             AlgorithmMetaInf metainf, MediaType media) {
-        StringRepresentation representation = null;
+        Representation representation = null;
         if ((MediaType.APPLICATION_RDF_XML.equals(media))
                 || (MediaType.APPLICATION_RDF_TURTLE.equals(media))
                 || (OpenToxMediaType.TEXT_N3.equals(media))
                 || (OpenToxMediaType.TEXT_TRIPLE.equals(media))) {
             AlgorithmRdfFormatter formater = new AlgorithmRdfFormatter(metainf);
-            representation = formater.getStringRepresentation(media);
+            representation = formater.getRepresentation(media);
         } else if (MediaType.APPLICATION_JSON.equals(media)) {
             AlgorithmJsonFormatter formater = new AlgorithmJsonFormatter(metainf);
-            representation = formater.getStringRepresentation(media);
+            representation = formater.getRepresentation(media);
         } else if (MediaType.TEXT_XML.equals(media)) {
             AlgorithmXmlFormatter formater = new AlgorithmXmlFormatter(metainf);
-            representation = formater.getStringRepresentation(media);
+            representation = formater.getRepresentation(media);
         } else if (OpenToxMediaType.TEXT_YAML.equals(media)) {
             AlgorithmYamlFormatter formater = new AlgorithmYamlFormatter(metainf);
-            representation = formater.getStringRepresentation(media);
+            representation = formater.getRepresentation(media);
         } else {
         }
         return representation;
     }
 
     @Override
-    public StringRepresentation FormatedRepresntation(MediaType media, AlgorithmEnum algorithm) {
+    public Representation FormatedRepresntation(MediaType media, AlgorithmEnum algorithm) {
 
-        StringRepresentation representation = null;
+        Representation representation = null;
 
         AlgorithmMetaInf genericMetaInf = new AlgorithmMetaInf();
         genericMetaInf.type = ("http://purl.org/dc/dcmitype/Service");
@@ -120,7 +119,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
             MlrMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.mlr),
                     Parameters(AlgorithmEnum.mlr));
 
-            representation = getStringRepresentationForMetaInf(MlrMetaInf, media);
+            representation = getRepresentationForMetaInf(MlrMetaInf, media);
 
         } else if (algorithm == AlgorithmEnum.svm) {
             AlgorithmMetaInf SvmMetaInf = genericMetaInf;
@@ -134,7 +133,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
                     Parameters(AlgorithmEnum.svm));
             SvmMetaInf.identifier = (AbstractResource.URIs.svmAlgorithmURI);
 
-            representation = getStringRepresentationForMetaInf(SvmMetaInf, media);
+            representation = getRepresentationForMetaInf(SvmMetaInf, media);
 
         } else if (algorithm == AlgorithmEnum.svc) {
             AlgorithmMetaInf SvcMetaInf = genericMetaInf;
@@ -148,7 +147,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
                     Parameters(AlgorithmEnum.svc));
             SvcMetaInf.identifier = (AbstractResource.URIs.svcAlgorithmURI);
 
-            representation = getStringRepresentationForMetaInf(SvcMetaInf, media);
+            representation = getRepresentationForMetaInf(SvcMetaInf, media);
         }
         return representation;
     }

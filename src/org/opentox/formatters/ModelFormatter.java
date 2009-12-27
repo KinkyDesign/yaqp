@@ -13,6 +13,7 @@ import org.opentox.resource.AbstractResource.Directories;
 import org.opentox.namespaces.Namespace;
 import org.opentox.util.RepresentationFactory;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
@@ -28,7 +29,7 @@ public class ModelFormatter extends AbstractModelFormatter {
     }
 
     @Override
-    public StringRepresentation getStringRepresentation(MediaType mediatype) {
+    public Representation getRepresentation(MediaType mediatype) {
         Representation rep = null;
         if (    (MediaType.TEXT_PLAIN.equals(mediatype))||
                 (MediaType.APPLICATION_RDF_XML.equals(mediatype))||
@@ -55,23 +56,24 @@ public class ModelFormatter extends AbstractModelFormatter {
                     jenaModel.write(str, Lang);
                     rep = new StringRepresentation(str.toString());
                 } catch (Exception ex) {
-                    Logger.getLogger(ModelFormatter.class.getName()).log(Level.SEVERE, null, ex);
+                    errorRep.append(ex, "Model Parsing Error: Model could not be parsed successfully!", Status.SERVER_ERROR_INTERNAL);
                 }
             } catch (FileNotFoundException ex) {
-                rep = new StringRepresentation("Model not Found!\n");
+                errorRep.append(ex, "Model not found!", Status.CLIENT_ERROR_NOT_FOUND);
             }
         }else if (MediaType.APPLICATION_XML.equals(mediatype)){
             RepresentationFactory rf = new RepresentationFactory(Directories.modelPmmlDir+"/"+model_id);
             try {
                 rep = new StringRepresentation(rf.getString().toString(), mediatype);
             } catch (FileNotFoundException ex) {
-                rep = new StringRepresentation("Model not Found!\n");
+                errorRep.append(ex, "Model not found!", Status.CLIENT_ERROR_NOT_FOUND);
             } catch (IOException ex) {
+                errorRep.append(ex, "Input/Output error while reading a model file.", Status.SERVER_ERROR_INTERNAL);
                 Logger.getLogger(ModelFormatter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
-        return (StringRepresentation) rep;
+        return errorRep.getErrorLevel()==0 ? (StringRepresentation) rep : errorRep;
     }
 
 }

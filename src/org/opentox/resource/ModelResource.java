@@ -15,6 +15,7 @@ import org.opentox.media.OpenToxMediaType;
 import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
+import org.opentox.error.ErrorRepresentation;
 import org.opentox.formatters.ModelFormatter;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -71,10 +72,18 @@ public class ModelResource extends AbstractResource {
      * @return StringRepresentation
      */
     @Override
-    protected Representation get(Variant variant) {
-        System.out.println(variant.getMediaType());
-        ModelFormatter modelFormatter = new ModelFormatter(Integer.parseInt(model_id));
-        return modelFormatter.getStringRepresentation(variant.getMediaType());
+    protected Representation get(Variant variant) {        
+        ErrorRepresentation errorRepr = new ErrorRepresentation();
+        ModelFormatter modelFormatter = null;
+        try {
+            int model_id_as_integer = Integer.parseInt(model_id);
+        modelFormatter = new ModelFormatter(model_id_as_integer);
+        } catch (NumberFormatException nfex){
+
+            errorRepr.append(nfex, "Not a valid model URI - see "+URIs.modelURI+" for a list of available models!",
+                    Status.CLIENT_ERROR_BAD_REQUEST);
+        }
+        return errorRepr.getErrorLevel()==0 ? modelFormatter.getRepresentation(variant.getMediaType()) : errorRepr;
 
     }
 

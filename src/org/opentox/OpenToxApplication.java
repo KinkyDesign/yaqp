@@ -3,6 +3,8 @@ package org.opentox;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +25,7 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
 import org.opentox.auth.Priviledges;
+import org.opentox.resource.TaskResource;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.routing.Router;
@@ -32,6 +35,7 @@ import org.restlet.security.Enroler;
 import org.restlet.security.MethodAuthorizer;
 import org.restlet.security.UniformGuard;
 import org.restlet.security.Verifier;
+import org.restlet.service.TaskService;
 
 /**
  *  Initial Implementation of the OpenTox Restful WebServices.<br/>
@@ -70,6 +74,8 @@ public class OpenToxApplication extends Application {
      * Server logs.
      */
     public static Logger opentoxLogger;
+    public static ExecutorService executor;
+    private static final int THREADS = 100;
 
     /**
      * Constructor.
@@ -78,21 +84,21 @@ public class OpenToxApplication extends Application {
         if (!(new File(AbstractResource.Directories.logDir)).exists()) {
             new File(AbstractResource.Directories.logDir).mkdirs();
         }
+        AbstractResource.Directories.checkDirs();
         opentoxLogger = Logger.getLogger("org.restlet");
         FileHandler fileHand = new FileHandler(AbstractResource.Directories.logDir + "/" + new Date());
         fileHand.setFormatter(new SimpleFormatter());
         opentoxLogger.addHandler(fileHand);
         opentoxLogger.setLevel(Level.INFO);
-        dbcon = new InHouseDB();
-        AbstractResource.Directories.checkDirs();        
+        dbcon = InHouseDB.INSTANCE;
+        executor = Executors.newFixedThreadPool(THREADS);
     }
-
-
 
     protected UniformGuard createGuard(Verifier verifier, boolean optional) {
 
 
         Enroler enroler = new Enroler() {
+
             @Override
             public void enrole(Subject subject) {
                 //System.out.println(subject);
@@ -102,18 +108,19 @@ public class OpenToxApplication extends Application {
         /*
          * Simple authorizer: Not completed yet...
          */
-        MethodAuthorizer authorizer = new MethodAuthorizer("authorizer"){
+        MethodAuthorizer authorizer = new MethodAuthorizer("authorizer") {
+
             @Override
-            public boolean authorize(Request request, Response response) {                                
-                    return super.authorize(request, response);                
+            public boolean authorize(Request request, Response response) {
+                return super.authorize(request, response);
             }
         };
 
         authorizer.getAuthenticatedMethods().add(Method.DELETE);
         authorizer.getAuthenticatedMethods().add(Method.GET);
-        authorizer.getAuthenticatedMethods().add(Method.POST);        
+        authorizer.getAuthenticatedMethods().add(Method.POST);
 
-                
+
         // Create a Guard
         ChallengeGuard guard = new ChallengeGuard(getContext(),
                 ChallengeScheme.HTTP_BASIC, "realm");
@@ -124,26 +131,22 @@ public class OpenToxApplication extends Application {
             @Override
             protected boolean authenticate(Request request, Response response) {
                 /** Allow everyone to GET but only Admins to apply DELETE!**/
-                if (
-                        (Method.GET.equals(request.getMethod()))
-                        || (Method.POST.equals(request.getMethod()))
-                ){
+                if ((Method.GET.equals(request.getMethod()))
+                        || (Method.POST.equals(request.getMethod()))) {
                     System.out.println("PASS without password!");
                     return true;
-                }else{
+                } else {
                     return super.authenticate(request, response);
                 }
             }
         };
-         guard.setContext(getContext());
-         guard.setAuthenticator(authenticator);
-         guard.getAuthenticator().setVerifier(verifier);
-         guard.getAuthenticator().setEnroler(enroler);
+        guard.setContext(getContext());
+        guard.setAuthenticator(authenticator);
+        guard.getAuthenticator().setVerifier(verifier);
+        guard.getAuthenticator().setEnroler(enroler);
         guard.setAuthorizer(authorizer);
         return guard;
     }
-
-
 
     /**
      * Creates a root Restlet that will receive all incoming calls.
@@ -188,7 +191,7 @@ public class OpenToxApplication extends Application {
          */
         router.setRetryDelay(1L);
 
-        
+
         /**
          * We set maximum attempts to 5
          */
@@ -201,8 +204,8 @@ public class OpenToxApplication extends Application {
          */
         router.attach(
                 "", IndexResource.class);
-        
-        
+
+
         /**
          * Resources compliant to the
          * OpenTox API specifications:
@@ -212,11 +215,13 @@ public class OpenToxApplication extends Application {
 
         router.attach("/model", ListModels.class);
         router.attach("/model/{model_id}", modelKerberos);  // The deletion of models is guarded!!!
-
         router.attach("/model/{model_id}/{info}", ModelInfoResource.class);
 
+        router.attach("/task", TaskResource.class);
+
         router.attach("/test", TestResource.class);
-        
+
+
 
 
         return router;

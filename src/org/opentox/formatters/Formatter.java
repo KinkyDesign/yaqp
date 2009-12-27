@@ -1,7 +1,7 @@
 package org.opentox.formatters;
 
 import org.restlet.data.MediaType;
-import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Representation;
 
 /**
  *
@@ -9,6 +9,6 @@ import org.restlet.representation.StringRepresentation;
  */
 public interface Formatter {
 
-    public abstract StringRepresentation getStringRepresentation(MediaType mediatype);
+    public abstract Representation getRepresentation(MediaType mediatype);
 
 }

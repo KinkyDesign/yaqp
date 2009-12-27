@@ -4,6 +4,7 @@ package org.opentox.formatters;
 import org.opentox.algorithm.AlgorithmMetaInf;
 import org.opentox.media.OpenToxMediaType;
 import org.restlet.data.MediaType;
+import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
 /**
@@ -23,7 +24,7 @@ public class AlgorithmYamlFormatter extends AbstractAlgorithmFormatter{
    }
 
 
-    public StringRepresentation getStringRepresentation(MediaType mediatype) {
+    public Representation getRepresentation(MediaType mediatype) {
         StringBuilder builder = new StringBuilder();
         builder.append("---\nAlgorithm:\n");
         builder.append("    name : " + metainf.title + "\n");

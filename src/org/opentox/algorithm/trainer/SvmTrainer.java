@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,51 +40,17 @@ import weka.core.converters.ArffSaver;
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
- * @version 1.3.3 (Last update: Dec 20, 2009)
+ * @version 1.3.3 (Last update: Dec 28, 2009)
  */
 public class SvmTrainer extends AbstractTrainer {
 
     private static final long serialVersionUID = -1522085945071581484L;
-    private int i;
-    private double d;
+    private int i = 0;
+    private double d = 0.0;
     /**
-     * The name of the target attribute which normally is the
-     * URI of a feature definition.
+     * Tuning Parameters for the SVM algorithm.
      */
-    private String targetAttribute;
-    /**
-     * The kernel used in the SVM model.
-     * This can be rbf, linear, sigmoid or polynomial.
-     */
-    private String kernel;
-    /**
-     * The degree of the polynomial kernel (when used).
-     */
-    private String degree;
-    /**
-     * The cahed memory used in model training.
-     */
-    private String cacheSize;
-    /**
-     * The Cost coefficient.
-     */
-    private String cost;
-    /**
-     * The parameter epsilon used in SVM models.
-     */
-    private String epsilon;
-    /**
-     * The kernel parameter gamma used in various kernel functions.
-     */
-    private String gamma;
-    /**
-     * The bias of the support vector model.
-     */
-    private String coeff0;
-    /**
-     * The tolerance used in model training.
-     */
-    private String tolerance;
+    private SvmParameters prm = new SvmParameters();
     /**
      * The id of the generated model.
      */
@@ -93,7 +58,7 @@ public class SvmTrainer extends AbstractTrainer {
     /**
      * An Instances object used to store the data.
      */
-    private Instances dataInstances;
+    private volatile Instances dataInstances;
 
     /**
      * Constructor of the trainer.
@@ -140,26 +105,26 @@ public class SvmTrainer extends AbstractTrainer {
 
                 // 6. Build the Regression Model:
                 weka.classifiers.functions.SVMreg regressor = new SVMreg();
-                String[] regressorOptions = {"-P", epsilon,
-                    "-T", tolerance};
+                String[] regressorOptions = {"-P", prm.epsilon,
+                    "-T", prm.tolerance};
 
                 Kernel svm_kernel = null;
-                if (this.kernel.equalsIgnoreCase("rbf")) {
+                if (prm.kernel.equalsIgnoreCase("rbf")) {
                     RBFKernel rbf_kernel = new RBFKernel();
-                    rbf_kernel.setGamma(Double.parseDouble(gamma));
-                    rbf_kernel.setCacheSize(Integer.parseInt(cacheSize));
+                    rbf_kernel.setGamma(Double.parseDouble(prm.gamma));
+                    rbf_kernel.setCacheSize(Integer.parseInt(prm.cacheSize));
                     svm_kernel = rbf_kernel;
-                } else if (this.kernel.equalsIgnoreCase("polynomial")) {
+                } else if (prm.kernel.equalsIgnoreCase("polynomial")) {
                     PolyKernel poly_kernel = new PolyKernel();
-                    poly_kernel.setExponent(Double.parseDouble(degree));
-                    poly_kernel.setCacheSize(Integer.parseInt(cacheSize));
+                    poly_kernel.setExponent(Double.parseDouble(prm.degree));
+                    poly_kernel.setCacheSize(Integer.parseInt(prm.cacheSize));
                     poly_kernel.setUseLowerOrder(true);
                     svm_kernel = poly_kernel;
-                } else if (this.kernel.equalsIgnoreCase("linear")) {
+                } else if (prm.kernel.equalsIgnoreCase("linear")) {
                     PolyKernel linear_kernel = new PolyKernel();
                     PolyKernel poly_kernel = new PolyKernel();
                     poly_kernel.setExponent((double) 1.0);
-                    poly_kernel.setCacheSize(Integer.parseInt(cacheSize));
+                    poly_kernel.setCacheSize(Integer.parseInt(prm.cacheSize));
                     poly_kernel.setUseLowerOrder(true);
                     svm_kernel = poly_kernel;
                 }
@@ -184,19 +149,12 @@ public class SvmTrainer extends AbstractTrainer {
                      * 7. Generate the RDF representation of the model and
                      * store it in a file.
                      */
-                    List<AlgorithmParameter> paramList = new ArrayList<AlgorithmParameter>();
-                    paramList.add(ConstantParameters.COEFF0(Double.parseDouble(coeff0)));
-                    paramList.add(ConstantParameters.COST(Double.parseDouble(cost)));
-                    paramList.add(ConstantParameters.TARGET(targetAttribute));
-                    paramList.add(ConstantParameters.DEGREE(Integer.parseInt(degree)));
-                    paramList.add(ConstantParameters.KERNEL(kernel));
-                    paramList.add(ConstantParameters.EPSILON(Double.parseDouble(epsilon)));
+                    List<AlgorithmParameter> paramList = prm.getListOfParameters();
 
                     Model opentoxModel = new Model();
 
                     opentoxModel.createModel(Integer.toString(model_id),
                             dataseturi.toString(),
-                            targetAttribute,
                             dataInstances,
                             paramList,
                             URIs.svmAlgorithmURI,
@@ -232,7 +190,7 @@ public class SvmTrainer extends AbstractTrainer {
      * checking.
      */
     @Override
-    public ErrorRepresentation checkParameters() {
+    public synchronized ErrorRepresentation checkParameters() {
         // Some initial definitions:
         final Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
 
@@ -241,38 +199,38 @@ public class SvmTrainer extends AbstractTrainer {
          * Assign default values to the parameters that where not
          * posted.
          */
-        kernel = form.getFirstValue("kernel");
-        if (kernel == null) {
-            kernel = ConstantParameters.KERNEL.paramValue.toString();
+        prm.kernel = form.getFirstValue("kernel");
+        if (prm.kernel == null) {
+            prm.kernel = ConstantParameters.KERNEL.paramValue.toString();
         }
 
-        cost = form.getFirstValue("cost");
-        if (cost == null) {
-            cost = ConstantParameters.COST.paramValue.toString();
+        prm.cost = form.getFirstValue("cost");
+        if (prm.cost == null) {
+            prm.cost = ConstantParameters.COST.paramValue.toString();
         }
-        gamma = form.getFirstValue("gamma");
-        if (gamma == null) {
-            gamma = ConstantParameters.GAMMA.paramValue.toString();
+        prm.gamma = form.getFirstValue("gamma");
+        if (prm.gamma == null) {
+            prm.gamma = ConstantParameters.GAMMA.paramValue.toString();
         }
-        epsilon = form.getFirstValue("epsilon");
-        if (epsilon == null) {
-            epsilon = ConstantParameters.EPSILON.paramValue.toString();
+        prm.epsilon = form.getFirstValue("epsilon");
+        if (prm.epsilon == null) {
+            prm.epsilon = ConstantParameters.EPSILON.paramValue.toString();
         }
-        coeff0 = form.getFirstValue("coeff0");
-        if (coeff0 == null) {
-            coeff0 = ConstantParameters.COEFF0.paramValue.toString();
+        prm.coeff0 = form.getFirstValue("coeff0");
+        if (prm.coeff0 == null) {
+            prm.coeff0 = ConstantParameters.COEFF0.paramValue.toString();
         }
-        degree = form.getFirstValue("degree");
-        if (degree == null) {
-            degree = ConstantParameters.DEGREE.paramValue.toString();
+        prm.degree = form.getFirstValue("degree");
+        if (prm.degree == null) {
+            prm.degree = ConstantParameters.DEGREE.paramValue.toString();
         }
-        tolerance = form.getFirstValue("tolerance");
-        if (tolerance == null) {
-            tolerance = ConstantParameters.TOLERANCE.paramValue.toString();
+        prm.tolerance = form.getFirstValue("tolerance");
+        if (prm.tolerance == null) {
+            prm.tolerance = ConstantParameters.TOLERANCE.paramValue.toString();
         }
-        cacheSize = form.getFirstValue("cacheSize");
-        if (cacheSize == null) {
-            cacheSize = "50";
+        prm.cacheSize = form.getFirstValue("cacheSize");
+        if (prm.cacheSize == null) {
+            prm.cacheSize = "50";
         }
 
 
@@ -283,7 +241,7 @@ public class SvmTrainer extends AbstractTrainer {
 
             @Override
             public void run() {
-                
+
                 String message = "";
                 try {
                     dataseturi = new URI(form.getFirstValue("dataset_uri"));
@@ -304,7 +262,7 @@ public class SvmTrainer extends AbstractTrainer {
                 }
 
 
-                
+
 
                 /**
                  * Check the target parameter.........
@@ -312,7 +270,7 @@ public class SvmTrainer extends AbstractTrainer {
                 try {
                     targeturi = new URI(form.getFirstValue("target"));
                     targeturi.toURL();
-                    targetAttribute = targeturi.toString();
+                    prm.targetAttribute = targeturi.toString();
                 } catch (MalformedURLException ex) {
                     message = "[Wrong Posted Parameter ]: The client did"
                             + " not post a valid URI for the target feature";
@@ -335,9 +293,10 @@ public class SvmTrainer extends AbstractTrainer {
                      * If the data were successfully parsed, try to set the class attribute.
                      */
                     try {
-                        dataInstances.setClass(dataInstances.attribute(targetAttribute));
+                        dataInstances.setClass(dataInstances.attribute(prm.targetAttribute));
                     } catch (NullPointerException ex) {
-                        message = "The target you posted in not a feature of the dataset: " + targetAttribute;
+                        message = "The target you posted in not a feature of the dataset: "
+                                + prm.targetAttribute;
                         errorRep.append(ex, message, clientPostedWrongParametersStatus);
                     } catch (Throwable thr) {
                         errorRep.append(thr, "Severe Internal Error!", Status.SERVER_ERROR_INTERNAL);
@@ -356,10 +315,10 @@ public class SvmTrainer extends AbstractTrainer {
 
             @Override
             public void run() {
-                if (!((kernel.equalsIgnoreCase("linear"))
-                        || (kernel.equalsIgnoreCase("polynomial"))
-                        || (kernel.equalsIgnoreCase("rbf"))
-                        || (kernel.equalsIgnoreCase("sigmoid")))) {
+                if (!((prm.kernel.equalsIgnoreCase("linear"))
+                        || (prm.kernel.equalsIgnoreCase("polynomial"))
+                        || (prm.kernel.equalsIgnoreCase("rbf"))
+                        || (prm.kernel.equalsIgnoreCase("sigmoid")))) {
                     errorRep.append(new Exception("Invalid Kernel"), "Invalid Kernel Type", clientPostedWrongParametersStatus);
                 }
             }
@@ -375,7 +334,7 @@ public class SvmTrainer extends AbstractTrainer {
                  */
                 String message;
                 try {
-                    d = Double.parseDouble(cost);
+                    d = Double.parseDouble(prm.cost);
                     if (d <= 0) {
                         errorRep.append(new NumberFormatException("Strictly positive number was expected"),
                                 "The cost should be strictly positive", Status.CLIENT_ERROR_BAD_REQUEST);
@@ -383,7 +342,7 @@ public class SvmTrainer extends AbstractTrainer {
                 } catch (NumberFormatException e) {
                     message =
                             "The cost should be Double type, while you specified "
-                            + "a non double value : " + cost + "\n";
+                            + "a non double value : " + prm.cost + "\n";
                     errorRep.append(e, message, Status.CLIENT_ERROR_BAD_REQUEST);
                 } catch (Throwable thr) {
                     errorRep.append(thr, "Severe Internal Error! Excpeption", Status.SERVER_ERROR_INTERNAL);
@@ -403,7 +362,7 @@ public class SvmTrainer extends AbstractTrainer {
                  * positive.
                  */
                 try {
-                    d = Double.parseDouble(epsilon);
+                    d = Double.parseDouble(prm.epsilon);
                     if (d <= 0) {
                         errorRep.append(new NumberFormatException("Positive double was expected"),
                                 "Epsilon must be strictly positive!", clientPostedWrongParametersStatus);
@@ -425,7 +384,7 @@ public class SvmTrainer extends AbstractTrainer {
                  * Degree should be a strictly positive integer
                  */
                 try {
-                    i = Integer.parseInt(degree);
+                    i = Integer.parseInt(prm.degree);
                     if (i <= 0) {
                         errorRep.append(new NumberFormatException(),
                                 "The degree must be a strictly positive integer!",
@@ -449,7 +408,7 @@ public class SvmTrainer extends AbstractTrainer {
                  * positive.
                  */
                 try {
-                    d = Double.parseDouble(gamma);
+                    d = Double.parseDouble(prm.gamma);
                     if (d <= 0) {
                         errorRep.append(new NumberFormatException(),
                                 "gamma must be a strictly positive double!", clientPostedWrongParametersStatus);
@@ -472,7 +431,7 @@ public class SvmTrainer extends AbstractTrainer {
                  * coeff0 should be convertible to Double.
                  */
                 try {
-                    d = Double.parseDouble(coeff0);
+                    d = Double.parseDouble(prm.coeff0);
                 } catch (NumberFormatException e) {
                     errorRep.append(e, "coeff must be a double!", clientPostedWrongParametersStatus);
                 } catch (Throwable thr) {
@@ -489,7 +448,7 @@ public class SvmTrainer extends AbstractTrainer {
                  * Tolerance
                  */
                 try {
-                    d = Double.parseDouble(tolerance);
+                    d = Double.parseDouble(prm.tolerance);
                     if (d <= 0) {
                         errorRep.append(new NumberFormatException("A positive double was expected!"),
                                 "Tolerance must be a strictly positive double (preferably small)!", clientPostedWrongParametersStatus);
@@ -511,7 +470,7 @@ public class SvmTrainer extends AbstractTrainer {
                  * cache size
                  */
                 try {
-                    i = Integer.parseInt(cacheSize);
+                    i = Integer.parseInt(prm.cacheSize);
                     if (i <= 0) {
                         errorRep.append(new NumberFormatException("A positive integer was expected!"),
                                 "cacheSize must be a strictly positive integer!", clientPostedWrongParametersStatus);
@@ -524,7 +483,6 @@ public class SvmTrainer extends AbstractTrainer {
 
             }
         };
-        
 
 
         ExecutorService checker = Executors.newFixedThreadPool(9);
@@ -542,10 +500,13 @@ public class SvmTrainer extends AbstractTrainer {
         /**
          * Wait until all checks are terminated!
          */
-        while (!checker.isTerminated()){
-            // just wait!
+        while (!checker.isTerminated()) {
+            try {
+                wait(5);
+            } catch (InterruptedException ex) {
+            }
         }
-
+        notifyAll();
         return errorRep;
 
     }

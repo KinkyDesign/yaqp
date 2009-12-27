@@ -1,7 +1,6 @@
 package org.opentox;
 
 import java.io.IOException;
-import org.opentox.OpenToxApplication;
 import org.opentox.resource.AbstractResource;
 import org.restlet.Application;
 import org.restlet.Component;

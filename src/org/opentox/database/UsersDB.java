@@ -12,7 +12,7 @@ import org.opentox.OpenToxApplication;
  *
  * @author chung
  */
-public class UsersDB extends InHouseDB implements DataBaseAccess{
+public class UsersDB implements DataBaseAccess{
 
     protected final static String USER_ACCOUNTS_TABLE = "USERS";
 
@@ -40,7 +40,7 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
                 "USER_PASSWORD VARCHAR(20)," +
                 "AUTH VARCHAR(20))";
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(CreateTable);
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
@@ -59,7 +59,7 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
         String addUser = "INSERT INTO "+USER_ACCOUNTS_TABLE+ " VALUES ('"+UserName+"' , '"+
                 PassWord+"' , '"+priviledges.getLevel()+"' )";
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(addUser);
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
@@ -75,7 +75,7 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
         String removeUser = "DELETE FROM "+USER_ACCOUNTS_TABLE+" WHERE USER_NAME = '"+UserName+"'";
         Statement stmt;
         try {
-            stmt = connection.createStatement();
+            stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(removeUser);
             OpenToxApplication.opentoxLogger.info("The user '"+UserName+"' was deleted!");
         } catch (SQLException ex) {
@@ -88,7 +88,7 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
         String dbQuery = "SELECT * FROM "+USER_ACCOUNTS_TABLE+" WHERE USER_NAME = '"+username+"'";
         ResultSet rs = null;
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             rs = stmt.executeQuery(dbQuery);
             if (rs.next())
             priviledges = new Priviledges(rs.getString("AUTH"));
@@ -121,7 +121,7 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
         ResultSet rs = null;
         boolean verify = false;
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             rs = stmt.executeQuery(dbQuery);
             if (rs.next())
                     verify = true;
@@ -145,7 +145,7 @@ public class UsersDB extends InHouseDB implements DataBaseAccess{
                 priviledges.getLevel()+"%'";
         ResultSet rs = null;
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = InHouseDB.connection.createStatement();
             rs = stmt.executeQuery(getCredentials);
             while (rs.next()) {
                 secret.put(rs.getString("USER_NAME"),rs.getString("USER_PASSWORD").toCharArray());

@@ -97,7 +97,6 @@ public class MlrTrainer extends AbstractTrainer {
                  */
                 model.createModel(Integer.toString(model_id),
                         dataseturi.toString(),
-                        targeturi.toString(),
                         data,
                         paramList,
                         URIs.mlrAlgorithmURI,
@@ -143,7 +142,7 @@ public class MlrTrainer extends AbstractTrainer {
      * is defined accordingly.
      */
     @Override
-    public ErrorRepresentation checkParameters() {
+    public synchronized ErrorRepresentation checkParameters() {
         final Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
 
 
@@ -215,13 +214,17 @@ public class MlrTrainer extends AbstractTrainer {
         checker.execute(check2);
         checker.shutdown();
 
-         /**
+        /**
          * Wait until all checks are terminated!
          */
-        while (!checker.isTerminated()){
-            // just wait!
+        while (!checker.isTerminated()) {
+            try {
+                wait(5);
+            } catch (InterruptedException ex) {
+            }
         }
 
+        notifyAll();
         return errorRep;
     }
 

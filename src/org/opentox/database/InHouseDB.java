@@ -1,43 +1,56 @@
 package org.opentox.database;
 
-
 import java.sql.*;
 import java.util.logging.Level;
 import org.opentox.OpenToxApplication;
 
-
 /**
- * This is a class to manage access to the database behind the services. 
- * In this database one finds 3 tables. The first one contains information about the trained
- * models such as their internal id, their URI (globally recognizable) and the URI
- * of the algorithm that was used to train every model. The second table contains
- * information about which is the next id to be assigned to a new model and the third
- * one contains authorization/authentication information such as the user name, the
- * password and the priviledged assigned to each user.
+ * This is a class to manage access to the database behind the services. This
+ * class adopts the Singleton Design Pattern (see
+ * <a href="http://www.javaworld.com/javaworld/jw-04-2003/jw-0425-designpatterns.html?page=1">this
+ * article</a> for details ). Only one object of this class can be created! The access point
+ * pf this class is {@link InHouseDB#INSTANCE } and is the only object that can be created.
+ * The contructor of InHouseDB is private and cannot be accessed from other classes and
+ * what is more, InHouseDB cannot be subclassed. The interface {@link  DataBaseAccess } provides
+ * an API for classes used to access certain tables of the database such as the Models' and
+ * the Users' ones. 
  *
- * @author OpenTox - http://www.opentox.org
- * @author Kolotouros Dimitris
+ * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
+ * @author Sarimveis Harry
+ * @version 1.3.3 (Last update: Dec 28, 2009)
  */
-public class InHouseDB implements DataBaseAccess {
-
-    
-
-    private static Driver myDriver = null;
+public final class InHouseDB implements DataBaseAccess {
 
     /**
      * Static Connection to the databse.
      */
     protected static Connection connection = null;
+    /**
+     *
+     */
+    private static InHouseDB instanceOfThis = null;
+    /**
+     * Thread-safe instantiation of the database through a final
+     * instance of it.
+     */
+    public final static InHouseDB INSTANCE = getInstance();
 
     /**
      * Database Constructor.
      * Connects to the existing database or creates a new one if database doesn't exist.
      */
-    public InHouseDB() {
+    private InHouseDB() {
         loadDriver();
         getConnection();
         loadTables();
+    }
+
+    private static InHouseDB getInstance() {
+        if (instanceOfThis == null) {
+            instanceOfThis = new InHouseDB();
+        }
+        return instanceOfThis;
     }
 
     /**
@@ -47,13 +60,16 @@ public class InHouseDB implements DataBaseAccess {
 
 
         try {
-            myDriver = (Driver) Class.forName(DRIVER).newInstance();
-        } catch (InstantiationException ex) {
-            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+            Driver myDriver = (Driver) Class.forName(DRIVER).newInstance();
+            assert (myDriver.jdbcCompliant());
+        } catch (InstantiationException ie) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ie);
+        } catch (IllegalAccessException iae) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, iae);
+        } catch (ClassNotFoundException cnf) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, cnf);
+        } catch (AssertionError ae){
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ae);
         }
     }
 
@@ -140,7 +156,8 @@ public class InHouseDB implements DataBaseAccess {
                     + "Details: " + ex.getMessage());
         }
     }
+    
 
 
-   
 }// end of class
+
