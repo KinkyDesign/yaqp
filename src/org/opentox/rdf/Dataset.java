@@ -74,17 +74,17 @@ public class Dataset extends RDFHandler {
             con.addRequestProperty("Accept", "application/rdf+xml");
             jenaModel = OT.createModel();
             jenaModel.read(con.getInputStream(), null);
-        } catch (MalformedURLException ex){
-             errorRep.append(ex, "The dataset_uri cannot be cast as a valid URL!", Status.CLIENT_ERROR_BAD_REQUEST);
-        } catch (IllegalArgumentException ex){
+        } catch (MalformedURLException ex) {
+            errorRep.append(ex, "The dataset_uri cannot be cast as a valid URL!", Status.CLIENT_ERROR_BAD_REQUEST);
+        } catch (IllegalArgumentException ex) {
             errorRep.append(ex, "Check the dataset URI you posted !", Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (SecurityException ex) {
-            errorRep.append(ex, "A security exception occured! It is possible that a resource" +
-                    "requires user authentication.", Status.SERVER_ERROR_INTERNAL);
+            errorRep.append(ex, "A security exception occured! It is possible that a resource"
+                    + "requires user authentication.", Status.SERVER_ERROR_INTERNAL);
         } catch (IllegalStateException ex) {
             errorRep.append(ex, "HTTP connection cannot be configured correctly!",
                     Status.SERVER_ERROR_INTERNAL);
-        } catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             errorRep.append(ex, "The requested dataset resource could not be found!", Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (IOException ex) {
             errorRep.append(ex, "Input/Output Error while trying to open a connection!", Status.SERVER_ERROR_INTERNAL);
@@ -96,7 +96,7 @@ public class Dataset extends RDFHandler {
     }
 
     /**
-     * Initialized a Dataset object given a URL.
+     * Initializes a Dataset object given a URL.
      * @param dataset_url
      * @throws URISyntaxException
      * @see Dataset#Dataset(java.net.URI)
@@ -165,16 +165,16 @@ public class Dataset extends RDFHandler {
      * be nominal.
      * @return The Instances object which encapsulates the data in the RDF document.
      */
-    public Instances getWekaDatasetForTraining(String target, boolean isClassNominal) throws Exception{
+    public Instances getWekaDatasetForTraining(String target, boolean isClassNominal) throws Exception {
 
         /**
          * Check if some error occured while constructing the
          * Dataset object.
          */
-        if (errorRep.getErrorLevel()>0){
+        if (errorRep.getErrorLevel() > 0) {
             throw new Exception();
         }
-        
+
 
 
         // A1. Some initial definitions:
@@ -256,6 +256,8 @@ public class Dataset extends RDFHandler {
         while (dataEntryIterator.hasNext()) {
             Statement dataEntry = dataEntryIterator.next();
 
+            
+
             /**
              * B2. For every dataEntry, iterate over all values nodes.
              */
@@ -267,6 +269,15 @@ public class Dataset extends RDFHandler {
             for (int i = 0; i < data.numAttributes(); i++) {
                 vals[i] = Instance.missingValue();
             }
+
+            StmtIterator compoundNamesIterator =
+                    jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OT.compound, (Resource) null));
+            String compoundName=null;
+            if (compoundNamesIterator.hasNext()){
+                compoundName = compoundNamesIterator.next().getObject().as(Resource.class).getURI();
+            }
+
+            vals[data.attribute("compound_uri").index()] = data.attribute("compound_uri").addStringValue(compoundName);
 
             while (valuesIterator.hasNext()) {
                 Statement values = valuesIterator.next();
@@ -282,17 +293,17 @@ public class Dataset extends RDFHandler {
                 // and atName is the name of the corresponding attribute.
                 String atName = values.getProperty(OT.feature).getObject().as(Resource.class).getURI();
 
-
+                
+                
                 if (numericXSDtypes().contains(featureTypeMap.get(jenaModel.createResource(atName)))) {
-                    try{
+                    try {
                         vals[data.attribute(atName).index()] = Double.parseDouble(atVal);
                         /**
                          * The following catch rule, handles cases where some values are declared
                          * as numeric (double, float etc) but their value cannot be cast as
                          * double.
                          */
-                    } catch (NumberFormatException ex){
-                        
+                    } catch (NumberFormatException ex) {
                     }
                 } else if (stringXSDtypes().contains(featureTypeMap.get(jenaModel.createResource(atName)))) {
                     vals[data.attribute(atName).index()] = data.attribute(atName).addStringValue(atVal);
@@ -305,6 +316,7 @@ public class Dataset extends RDFHandler {
                 }
 
 
+                
             }
             temp = new Instance(1.0, vals);
 
@@ -333,8 +345,8 @@ public class Dataset extends RDFHandler {
                 errorRep.append(ex, "(Dataset Parser) The target you specified seems not to be valid!",
                         Status.CLIENT_ERROR_BAD_REQUEST);
             } catch (Exception ex) {
-                errorRep.append(ex, "(Dataset Parser) Internal Error occured while trying to " +
-                        "parse the given dataset. The target could not be converted to nominal!",
+                errorRep.append(ex, "(Dataset Parser) Internal Error occured while trying to "
+                        + "parse the given dataset. The target could not be converted to nominal!",
                         Status.SERVER_ERROR_INTERNAL);
                 Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -344,7 +356,9 @@ public class Dataset extends RDFHandler {
 
         return data;
 
-    };
+    }
+
+    ;
 
     /**
      * Similar to {@link org.opentox.rdf.Dataset#getWekaDatasetForTraining(java.lang.String, boolean)  }
@@ -399,9 +413,12 @@ public class Dataset extends RDFHandler {
      * @return FastVector of Attributes
      */
     private FastVector getAttributes(Map<Resource, String> featureTypeMap) {
+        // atts is the FastVector containing all attributes of the dataset:
         FastVector atts = new FastVector();
         Iterator<Entry<Resource, String>> mapIterator = featureTypeMap.entrySet().iterator();
         Entry<Resource, String> entry;
+        // All datasets must have an attribute called 'compound_uri'
+        atts.addElement(new Attribute("compound_uri", (FastVector) null));
         while (mapIterator.hasNext()) {
             entry = mapIterator.next();
             String dataType = entry.getValue();
@@ -411,6 +428,7 @@ public class Dataset extends RDFHandler {
                 atts.addElement(new Attribute(entry.getKey().getURI(), (FastVector) null));
             }
         }
+        
         return atts;
     }
 
@@ -480,21 +498,9 @@ public class Dataset extends RDFHandler {
 
     }
 
-    /**
-     * This main method is for testing purposes only and will be removed.
-     * @param args
-     * @throws Exception
-     * @see Dataset#Dataset(java.net.URI) 
-     * @see Dataset#getWekaDatasetForTraining(java.lang.String, boolean)
-     * @see Dataset#getWekaDatasetForPrediction(java.lang.String)
-     */
-    public static void main(String[] args) throws IOException, URISyntaxException, Exception {
 
-
-        URI d_set = new URI("http://localhost/X.rdf");
-        Dataset data = new Dataset(d_set);
-        Instances wekaData = data.getWekaDatasetForTraining("http://sth.com/feature/10", true);
-        System.out.println(data.errorRep.getText());
-
+    public static void main(String[] atts) throws URISyntaxException, Exception{
+        Dataset ds = new Dataset(new URI("http://localhost/small.rdf"));
+        System.out.println(ds.getWekaDatasetForTraining(null, false));
     }
 }

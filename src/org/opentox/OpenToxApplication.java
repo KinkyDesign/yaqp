@@ -36,6 +36,7 @@ import org.restlet.security.MethodAuthorizer;
 import org.restlet.security.UniformGuard;
 import org.restlet.security.Verifier;
 import org.restlet.service.TaskService;
+import org.restlet.util.Template;
 
 /**
  *  Initial Implementation of the OpenTox Restful WebServices.<br/>
@@ -186,6 +187,7 @@ public class OpenToxApplication extends Application {
 
         Router router = new Router(getContext());
 
+
         /**
          * We set Retry Delay to 1sec
          */
@@ -196,6 +198,12 @@ public class OpenToxApplication extends Application {
          * We set maximum attempts to 5
          */
         router.setMaxAttempts(20);
+
+        /**
+         * Some other configurations
+         */
+        router.setDefaultMatchingMode(Template.MODE_STARTS_WITH);
+        router.setRoutingMode(Router.BEST);
 
         /**
          * Index Resource and stylesheet

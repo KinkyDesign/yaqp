@@ -49,8 +49,7 @@ public class TestResource extends AbstractResource {
     }
 
     @Override
-    protected Representation get(Variant variant) throws ResourceException {    
-        
+    protected Representation get(Variant variant) throws ResourceException {            
 
         try {
             getResponse().setEntity(new StringRepresentation("1"));

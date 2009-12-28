@@ -20,7 +20,7 @@ public class ConstantParameters {
     public static final AlgorithmParameter<Double> COEFF0 = COEFF0(0.0);
     public static final AlgorithmParameter<Integer> DEGREE = DEGREE((int) 3);
     public static final AlgorithmParameter<Double> TOLERANCE = TOLERANCE(0.0001);
-    public static final AlgorithmParameter<Integer> CACHESIZE = CACHESIZE((int)50);
+    public static final AlgorithmParameter<Integer> CACHESIZE = CACHESIZE((int)250007);
 
     public static final AlgorithmParameter<String> TARGET(String value) {
         return new AlgorithmParameter<String>("target",
@@ -61,6 +61,6 @@ public class ConstantParameters {
 
     private static final AlgorithmParameter<Integer> CACHESIZE(int value) {
         return new AlgorithmParameter<Integer>("cacheSize",
-                XSDDatatype.XSDdouble, value, "optional");
+                XSDDatatype.XSDnonNegativeInteger, value, "optional");
     }
 }

@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -90,7 +91,7 @@ public class SvmTrainer extends AbstractTrainer {
 
             // 4. Define the temporary arff file that will be used to store data
             //    and the path to the model file that will be created.
-            long rand = System.currentTimeMillis();
+            long rand = new Random().nextInt() + System.currentTimeMillis();
             String temporaryArffFile = Directories.dataDir + "/" + rand + ".arff",
                     modelFile = Directories.modelWekaDir + "/" + model_id;
 
@@ -170,11 +171,13 @@ public class SvmTrainer extends AbstractTrainer {
                 }
             } catch (AssertionError ex) {
                 errorRep.append(ex, "Dataset id empty!", Status.CLIENT_ERROR_BAD_REQUEST);
-                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
+                errorRep.append(ex, "Communication/Connection to a remote server" +
+                        " ended up unexpectedly: The server encountered an error " +
+                        " while acting as a gateway!",
+                        Status.SERVER_ERROR_BAD_GATEWAY);
             } catch (Exception ex) {
-                Logger.getLogger(SvmTrainer.class.getName()).log(Level.SEVERE, null, ex);
+                errorRep.append(ex, "Some internal error occured!", Status.SERVER_ERROR_INTERNAL);
             }
         }
 
@@ -230,14 +233,14 @@ public class SvmTrainer extends AbstractTrainer {
         }
         prm.cacheSize = form.getFirstValue("cacheSize");
         if (prm.cacheSize == null) {
-            prm.cacheSize = "50";
+            prm.cacheSize = Integer.toString(ConstantParameters.CACHESIZE.paramValue);
         }
 
 
         /**
          * Check the dataset_uri parameter.........
          */
-        Thread check1 = new Thread() {
+        Thread checkDataset = new Thread() {
 
             @Override
             public void run() {
@@ -311,7 +314,7 @@ public class SvmTrainer extends AbstractTrainer {
         };
 
 
-        Thread check2 = new Thread() {
+        Thread checkKernel = new Thread() {
 
             @Override
             public void run() {
@@ -324,7 +327,7 @@ public class SvmTrainer extends AbstractTrainer {
             }
         };
 
-        Thread check3 = new Thread() {
+        Thread checkCost = new Thread() {
 
             @Override
             public void run() {
@@ -352,7 +355,7 @@ public class SvmTrainer extends AbstractTrainer {
             }
         };
 
-        Thread check4 = new Thread() {
+        Thread checkEpsilon = new Thread() {
 
             @Override
             public void run() {
@@ -376,7 +379,7 @@ public class SvmTrainer extends AbstractTrainer {
             }
         };
 
-        Thread check5 = new Thread() {
+        Thread checkDegree = new Thread() {
 
             @Override
             public void run() {
@@ -399,7 +402,7 @@ public class SvmTrainer extends AbstractTrainer {
             }
         };
 
-        Thread check6 = new Thread() {
+        Thread checkGamma = new Thread() {
 
             @Override
             public void run() {
@@ -423,7 +426,7 @@ public class SvmTrainer extends AbstractTrainer {
             }
         };
 
-        Thread check7 = new Thread() {
+        Thread checkCoeff0 = new Thread() {
 
             @Override
             public void run() {
@@ -440,7 +443,7 @@ public class SvmTrainer extends AbstractTrainer {
             }
         };
 
-        Thread check8 = new Thread() {
+        Thread checkTolerance = new Thread() {
 
             @Override
             public void run() {
@@ -462,7 +465,7 @@ public class SvmTrainer extends AbstractTrainer {
             }
         };
 
-        Thread check9 = new Thread() {
+        Thread checkCache = new Thread() {
 
             @Override
             public void run() {
@@ -471,9 +474,9 @@ public class SvmTrainer extends AbstractTrainer {
                  */
                 try {
                     i = Integer.parseInt(prm.cacheSize);
-                    if (i <= 0) {
-                        errorRep.append(new NumberFormatException("A positive integer was expected!"),
-                                "cacheSize must be a strictly positive integer!", clientPostedWrongParametersStatus);
+                    if ((i < 0)&&(i != -1)) {
+                        errorRep.append(new NumberFormatException("A non-negative integer was expected!"),
+                                "cacheSize must be a non-negative integer or -1 for no cache!", clientPostedWrongParametersStatus);
                     }
                 } catch (NumberFormatException e) {
                     errorRep.append(e, "cacheSize should be an integer!", clientPostedWrongParametersStatus);
@@ -486,15 +489,15 @@ public class SvmTrainer extends AbstractTrainer {
 
 
         ExecutorService checker = Executors.newFixedThreadPool(9);
-        checker.execute(check1);
-        checker.execute(check2);
-        checker.execute(check3);
-        checker.execute(check4);
-        checker.execute(check5);
-        checker.execute(check6);
-        checker.execute(check7);
-        checker.execute(check8);
-        checker.execute(check9);
+        checker.execute(checkDataset);
+        checker.execute(checkKernel);
+        checker.execute(checkCost);
+        checker.execute(checkEpsilon);
+        checker.execute(checkDegree);
+        checker.execute(checkGamma);
+        checker.execute(checkCoeff0);
+        checker.execute(checkTolerance);
+        checker.execute(checkCache);
         checker.shutdown();
 
         /**

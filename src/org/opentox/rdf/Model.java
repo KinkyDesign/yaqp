@@ -1,16 +1,25 @@
 package org.opentox.rdf;
 
+import java.io.FileNotFoundException;
 import org.opentox.namespaces.OT;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.SimpleSelector;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.opentox.resource.AbstractResource;
@@ -18,6 +27,8 @@ import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.AlgorithmParameter;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import sun.tools.jar.resources.jar;
+import weka.core.Attribute;
 import weka.core.Instances;
 
 /**
@@ -35,12 +46,20 @@ public class Model extends RDFHandler {
         super();
     }
 
+    /**
+     * Initialized a new instance of {@link Model } reading its content
+     * from an input stream which can be a {@link FileInputStream } or an 
+     * InputStream pointing to a web Resource.
+     * @see HttpURLConnection#getInputStream() 
+     * @param in InputStream for reading the content of the Model.
+     */
     public Model(InputStream in) {
         super(in);
     }
 
     /**
-     * Returns the set of features in the Model (RDF representation).
+     * Returns the set of all features in the Model (RDF representation) including
+     * dependent, independent and predicted ones.
      * @return set of all features or the model.
      */
     public Set<String> setOfFeatures() {
@@ -53,13 +72,48 @@ public class Model extends RDFHandler {
         return set;
     }
 
+
     /**
-     * Get the URI of a new feature from a feature service
-     * @param featureService URI of a feature service
+     * The set of independent variables of the model.
+     * @return set of URIs
+     */
+    public Set<String> getSetOfIndependentFeatures(){
+        Set<String> set = new HashSet<String>();
+        StmtIterator stmt_iter = jenaModel.listStatements(
+                new SimpleSelector(null, OT.independentVariables, (Resource) null));
+        while (stmt_iter.hasNext()){
+            Statement stmt = stmt_iter.next();
+            set.add(stmt.getObject().as(Resource.class).getURI());
+        }
+        return set;
+    }
+
+    /**
+     * Returns the dependent features of the model.
+     * @return dependent feature URI as a String.
+     */
+    public String getDependentFeatureUri(){
+        String dependentFeature = null;
+        StmtIterator stmt_iter = jenaModel.listStatements(
+                new SimpleSelector(null, OT.dependentVariables, (Resource) null));
+        if (stmt_iter.hasNext()){
+            dependentFeature = stmt_iter.next().getObject().as(Resource.class).getURI();
+        }
+        return dependentFeature;
+    }
+
+    /**
+     * Get the URI of the predicted feature of the model.
      * @return URI of predicted feature.
      */
-    private String getPredictedFeatureUri(String featureService) {
-        throw new UnsupportedOperationException("Not Supported yet!");
+    public String getPredictedFeatureUri() {
+        String predictedFeature = null;
+        StmtIterator stmt_iter = jenaModel.listStatements(
+                new SimpleSelector(null, OT.predictedVariables, (Resource) null));
+        if (stmt_iter.hasNext()){
+            predictedFeature = stmt_iter.next().getObject().as(Resource.class).getURI();
+        }
+        return predictedFeature;
     }
 
     /**
@@ -167,4 +221,39 @@ public class Model extends RDFHandler {
         }
 
     }
+
+    
+    
+    public static void main(String[] args) throws FileNotFoundException{
+        Model mod = new Model(new FileInputStream(AbstractResource.Directories.modelRdfDir+"/233"));
+        Set<String> ind_set = mod.getSetOfIndependentFeatures();
+        Iterator<String> it = ind_set.iterator();
+        while (it.hasNext()){
+            System.out.println(it.next());
+        }
+    }
+
+    /**
+     * Check the assertion that a certain weka.core.Instances object is
+     * compatible with this model in terms of having proper features. In fact
+     * the set of attributes of testData must be a hyperset of the dependent
+     * attributes of the model. In plain english, the testData set should provide
+     * at least the information needed.
+     * @param testData
+     * @return
+     */
+    public boolean compatibleWith(Instances testData) {
+        Set<String> modelIndependentFeatures = getSetOfIndependentFeatures();
+        Set<String> testDataIndependentFeatures = new HashSet<String>();
+
+        for (int j=0;j<testData.numAttributes();j++){
+            Attribute current = testData.attribute(j);
+            if (testData.classAttribute().equals(current)){
+                testDataIndependentFeatures.add(current.name());
+            }
+        }
+        return testDataIndependentFeatures.containsAll(modelIndependentFeatures);
+    }
+
+
 }

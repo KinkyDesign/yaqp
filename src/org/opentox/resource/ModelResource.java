@@ -26,6 +26,7 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
+import sun.org.mozilla.javascript.internal.ErrorReporter;
 
 /**
  * 
@@ -98,15 +99,24 @@ public class ModelResource extends AbstractResource {
         switch (algorithm) {
             case svc:
                 predictor = new SvcPredictor();
+                rep = predictor.predict(form, model_id);
                 break;
             case svm:
                 predictor = new SvmPredictor();
+                rep = predictor.predict(form, model_id);
                 break;
             case mlr:
                 predictor = new MlrPredictor();
+                rep = predictor.predict(form, model_id);
                 break;
+            case unknown:
+                rep = new ErrorRepresentation((Throwable) new IllegalArgumentException("No such model!"),
+                        "The model you requested was not found! Check out "+URIs.modelURI+" for a complete " +
+                        "list of all available models on the server!", Status.CLIENT_ERROR_BAD_REQUEST);
+                break; 
+
         }
-        rep = predictor.predict(form, model_id);
+        
 
         return rep;
     }
