@@ -21,8 +21,9 @@ h2. Summary
 
 |Project Name|YAQP (under OpenTox)|
 |Programming Lang.|Java|
-|Project Type|Restful WebServices
-|Developed by|Sopasakis Pantelis, Kolotouros Dimitris|
+|Project Type|Restful WebServices|
+|Developed by|Sopasakis Pantelis|
+||Kolotouros Dimitris|
 |Home Page|https://opentox.ntua.gr|
 |Documentation|https://opentox.ntua.gr/index.php?p=guide|
 | |http://opentox.org/dev/testing/testtoxservices|
