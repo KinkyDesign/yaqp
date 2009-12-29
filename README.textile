@@ -1,4 +1,4 @@
-= YAQP - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
+h1. YAQP - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
 Copyright 2009 - Yet Antother Qsar Project
 http://opentox.ntua.gr:3000
 
@@ -16,8 +16,7 @@ We put effort so that our services be compliant with the OpenTox specifications
 according to the API 1.1.
 
 
-
-== Summary
+h2. Summary
 Project Name      : YAQP (under OpenTox)
 Programming Lang. : Java
 Project Type      : Restful WebServices
@@ -39,14 +38,13 @@ but you can also download and compile the source code and run it locally.
 Enjoy YAQP !
 
 
-
-== ONLINE WEB SERVICES
+h2. ONLINE WEB SERVICES
 
 A server has been set up that supports the services at http://opentox.ntua.gr:3000/
 You can use the well known program cURL to consume these services. If cURL is not 
 installed on your system, install it typing:
 
-	sudo apt-get install curl
+sudo apt-get install curl
 
 Find a complete guide for usign curl at https://opentox.ntua.gr/index.php?p=guide. Feel free
 to contact us via email at chvng[at]mail[dot]ntua[dot]gr. 
@@ -56,19 +54,19 @@ Download the latest version of the source code
 
 
 
-== Compilation
+h2. Compilation
 
 You can download and compile the source code on your local machine. The libraries 
 you need are listed below:
 
-- Restlet v. 2.0 milestone 3 - Download it from http://www.restlet.org/downloads/2.0/
+* Restlet v. 2.0 milestone 3 - Download it from http://www.restlet.org/downloads/2.0/
   Restlet is licensed under GNU LGPL 3.0, GNU LGPL 2.1, CDDL 1.0 and EPL 1.0
-- Weka v. 3.6.0 - Download it from http://www.cs.waikato.ac.nz/ml/weka/
+* Weka v. 3.6.0 - Download it from http://www.cs.waikato.ac.nz/ml/weka/
   Weka is licenses under GNU GPL 3.0
-- Jena - Download it from http://jena.sourceforge.net/downloads.html
+* Jena - Download it from http://jena.sourceforge.net/downloads.html
   Detailed information about its license can be found online at
   http://jena.sourceforge.net/license.html
-- libSVM - Download the java library from http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+* libSVM - Download the java library from http://www.csie.ntu.edu.tw/~cjlin/libsvm/
   libSVM is licensed with the "libSVM license" ("the modified BSD license").
 
 
