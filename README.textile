@@ -1,4 +1,5 @@
 h1. YAQP - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
+
 Copyright 2009 - Yet Antother Qsar Project
 http://opentox.ntua.gr:3000
 
@@ -7,16 +8,17 @@ This Project is under development!
 This is the version 1.3.3 (pre-alpha) of the web service yaqp 
 (yet another qsar project) and brings the following features:
 
-- 100% Restful Architecture of services.
-- Services based on the RDF format for data exchange between different servers
+* 100% Restful Architecture of services.
+* Services based on the RDF format for data exchange between different servers
   which is a W3C recommendation.
-- All RDF documents are compliant with OWL-DL ( http://www.mygrid.org.uk/OWL/Validator )
+* All RDF documents are compliant with OWL-DL ( http://www.mygrid.org.uk/OWL/Validator )
 
 We put effort so that our services be compliant with the OpenTox specifications 
 according to the API 1.1.
 
 
 h2. Summary
+
 Project Name      : YAQP (under OpenTox)
 Programming Lang. : Java
 Project Type      : Restful WebServices
@@ -38,7 +40,7 @@ but you can also download and compile the source code and run it locally.
 Enjoy YAQP !
 
 
-h2. ONLINE WEB SERVICES
+h2. Online Web Services
 
 A server has been set up that supports the services at http://opentox.ntua.gr:3000/
 You can use the well known program cURL to consume these services. If cURL is not 
@@ -68,8 +70,6 @@ you need are listed below:
   http://jena.sourceforge.net/license.html
 * libSVM - Download the java library from http://www.csie.ntu.edu.tw/~cjlin/libsvm/
   libSVM is licensed with the "libSVM license" ("the modified BSD license").
-
-
 
 
 
