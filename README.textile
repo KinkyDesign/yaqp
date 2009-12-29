@@ -1,4 +1,4 @@
-h1. YAQP - A WEB SERVICE FOR THE TRAINING AND VALIDATION OF QSAR MODELS
+h1. Yet Another Qsar Project
 
 Copyright 2009 - Yet Antother Qsar Project
 http://opentox.ntua.gr:3000
@@ -22,8 +22,7 @@ h2. Summary
 Project Name      : YAQP (under OpenTox)
 Programming Lang. : Java
 Project Type      : Restful WebServices
-Developed by      : Sopasakis Pantelis
-                    Kolotouros Dimitris
+Developed by      : Sopasakis Pantelis, Kolotouros Dimitris
 Home Page         : https://opentox.ntua.gr
 Documentation     : https://opentox.ntua.gr/index.php?p=guide
                     http://opentox.org/dev/testing/testtoxservices
@@ -46,7 +45,9 @@ A server has been set up that supports the services at http://opentox.ntua.gr:30
 You can use the well known program cURL to consume these services. If cURL is not 
 installed on your system, install it typing:
 
-sudo apt-get install curl
+<pre><code>
+$ sudo apt-get install curl
+</code></pre>
 
 Find a complete guide for usign curl at https://opentox.ntua.gr/index.php?p=guide. Feel free
 to contact us via email at chvng[at]mail[dot]ntua[dot]gr. 
