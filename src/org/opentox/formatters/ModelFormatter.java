@@ -5,15 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.resource.AbstractResource.Directories;
 import org.opentox.namespaces.Namespace;
-import org.opentox.util.RepresentationFactory;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
@@ -62,18 +61,16 @@ public class ModelFormatter extends AbstractModelFormatter {
                 errorRep.append(ex, "Model not found!", Status.CLIENT_ERROR_NOT_FOUND);
             }
         }else if (MediaType.APPLICATION_XML.equals(mediatype)){
-            RepresentationFactory rf = new RepresentationFactory(Directories.modelPmmlDir+"/"+model_id);
             try {
-                rep = new StringRepresentation(rf.getString().toString(), mediatype);
-            } catch (FileNotFoundException ex) {
-                errorRep.append(ex, "Model not found!", Status.CLIENT_ERROR_NOT_FOUND);
-            } catch (IOException ex) {
-                errorRep.append(ex, "Input/Output error while reading a model file.", Status.SERVER_ERROR_INTERNAL);
+                File pmmlModelFile = new File(Directories.modelPmmlDir+"/"+model_id);
+                rep = new FileRepresentation(pmmlModelFile, mediatype);
+            } catch (Exception ex) {
+                errorRep.append(ex, "Model seems to be missing or destroyed!", Status.SERVER_ERROR_INTERNAL);
                 Logger.getLogger(ModelFormatter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
-        return errorRep.getErrorLevel()==0 ? (StringRepresentation) rep : errorRep;
+        return errorRep.getErrorLevel()==0 ? rep : errorRep;
     }
 
 }

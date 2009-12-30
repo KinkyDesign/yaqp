@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentox.resource.AbstractResource;
-import org.opentox.error.ErrorSource;
 import org.opentox.namespaces.Namespace;
 import org.opentox.namespaces.OT;
 import org.restlet.data.MediaType;
