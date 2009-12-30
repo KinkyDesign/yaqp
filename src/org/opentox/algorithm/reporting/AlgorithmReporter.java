@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.resource.AbstractResource;
 import org.opentox.namespaces.AlgorithmTypes;
+import org.opentox.resource.AbstractResource.URIs;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 
 /**
  *
@@ -104,7 +104,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
         genericMetaInf.format = (MediaType.TEXT_XML.toString());
         genericMetaInf.audience = ("QSAR Experts, Biologists, Toxicologists");
         genericMetaInf.provenance = ("");
-        genericMetaInf.source = (AbstractResource.baseURI);
+        genericMetaInf.source = (URIs.baseURI);
         genericMetaInf.relation = ("http://opentox.org");
 
 

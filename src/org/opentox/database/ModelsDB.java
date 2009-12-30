@@ -7,6 +7,7 @@ import org.opentox.OpenToxApplication;
 import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.database.DataBaseAccess.CreateTable;
 import org.opentox.database.DataBaseAccess.Removal;
+import org.opentox.resource.AbstractResource.URIs;
 
 /**
  *
@@ -143,7 +144,7 @@ public class ModelsDB implements DataBaseAccess {
     @Registration
     public static synchronized int registerNewModel(String AlgID) {
         int id = getModelsStack() + 1;
-        String uri = org.opentox.resource.AbstractResource.baseURI + "/model/" + id;
+        String uri = URIs.baseURI + "/model/" + id;
         String CreateValue = "INSERT INTO " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
         Statement stmt;
         try {

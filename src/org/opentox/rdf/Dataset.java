@@ -1,6 +1,5 @@
 package org.opentox.rdf;
 
-import com.hp.hpl.jena.sparql.modify.UpdateVisitor;
 import org.opentox.namespaces.OT;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
@@ -15,15 +14,13 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.modify.op.Update;
-import com.hp.hpl.jena.update.UpdateAction;
-import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -47,7 +44,7 @@ import weka.filters.unsupervised.attribute.NumericToNominal;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class Dataset extends RDFHandler {
+public class Dataset extends RDFHandler implements Serializable{
 
     private static final long serialVersionUID = -920482801546239926L;
 
@@ -368,9 +365,9 @@ public class Dataset extends RDFHandler {
 
         return data;
 
-    }
+    };
 
-    ;
+    
 
     /**
      * Similar to {@link org.opentox.rdf.Dataset#getWekaDatasetForTraining(java.lang.String, boolean)  }
@@ -568,6 +565,7 @@ public class Dataset extends RDFHandler {
 
         return new Dataset(datasetModel);
     }
+
 
     public static void main(String[] atts) throws URISyntaxException, Exception {
         Dataset ds = new Dataset(new URI("http://localhost/small.rdf"));

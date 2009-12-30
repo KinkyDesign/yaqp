@@ -33,7 +33,7 @@ public class opentoxClient implements AbstractClient{
         int i = 1;
         boolean isalive = false;
         while (isalive == false) {
-            System.out.println("Attempt : " + i);
+            // System.out.println("Attempt : " + i);
             if (i == attempts) {
                 break;
             }

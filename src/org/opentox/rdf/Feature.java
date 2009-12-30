@@ -1,27 +1,22 @@
 package org.opentox.rdf;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import org.opentox.namespaces.OT;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URI;
-import org.opentox.OpenToxApplication;
-import org.opentox.Server;
 import org.opentox.resource.AbstractResource;
 import org.restlet.Client;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.data.Protocol;
-import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 /**
@@ -31,7 +26,7 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 23, 2009)
  */
-public class Feature extends RDFHandler {
+public class Feature extends RDFHandler  implements Serializable {
 
     public Feature() {
         super();

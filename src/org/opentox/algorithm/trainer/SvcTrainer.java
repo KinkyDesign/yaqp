@@ -14,6 +14,7 @@ import org.opentox.error.ErrorRepresentation;
 import org.opentox.resource.AbstractResource.Directories;
 import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
+import org.opentox.algorithm.trainer.AbstractTrainer.Classification;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
 import org.opentox.rdf.Dataset;
@@ -39,7 +40,7 @@ import weka.core.converters.ArffSaver;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class SvcTrainer extends AbstractTrainer {
+@Classification(name="SVC") public class SvcTrainer extends AbstractTrainer {
 
     private static final long serialVersionUID = -6751396783635831385L;
 

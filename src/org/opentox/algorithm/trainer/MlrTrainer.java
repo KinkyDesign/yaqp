@@ -20,6 +20,7 @@ import org.opentox.resource.AbstractResource;
 import org.opentox.resource.AbstractResource.Directories;
 import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
+import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
@@ -41,7 +42,7 @@ import weka.core.Instances;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class MlrTrainer extends AbstractTrainer {
+@Regression(name="MLR") public class MlrTrainer extends AbstractTrainer{
 
     protected Instances data;
 

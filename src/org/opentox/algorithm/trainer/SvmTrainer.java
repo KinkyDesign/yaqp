@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import org.opentox.resource.AbstractResource.Directories;
 import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
+import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
@@ -41,7 +42,7 @@ import weka.core.converters.ArffSaver;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 28, 2009)
  */
-public class SvmTrainer extends AbstractTrainer {
+@Regression(name="SVM") public class SvmTrainer extends AbstractTrainer {
 
     private static final long serialVersionUID = -1522085945071581484L;
     private int i = 0;

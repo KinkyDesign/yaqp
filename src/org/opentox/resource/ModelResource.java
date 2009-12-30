@@ -39,7 +39,6 @@ import org.restlet.resource.ResourceException;
 public class ModelResource extends AbstractResource {
 
     private static final long serialVersionUID = 26047187263491246L;
-    private Status internalStatus = Status.SUCCESS_ACCEPTED;
     private String model_id;
     private AlgorithmEnum algorithm;
 
@@ -117,8 +116,13 @@ public class ModelResource extends AbstractResource {
 
         }
         
-        getResponse().setStatus(((ErrorSource)predictor).errorRep.getStatus());
-        return rep;
+       if (((ErrorSource)predictor).errorRep.getErrorLevel() == 0){
+           getResponse().setStatus(Status.SUCCESS_OK);
+       }else{
+           getResponse().setStatus(((ErrorSource)predictor).errorRep.getStatus());
+       }
+
+       return rep;
     }
 
 
@@ -151,19 +155,6 @@ public class ModelResource extends AbstractResource {
         return new StringRepresentation(responseText + "\n");
     }
 
-    public void setInternalStatus(Status status) {
-        if (((internalStatus.getCode() >= 400) && (internalStatus.getCode() < 500) && status.getCode() >= 400)
-                || ((internalStatus.getCode()) < 300)) {
-            this.internalStatus = status;
-        }
-    }
-
-    /**
-     * Returns the status that the trainer suggests.
-     * @return The internal status of the Trainer.
-     */
-    public Status getInternalStatus() {
-        return internalStatus;
-    }
+    
 }// End of class
 

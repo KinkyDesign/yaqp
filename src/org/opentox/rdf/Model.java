@@ -15,6 +15,7 @@ import com.hp.hpl.jena.vocabulary.DC;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ import weka.core.Instances;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 23, 2009)
  */
-public class Model extends RDFHandler {
+public class Model extends RDFHandler  implements Serializable{
 
     private static final long serialVersionUID = -4754250023818796913L;
 
@@ -143,7 +144,7 @@ public class Model extends RDFHandler {
                     URIs.modelURI + "/" + model_id, OT.Class.Model.getOntClass(jenaModel));
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), "Model " + model_id);
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.identifier.getURI()), URIs.modelURI + "/" + model_id);
-            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.creator.getURI()), AbstractResource.baseURI);
+            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.creator.getURI()), URIs.baseURI);
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.date.getURI()), java.util.GregorianCalendar.getInstance().getTime().toString());
             ot_model.addProperty(jenaModel.createAnnotationProperty(OT.isA.getURI()), OT.Class.Model.getResource());
 

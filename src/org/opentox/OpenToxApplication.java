@@ -17,7 +17,7 @@ import org.opentox.resource.ListModels;
 import org.opentox.resource.ListAlgorithms;
 import org.opentox.resource.IndexResource;
 import org.opentox.resource.ModelInfoResource;
-import org.opentox.resource.TestResource;
+import org.opentox.resource.ShutDownResource;
 import org.opentox.auth.CredentialsVerifier;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -67,6 +67,7 @@ import org.restlet.util.Template;
 public class OpenToxApplication extends Application {
 
     private static final long serialVersionUID = 749479721274764426L;
+
     /**
      * Connection to the Models' database.
      */
@@ -78,10 +79,27 @@ public class OpenToxApplication extends Application {
     public static ExecutorService executor;
     private static final int THREADS = 100;
 
+    private static OpenToxApplication instanceOfThis = null;
+
+    public final static OpenToxApplication INSTANCE = getInstance();
+
+    private static OpenToxApplication getInstance()  {
+        if (instanceOfThis == null) {
+            try {
+                instanceOfThis = new OpenToxApplication();
+            } catch (IOException ex) {
+                Logger.getLogger(OpenToxApplication.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return instanceOfThis;
+    }
+
+
+
     /**
      * Constructor.
      */
-    public OpenToxApplication() throws IOException {
+    private OpenToxApplication() throws IOException {
         if (!(new File(AbstractResource.Directories.logDir)).exists()) {
             new File(AbstractResource.Directories.logDir).mkdirs();
         }
@@ -227,7 +245,7 @@ public class OpenToxApplication extends Application {
 
         router.attach("/task", TaskResource.class);
 
-        router.attach("/test", TestResource.class);
+        router.attach("/shutdown", ShutDownResource.class);
 
 
 

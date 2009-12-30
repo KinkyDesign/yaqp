@@ -61,6 +61,10 @@ public abstract class AbstractTrainer extends ErrorSource{
      */
     public abstract ErrorRepresentation checkParameters();
 
+    protected @interface Regression{ String name() default "";  };
+
+    protected @interface Classification{ String name() default "";  };
+
 
     
 

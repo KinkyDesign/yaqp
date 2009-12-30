@@ -9,6 +9,7 @@ import java.util.Set;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.opentox.OpenToxApplication;
+import org.opentox.Server;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 
@@ -39,11 +40,11 @@ public abstract class AbstractResource extends ServerResource {
         /**
          * Server Port on which the services are available.
          */
-        public static final int port = 3000;
+        public static final String port = Server.__PORT_;
         /**
          * The domain name assigned to the IP of the server.
          */
-        public static final String domainName = "opentox.ntua.gr";
+        public static final String domainName = Server.__DOMAIN_NAME_;
         /**
          * Full URI of the service.
          */
@@ -159,16 +160,8 @@ public abstract class AbstractResource extends ServerResource {
             + " xmlns=\"http://www.dmg.org/PMML-3_2\"  "
             + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
             + " <Header copyright=\"Copyleft (c) OpenTox - An Open Source Predictive Toxicology Framework, http://www.opentox.org, 2009\" />\n";
-    /**
-     * Port used by the web services. This variable has to be overriden if the
-     * services are deployed on another domain.
-     */
-    public static String port = "3000";
-    /**
-     * Base URI of the web services. This variable has to be overriden if the
-     * services are deployed on another domain.
-     */
-    public static String baseURI = "http://opentox.ntua.gr:" + port;
+    
+    
 
     @Override
     public void doInit() throws ResourceException {
