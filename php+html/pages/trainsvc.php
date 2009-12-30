@@ -11,10 +11,11 @@ Main Body of the page
 <?php echo "<form enctype=\"x-www-form-urlencoded\" method=\"POST\" action=\"".$svctrainurl."\">"; ?>
 <br/>
 Dataset to train the model<br/>
-<input type="text" name="dataset" value="http://opentox.ntua.gr/arff/reg"/> 
+<input type="text" name="dataset_uri" value="http://opentox.ntua.gr/ds.rdf" size=35/> 
 <br/><br/>
-Target Feature Definition<br/>
-<input type="text" name="target" value="http://someserver.com:8080/feature_definition/9016"/>
+Target Feature<br/>
+<input type="text" name="target" value="http://sth.com/feature/1" size=35/>
+<br/><br/>
 Cost<br/>
 <input type="text" name="cost" value="1000"/><br/>
 <br/>

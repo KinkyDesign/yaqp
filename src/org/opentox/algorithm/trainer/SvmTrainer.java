@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentox.resource.AbstractResource.Directories;
 import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;

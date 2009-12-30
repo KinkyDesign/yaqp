@@ -27,15 +27,9 @@ Main Body of the page
             <h2>
               <!-- Section : 1 - Algorithms -->  1. Algorithms for Training Models
             </h2>
-	<br/><br/>
-	    <h3>
-		API
-	    </h3>
-		The OpenTox API for Algorithm Services can be found <a href="http://opentox.org/dev/apis/api-1.1/Algorithm">here</a>.
-		<br/><br/>
-            <h3>
+            <p>
                List of involved URIs: 
-            </h3>
+            </p>
             <ol>
               <li>
                  <? echo($algorithmurl) ?>
@@ -62,14 +56,13 @@ Main Body of the page
             <p align="justify">
 
                Get a URI list of all available algorithms (including classification, regression and preprocessing). 
-              <br/><br/>
+              <br/>
               <code>curl -v -X GET -H &quot;Accept:text/uri-list&quot; <? echo ($algorithmurl)?> </code>
 	      Also, the list of algorithms in available in text/html.<br/><br/><br/>
 
                Get a representation of an algorithm in a prefered MIME type:             
-              <br/><br/>
-              <code>curl -v -X GET -H &quot;Accept:PreferedMimeType&quot; <?echo($algorithmurl)?>/{id} </code>
               <br/>
+              <code>curl -v -X GET -H &quot;Accept:PreferedMimeType&quot; <?echo($algorithmurl)?>/{id} </code>
 	      where {id} stands for the id of the algorithm and the list of supported MIMEs is:
 		<ol>
 		    <li>application/rdf+xml (default)</li>
@@ -83,41 +76,15 @@ Main Body of the page
               <br/>
               <br/>              
 		By means of a training algorithm service, train a regression or a classification model
-		<br/><br/>
-		<code>curl -v -X POST -d 'dataset_uri=http://someserver.com/dataset/{dataset_id}&amp;target=http://example.org/feature/{feature_id}' http://opentox.ntua.gr:3000/algorithm/{algorithm_id}</code><br/>
-	        Where {algorithm_id} is the id of the training algorithm (see http://opentox.ntua.gr:3000/algorithm for reference ). 
-		The URI http://someserver.com/dataset/{dataset_id} should be substituted by any URI pointing to an RDF representation of a 
-		dataset which complies to the <a href="http://opentox.org/dev/apis/api-1.1/dataset">OpenTox specifications</a> 
-		for datasets and the POSTed variable target is a <a href="http://opentox.org/dev/apis/api-1.1/Feature">feature</a> of the 
-		dataset that should be used as target (class variable). Here is a realistic example of a curl command you can use on your own to train an mlr model: 
-		<br/><br/>
-		<code>curl -X POST -d 'dataset_uri=http://opentox.ntua.gr/ds.rdf&target=http://sth.com/feature/1' http://opentox.ntua.gr:3000/algorithm/mlr
-</code>
-		<br/><br/>
-
-		<h3>Status Codes</h3>
-		<ol>
-		  <li>200: The request has succeeded!</li>
-		  <li>404: The algorithm you were looking for, cannot be found on the server. Check you syntax. The URI http://opentox.ntua.gr;3000/algorithm/svm is different from http://opentox.ntua.gr:3000/algorithm/Svm (with a capital S).</li>
-		  <li>400: Bad Request! This status code is returned in POST operations, i.e. when you're trying to train a model providing a dataset uri,a target feature uri and other tuning parameters. There are many reasons for such a status code; for example if you provide a gamma parameter which is negative or is not numeric, or if the target you provided is not a feature of the dataset etc. An explanatory message is always thrown.</li>
-		  <li>500: Internal Server Error! The server encountered an internal error. Please contact the system administrators via e-mail or report the issue at this
-			<a href="http://github.com/sopasakis/yaqp/issues">issue tracker</a>.
-		</ol>
-           <br/>            
-           <a href="#page">(Back to Top)</a>
-
+		<code>curl -v -X POST -d 'dataset_uri=http://someserver.com/dataset/{dataset_id}&amp;target=http://example.org/feature/{feature_id}' http://opentox.ntua.gr:3000/algorithm/{algorithm_id}</code>
+            <a href="#page">(Back to Top)</a>
 <br/><br/><br/><br/>
           </div>
 
 	<div id="sec2">
 	  <h2>2. Operations Involving Models</h2>
-		<br/><br/>
-	<h3>API</h3>
-	The OpenTox API for model services can be found <a href="http://opentox.org/dev/apis/api-1.1/Model">here</a>.
-	<br/><br/>
-	<h3>List Of Involved URIs</h3>	
         </div>
-<br/><br/><br/><br/>
+
 <!--
 End of Main Body
 -->

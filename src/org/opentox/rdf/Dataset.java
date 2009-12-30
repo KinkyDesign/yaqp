@@ -1,5 +1,6 @@
 package org.opentox.rdf;
 
+import com.hp.hpl.jena.sparql.modify.UpdateVisitor;
 import org.opentox.namespaces.OT;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
@@ -14,7 +15,12 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.modify.op.Update;
+import com.hp.hpl.jena.update.UpdateAction;
+import com.hp.hpl.jena.update.UpdateFactory;
+import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +35,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.opentox.resource.AbstractResource.URIs;
 import org.restlet.data.Status;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -55,6 +62,10 @@ public class Dataset extends RDFHandler {
         super(in);
     }
 
+    protected Dataset(OntModel ontological_model) {
+        jenaModel = ontological_model;
+    }
+
     /**
      * Initializes a Dataset given a URI.
      * @param dataset_uri
@@ -74,6 +85,7 @@ public class Dataset extends RDFHandler {
             con.addRequestProperty("Accept", "application/rdf+xml");
             jenaModel = OT.createModel();
             jenaModel.read(con.getInputStream(), null);
+
         } catch (MalformedURLException ex) {
             errorRep.append(ex, "The dataset_uri cannot be cast as a valid URL!", Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (IllegalArgumentException ex) {
@@ -256,7 +268,7 @@ public class Dataset extends RDFHandler {
         while (dataEntryIterator.hasNext()) {
             Statement dataEntry = dataEntryIterator.next();
 
-            
+
 
             /**
              * B2. For every dataEntry, iterate over all values nodes.
@@ -272,8 +284,8 @@ public class Dataset extends RDFHandler {
 
             StmtIterator compoundNamesIterator =
                     jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OT.compound, (Resource) null));
-            String compoundName=null;
-            if (compoundNamesIterator.hasNext()){
+            String compoundName = null;
+            if (compoundNamesIterator.hasNext()) {
                 compoundName = compoundNamesIterator.next().getObject().as(Resource.class).getURI();
             }
 
@@ -293,8 +305,8 @@ public class Dataset extends RDFHandler {
                 // and atName is the name of the corresponding attribute.
                 String atName = values.getProperty(OT.feature).getObject().as(Resource.class).getURI();
 
-                
-                
+
+
                 if (numericXSDtypes().contains(featureTypeMap.get(jenaModel.createResource(atName)))) {
                     try {
                         vals[data.attribute(atName).index()] = Double.parseDouble(atVal);
@@ -316,7 +328,7 @@ public class Dataset extends RDFHandler {
                 }
 
 
-                
+
             }
             temp = new Instance(1.0, vals);
 
@@ -428,7 +440,7 @@ public class Dataset extends RDFHandler {
                 atts.addElement(new Attribute(entry.getKey().getURI(), (FastVector) null));
             }
         }
-        
+
         return atts;
     }
 
@@ -498,8 +510,66 @@ public class Dataset extends RDFHandler {
 
     }
 
+    /**
+     *
+     * @param predictedData
+     * @return
+     */
+    public synchronized Dataset populateDataset(Instances predictedData) {
+        OntModel datasetModel = null;
+        try {
+            datasetModel = OT.createModel();
+            Individual dataset = datasetModel.createIndividual(OT.Class.Dataset.createOntClass(datasetModel));
+            dataset.addRDFType(OT.Class.Dataset.createProperty(datasetModel));
+            dataset.addProperty(jenaModel.createAnnotationProperty(DC.creator.getURI()), URIs.baseURI);
+            dataset.addProperty(jenaModel.createAnnotationProperty(RDFS.comment.getURI()),
+                    predictedData.relationName());
 
-    public static void main(String[] atts) throws URISyntaxException, Exception{
+
+            OT.Class.Dataset.createOntClass(datasetModel);
+            OT.Class.DataEntry.createOntClass(datasetModel);
+            OT.Class.Feature.createOntClass(datasetModel);
+            OT.Class.FeatureValue.createOntClass(datasetModel);
+            OT.Class.Compound.createOntClass(datasetModel);
+
+
+            Individual dataEntry = null, compound = null, feature = null, featureValue = null;
+
+
+
+            for (int i = 0; i < predictedData.numInstances(); i++) {
+                dataEntry = datasetModel.createIndividual(OT.Class.DataEntry.getOntClass(datasetModel));
+                dataset.addProperty(OT.dataEntry, dataEntry);
+
+                compound = datasetModel.createIndividual(
+                        predictedData.instance(i).stringValue(predictedData.attribute("compound_uri")),
+                        OT.Class.Compound.getOntClass(datasetModel));
+                dataEntry.addProperty(OT.compound, compound);
+
+                feature = datasetModel.createIndividual(predictedData.attribute(1).name(),
+                        OT.Class.Feature.getOntClass(datasetModel));
+                featureValue = datasetModel.createIndividual(
+                        OT.Class.FeatureValue.getOntClass(datasetModel));
+                featureValue.addProperty(OT.feature, feature);
+                featureValue.addLiteral(OT.value, datasetModel.createTypedLiteral(predictedData.instance(i).value(1),
+                        XSDDatatype.XSDdouble));
+                dataEntry.addProperty(OT.values, featureValue);
+
+
+                dataset.addProperty(OT.dataEntry, dataEntry);
+
+            }
+
+
+        } catch (Exception ex) {
+            errorRep.append(ex, "Unexpectable Exception!", Status.SERVER_ERROR_INTERNAL);
+
+        }
+
+        return new Dataset(datasetModel);
+    }
+
+    public static void main(String[] atts) throws URISyntaxException, Exception {
         Dataset ds = new Dataset(new URI("http://localhost/small.rdf"));
         System.out.println(ds.getWekaDatasetForTraining(null, false));
     }

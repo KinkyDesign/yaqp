@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +26,6 @@ import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.AlgorithmParameter;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import sun.tools.jar.resources.jar;
 import weka.core.Attribute;
 import weka.core.Instances;
 

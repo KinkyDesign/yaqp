@@ -2,7 +2,6 @@ package org.opentox.resource;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import org.opentox.resource.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +15,7 @@ import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsDB;
 import org.opentox.error.ErrorRepresentation;
+import org.opentox.error.ErrorSource;
 import org.opentox.formatters.ModelFormatter;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -26,7 +26,6 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import sun.org.mozilla.javascript.internal.ErrorReporter;
 
 /**
  * 
@@ -95,6 +94,7 @@ public class ModelResource extends AbstractResource {
         /** Get the posted parameters **/
         Form form = new Form(entity);
 
+
         Predictor predictor = null;
         switch (algorithm) {
             case svc:
@@ -107,7 +107,7 @@ public class ModelResource extends AbstractResource {
                 break;
             case mlr:
                 predictor = new MlrPredictor();
-                rep = predictor.predict(form, model_id);
+                rep = predictor.predict(form, model_id);                
                 break;
             case unknown:
                 rep = new ErrorRepresentation((Throwable) new IllegalArgumentException("No such model!"),
@@ -117,7 +117,7 @@ public class ModelResource extends AbstractResource {
 
         }
         
-
+        getResponse().setStatus(((ErrorSource)predictor).errorRep.getStatus());
         return rep;
     }
 

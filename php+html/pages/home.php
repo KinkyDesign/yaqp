@@ -17,6 +17,10 @@ This site offers predictive toxicology Web-based Services. It is 100% open to th
 <p align="justify">
 This project is open source and is offered free of any charge. The source code of these services is available at <a href="http://github.com/sopasakis/yaqp">http://github.com/sopasakis/yaqp</a>. A <a href="./javadoc">javadoc</a> ia also available online. The services are licenced under the General Public Licence <a href="http://www.gnu.org/licenses/gpl-3.0.txt">GPL v.3</a>.
 </p>
+<br/>
+<br/>
+<em>Last Update: 2009-11-27</em>
+<br/><br/>
 <!--
 End of Main Body
 -->

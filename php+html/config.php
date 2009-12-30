@@ -3,17 +3,22 @@
     $baseurl = "http://opentox.ntua.gr/";
     $servicesurl = "http://opentox.ntua.gr:3000";
     $algorithmurl= $servicesurl."/algorithm";
-    $learningurl = $algorithmurl."/learning"; 
-    $classificationurl = $learningurl."/classification";
-    $regressionurl = $learningurl."/regression";
 
-    $svctrainurl = $classificationurl."/svc";
-    $svmtrainurl = $regressionurl."/svm";
-    $mlrtrainurl = $regressionurl."/mlr";
+ $learningurl = $algorithmurl."DEPRECATED!!!!"; 
+ $classificationurl = $learningurl."DEPRECATED!!!!";
+ $regressionurl = $learningurl."DEPRECATED!!!!";
+
+    $svctrainurl = $algorithmurl."/svc";
+    $svmtrainurl = $algorithmurl."/svm";
+    $mlrtrainurl = $algorithmurl."/mlr";
+
     $modelurl = $servicesurl."/model"; 
+
     $svcmodelurl = $modelurl."?searchAlgorithm=svc";
     $svmmodelurl = $modelurl."?searchAlgorithm=svm";
     $mlrmodelurl = $modelurl."?searchAlgorithm=mlr";
+
+    $github = "http://github.com/sopasakis/yaqp";
 
     $pages_size = 8;
 

@@ -11,10 +11,7 @@ Main Body of the page
 <?php echo "<form enctype=\"x-www-form-urlencoded\" method=\"POST\" action=\"".$svmtrainurl."\">"; ?>
 <br/>
 Dataset to train the model<br/>
-<input type="text" name="dataset" value="http://opentox.ntua.gr/arff/reg"/> 
-<br/><br/>
-Target Feature Definition<br/>
-<input type="text" name="target" value="http://someserver.com:8080/feature_definition/445" />
+<input type="text" name="dataser_uri" value="http://opentox.ntua.gr/ds.rdf" size=35/> 
 <br/><br/>
 Cost<br/>
 <input type="text" name="cost" value="1000"/>

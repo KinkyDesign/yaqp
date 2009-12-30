@@ -1,21 +1,25 @@
 package org.opentox.prediction;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.opentox.resource.AbstractResource.Directories;
-import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.error.ErrorSource;
 import org.opentox.rdf.Dataset;
 import org.opentox.rdf.Model;
+import org.opentox.resource.AbstractResource.URIs;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import weka.classifiers.pmml.consumer.PMMLClassifier;
+import weka.core.Attribute;
+import weka.core.FastVector;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.pmml.PMMLFactory;
 import weka.core.pmml.PMMLModel;
@@ -29,14 +33,11 @@ import weka.core.pmml.PMMLModel;
  */
 public class MlrPredictor extends ErrorSource implements Predictor {
 
-
     /**
      * Constructor.
      */
-    public MlrPredictor(){
-
+    public MlrPredictor() {
     }
-
 
     /**
      * An implementation of the corresponding method in {@link Predictor } for
@@ -55,7 +56,7 @@ public class MlrPredictor extends ErrorSource implements Predictor {
         // the resulting representaiton.
         Representation rep = null;
         Model model = new Model();
-        Dataset dataset = new Dataset();
+        Dataset test_dataset = new Dataset();
 
         try {
 
@@ -66,11 +67,11 @@ public class MlrPredictor extends ErrorSource implements Predictor {
 
             // The dataset as an instance of org.opentox.rdf.Dataset (dataset)
             URI d_set = new URI(form.getFirstValue("dataset_uri"));
-            dataset = new Dataset(d_set);
+            test_dataset = new Dataset(d_set);
 
             // The dataset content as an instance of weka.core.Instances (testData):
-            Instances testData = dataset.getWekaDatasetForTraining(null, false);
-          
+            Instances testData = test_dataset.getWekaDatasetForTraining(null, false);
+
 
             // check the compatibility of the model with the testData:
             assert (model.compatibleWith(testData));
@@ -81,28 +82,59 @@ public class MlrPredictor extends ErrorSource implements Predictor {
             // set the target:
             testData.setClass(testData.attribute(target));
 
+            // Define the predicted dataset:
+            double[] vals = new double[2];
+            vals[0] = Instance.missingValue();
+            vals[1] = Instance.missingValue();
+
+            FastVector predictedDS_atts = new FastVector();
+            Attribute compound_uriAtt = new Attribute("compound_uri", (FastVector) null);
+            Attribute predictedAtt = new Attribute(model.getPredictedFeatureUri());
+            predictedDS_atts.addElement(compound_uriAtt);
+            predictedDS_atts.addElement(predictedAtt);
+            Instances predictedData = new Instances(form.getFirstValue("dataset_uri")
+                    +" ---> "+URIs.modelURI+"/"+model_id, predictedDS_atts, 0);
+
+
 
             // Create an instance of PMMLModel
-            PMMLModel mlrModel = PMMLFactory.getPMMLModel(
+            final PMMLModel mlrModel = PMMLFactory.getPMMLModel(
                     new File(Directories.modelPmmlDir + "/" + model_id));
 
 
             if (mlrModel instanceof PMMLClassifier) {
 
-                PMMLClassifier classifier = (PMMLClassifier) mlrModel;
+                final PMMLClassifier classifier = (PMMLClassifier) mlrModel;
 
 
-                /**
-                 * TODO: Do not return the list of predictions to the client! Instead
-                 * create a new dataset and post it to a dataset service.
-                 */
-                String predictions = "";
+                final int indexOfCompoundUri = predictedData.attribute("compound_uri").index();
+                final int indexOfPredictedFeature = predictedData.attribute(model.getPredictedFeatureUri()).index();
+                Instance current = null;
+                Instance temp = null;
 
-                for (int i = 0; i < testData.numInstances(); i++) {
-                    predictions = predictions + classifier.classifyInstance(testData.instance(i)) + "\n";
+                for (int k = 0; k < testData.numInstances(); k++) {
+                    current = testData.instance(k);
+                    if (!current.hasMissingValue()) {
+                        vals = new double[2];
+                        vals[indexOfCompoundUri] =
+                                predictedData.attribute(indexOfCompoundUri).
+                                addStringValue(current.stringValue(indexOfCompoundUri));
+                        vals[indexOfPredictedFeature] =
+                                classifier.classifyInstance(current);
+
+                        temp = new Instance(1.0, vals);
+
+                        if (predictedData.checkInstance(temp)) {
+                            predictedData.add(temp);
+                        }
+                    }
                 }
 
-                rep = new StringRepresentation(predictions, MediaType.TEXT_PLAIN);
+               Dataset predictedDataset = test_dataset.populateDataset(predictedData);
+               
+               ByteArrayOutputStream out = new ByteArrayOutputStream();
+               predictedDataset.jenaModel.write(out);
+               rep = new StringRepresentation(out.toString() + "\n", MediaType.TEXT_PLAIN);
             }
 
         } catch (AssertionError ass) {
@@ -114,12 +146,11 @@ public class MlrPredictor extends ErrorSource implements Predictor {
         } catch (Exception exc) { // thrown by dataset.getWekaDatasetForTraining(null, false);
             errorRep.append(exc, "This dataset cannot be successfully parsed due to syntax errors!",
                     clientBadRequest);
-        } finally{
+        } finally {
             errorRep.append(model.errorRep);
-            errorRep.append(dataset.errorRep);
+            errorRep.append(test_dataset.errorRep);
         }
-        
-    return errorRep.getErrorLevel()==0 ? rep : errorRep;
-}
 
+        return errorRep.getErrorLevel() == 0 ? rep : errorRep;
+    }
 }
