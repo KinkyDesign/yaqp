@@ -1,15 +1,20 @@
 package org.opentox.resource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.opentox.resource.*;
 import org.opentox.database.ModelsDB;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.ReferenceList;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
@@ -54,7 +59,7 @@ public class ListModels extends AbstractResource {
      * Return a text/uri-list or text/html representation of the list of
      * available models.
      * @param variant
-     * @return XML file containings the ids of all classification and regression models.
+     * @return Representation of list of models.
      */
     @Override
     public Representation get(Variant variant) {
@@ -69,12 +74,24 @@ public class ListModels extends AbstractResource {
 
 
         if ((MediaType.TEXT_URI_LIST).equals(variant.getMediaType())) {
-            rep = list.getTextRepresentation();
-            rep.setMediaType(MediaType.TEXT_URI_LIST);
+
+            if (list.size() > 0) {
+                getResponse().setStatus(Status.SUCCESS_OK);
+                rep = list.getTextRepresentation();
+                rep.setMediaType(MediaType.TEXT_URI_LIST);
+            } else {
+                getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+            }
+
         } else if ((MediaType.TEXT_HTML).equals(variant.getMediaType())) {
-            rep = list.getWebRepresentation();
-            rep.setMediaType(MediaType.TEXT_HTML);
-        }
+            if (list.size() > 0) {
+                rep = list.getWebRepresentation();
+                getResponse().setStatus(Status.SUCCESS_OK);
+                rep.setMediaType(MediaType.TEXT_HTML);
+            } else {
+                getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+            }
+        }        
         return rep;
     }
 }

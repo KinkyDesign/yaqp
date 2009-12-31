@@ -9,10 +9,7 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
-import org.restlet.Client;
 import org.restlet.data.MediaType;
-import org.restlet.data.Protocol;
-import org.restlet.data.Status;
 import weka.core.Instances;
 
 /**
@@ -86,7 +83,7 @@ public class opentoxClient implements AbstractClient{
       public static Instances getInstances(URI uri) {
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection con = null;
-        boolean isMimeAvailable;
+        boolean isMimeAvailable; //?????
         try {
             con = (HttpURLConnection) uri.toURL().openConnection();
             con.setDoInput(true);

@@ -22,9 +22,9 @@ import org.restlet.service.LogService;
  */
 public class Server {
 
-    public static String __PORT_;
-    public static String __DOMAIN_NAME_;
-    public static String __DATABASE_NAME;
+    public static String __PORT_ = "3000";
+    public static String __DOMAIN_NAME_ = "opentox.ntua.gr";
+    public static String __DATABASE_NAME = "modelsDb";
     private static Component component;
 
 
@@ -59,13 +59,6 @@ public class Server {
                     }
 
                 }
-            } else {
-                /**
-                 * Default startup parameters:
-                 */
-                __PORT_ = "3000";
-                __DOMAIN_NAME_ = "opentox.ntua.gr";
-                __DATABASE_NAME = "modelsDb";
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
             exitWithHelp();
