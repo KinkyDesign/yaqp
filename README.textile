@@ -66,13 +66,14 @@ you need are listed below:
 * Restlet v. 2.0 milestone 3 - Download it from http://www.restlet.org/downloads/2.0/
   Restlet is licensed under GNU LGPL 3.0, GNU LGPL 2.1, CDDL 1.0 and EPL 1.0
 * Weka v. 3.6.0 - Download it from http://www.cs.waikato.ac.nz/ml/weka/
-  Weka is licenses under GNU GPL 3.0
+  Weka is licensed under GNU GPL 3.0
 * Jena - Download it from http://jena.sourceforge.net/downloads.html
   Detailed information about its license can be found online at
   http://jena.sourceforge.net/license.html
 * libSVM - Download the java library from http://www.csie.ntu.edu.tw/~cjlin/libsvm/
   libSVM is licensed with the "libSVM license" ("the modified BSD license").
-
+* Apache Derby - Download it from http://db.apache.org/derby/
+  Derby is available under that Apache License, v.2.0. 
 
 
 

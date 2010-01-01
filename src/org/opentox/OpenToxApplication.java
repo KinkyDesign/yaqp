@@ -2,7 +2,9 @@ package org.opentox;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
@@ -19,6 +21,7 @@ import org.opentox.resource.IndexResource;
 import org.opentox.resource.ModelInfoResource;
 import org.opentox.resource.ShutDownResource;
 import org.opentox.auth.CredentialsVerifier;
+import org.opentox.auth.GuardDog;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.ChallengeScheme;
@@ -96,6 +99,7 @@ public class OpenToxApplication extends Application {
 
 
 
+
     /**
      * Constructor.
      */
@@ -113,59 +117,9 @@ public class OpenToxApplication extends Application {
         executor = Executors.newFixedThreadPool(THREADS);
     }
 
-    protected UniformGuard createGuard(Verifier verifier, boolean optional) {
 
 
-        Enroler enroler = new Enroler() {
 
-            @Override
-            public void enrole(Subject subject) {
-                //System.out.println(subject);
-            }
-        };
-
-        /*
-         * Simple authorizer: Not completed yet...
-         */
-        MethodAuthorizer authorizer = new MethodAuthorizer("authorizer") {
-
-            @Override
-            public boolean authorize(Request request, Response response) {
-                return super.authorize(request, response);
-            }
-        };
-
-        authorizer.getAuthenticatedMethods().add(Method.DELETE);
-        authorizer.getAuthenticatedMethods().add(Method.GET);
-        authorizer.getAuthenticatedMethods().add(Method.POST);
-
-
-        // Create a Guard
-        ChallengeGuard guard = new ChallengeGuard(getContext(),
-                ChallengeScheme.HTTP_BASIC, "realm");
-
-        ChallengeAuthenticator authenticator = new ChallengeAuthenticator(
-                getContext(), optional, ChallengeScheme.HTTP_BASIC, "realm") {
-
-            @Override
-            protected boolean authenticate(Request request, Response response) {
-                /** Allow everyone to GET but only Admins to apply DELETE!**/
-                if ((Method.GET.equals(request.getMethod()))
-                        || (Method.POST.equals(request.getMethod()))) {
-                    System.out.println("PASS without password!");
-                    return true;
-                } else {
-                    return super.authenticate(request, response);
-                }
-            }
-        };
-        guard.setContext(getContext());
-        guard.setAuthenticator(authenticator);
-        guard.getAuthenticator().setVerifier(verifier);
-        guard.getAuthenticator().setEnroler(enroler);
-        guard.setAuthorizer(authorizer);
-        return guard;
-    }
 
     /**
      * Creates a root Restlet that will receive all incoming calls.
@@ -198,9 +152,22 @@ public class OpenToxApplication extends Application {
         /**
          * Authenticate authorized users.
          */
-        CredentialsVerifier verifier = new CredentialsVerifier(
-                this, Priviledges.USER);
-        UniformGuard modelKerberos = createGuard(verifier, false);
+        Verifier verifier = new CredentialsVerifier(this, Priviledges.USER);
+        List<Method> modelMethods = new ArrayList<Method>();
+        modelMethods.add(Method.GET);
+        modelMethods.add(Method.POST);
+        modelMethods.add(Method.DELETE);
+        List<Method> modelFreeMethods = new ArrayList<Method>();
+        modelFreeMethods.add(Method.GET);
+        modelFreeMethods.add(Method.POST);
+        UniformGuard modelKerberos = new GuardDog().
+                createGuard(
+                this,
+                verifier,
+                false,
+                modelMethods,
+                modelFreeMethods,
+                ModelResource.class);
         modelKerberos.setNext(ModelResource.class);
 
         Router router = new Router(getContext());
@@ -245,7 +212,26 @@ public class OpenToxApplication extends Application {
 
         router.attach("/task", TaskResource.class);
 
-        router.attach("/shutdown", ShutDownResource.class);
+
+        /**
+         * Shutdown Resource
+         */
+
+        CredentialsVerifier shutDownVerifier = new CredentialsVerifier(this, Priviledges.ADMIN);
+        List<Method> shutdownMethods = new ArrayList<Method>();
+        shutdownMethods.add(Method.GET);
+        shutdownMethods.add(Method.POST);
+        List<Method> shutDownFree = new ArrayList<Method>();
+        shutDownFree.add(Method.GET);
+        UniformGuard shutDownKerberos = new GuardDog().
+                createGuard(
+                this,
+                shutDownVerifier,
+                false,
+                shutdownMethods,
+                shutDownFree,
+                ShutDownResource.class);
+        router.attach("/shutdown", shutDownKerberos);
 
 
 

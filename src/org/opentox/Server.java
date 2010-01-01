@@ -10,7 +10,6 @@ import org.opentox.resource.AbstractResource.URIs;
 import org.restlet.Application;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
-import org.restlet.ext.grizzly.GrizzlyServerHelper;
 import org.restlet.service.LogService;
 
 /**

@@ -179,7 +179,8 @@ public class Model extends RDFHandler  implements Serializable{
              * Generate a new feature in AMBIT ( http://ambit.uni-plovdiv.bg:8080/ambit2/feature )....
              */
             Feature featurec = new Feature();
-            Response response = featurec.createNewFeature("http://someserver.com/feature/101", new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/feature"));
+            Response response = featurec.createNewFeature(targeturi,
+                    new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/feature"));
 
             System.out.println(response.getEntity());
 
@@ -198,7 +199,7 @@ public class Model extends RDFHandler  implements Serializable{
             for (int i = 0; i < data.numAttributes(); i++) {
                 // for the target attribute...
                 if (targeturi.toString().equals(data.attribute(i).name())) {
-                    feature = jenaModel.createIndividual(targeturi.toString(),
+                    feature = jenaModel.createIndividual(targeturi,
                             OT.Class.Feature.getOntClass(jenaModel));
                     ot_model.addProperty(jenaModel.createAnnotationProperty(OT.dependentVariables.getURI()), feature);
                     //Add the predicted variable...

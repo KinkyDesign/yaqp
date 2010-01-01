@@ -68,6 +68,6 @@ public class ShutDownResource extends AbstractResource {
 
     @Override
     protected Representation get(Variant variant) throws ResourceException {
-        return new StringRepresentation("ShutDown service\n");
+        return new StringRepresentation("ShutDown service...\n");
     }
 }
