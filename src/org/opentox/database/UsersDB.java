@@ -117,7 +117,6 @@ public class UsersDB implements DataBaseAccess{
     public static boolean verifyCredentials(String userName, String password){
         String dbQuery = "SELECT * FROM "+USER_ACCOUNTS_TABLE+ " WHERE USER_NAME='"+userName+
                 "' AND USER_PASSWORD ='"+password+"'";
-        System.out.println(dbQuery);
         ResultSet rs = null;
         boolean verify = false;
         try {

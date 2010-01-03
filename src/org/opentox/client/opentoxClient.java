@@ -47,8 +47,7 @@ public class opentoxClient implements AbstractClient{
         if (!(soc == null)) {
             try {
                 soc.close();
-            } catch (IOException ex) {
-                Logger.getLogger(datasetFox.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {                
             }
         }
         return isalive;
@@ -74,7 +73,6 @@ public class opentoxClient implements AbstractClient{
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(datasetFox.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
@@ -100,7 +98,6 @@ public class opentoxClient implements AbstractClient{
 
         } catch (IOException ex) {
             /** Cannot read from that resource**/
-            Logger.getLogger(datasetFox.class.getName()).log(Level.SEVERE, null, ex);
             isMimeAvailable=false;
         }
         try {

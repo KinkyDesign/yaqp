@@ -6,26 +6,27 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
-import org.restlet.data.MediaType;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import weka.core.Instances;
 
 /**
  * This class contains methods that facilitate the restful methods on dataset
- * URIs.
+ * URIs.<br/>
+ * DEPRECATED: Will not be included in the next version.
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
+ * @deprecated
+ * @see opentoxClient
  */
+@Deprecated
 public class datasetFox extends Thread implements AbstractClient{
 
     private static final long serialVersionUID = -2854689332253394849L;

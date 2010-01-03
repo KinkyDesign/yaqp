@@ -122,8 +122,6 @@ public class Model extends RDFHandler  implements Serializable{
      * to the specification of OpenTox API (v 1.1).
      * @param model_id The id of the model (Integer).
      * @param dataseturi The URI of the dataset used to train the model.
-     * @param targeturi The URI of the target feature, i.e. the dependent variable of
-     * the model.
      * @param data The Instances object containing the training data.
      * @param algorithmParameters A List of the tuning parameters of the algorithm.
      * @param out The output stream used to store the model.
@@ -240,7 +238,7 @@ public class Model extends RDFHandler  implements Serializable{
      * attributes of the model. In plain english, the testData set should provide
      * at least the information needed.
      * @param testData
-     * @return
+     * @return Returns true if this Model object is compatible with the specified dataset.
      */
     public boolean compatibleWith(Instances testData) {
         Set<String> modelIndependentFeatures = getSetOfIndependentFeatures();

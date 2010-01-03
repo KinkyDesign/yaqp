@@ -29,14 +29,15 @@ public class Server {
 
     public static void exitWithHelp() {
         System.out.println("\nUsage: \n"
-                + "java -jar server.jar [--port 1234] [--serverName localhost] or "
-                + "java -jar server.jar [-p 1234] [-s localhost]\n"
+                + "java -jar server.jar [--port 1234] [--serverName localhost] " +
+                "[--dataBase myDataBase]or "
+                + "java -jar server.jar [-p 1234] [-s localhost] [-d myDataBase]\n"
                 + "Make sure that you use the sun Java version 6!\n\n");
         System.exit(10012);
     }
 
     /**
-     * Usage: Server --port PORT --serverName SERVER_NAME
+     * Usage: Server --port PORT --serverName SERVER_NAME --dataBase DATABASE_NAME
      * @param args
      * @throws IOException
      * @throws Exception
@@ -120,10 +121,9 @@ public class Server {
      * @throws Exception
      */
     public static void shutdown() throws Exception {
+        OpenToxApplication.opentoxLogger.info("Server is shutting down Gracefully");
         component.stop();
     }
 
-    public static void restart() throws Exception {
-        // ???
-    }
+   
 }

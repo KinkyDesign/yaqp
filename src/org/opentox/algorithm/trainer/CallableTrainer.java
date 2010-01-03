@@ -17,7 +17,7 @@ public class CallableTrainer extends ErrorSource implements Callable<Representat
     }
 
     /**
-     * Returns the Represe
+     * 
      * @return
      * @throws Exception
      */

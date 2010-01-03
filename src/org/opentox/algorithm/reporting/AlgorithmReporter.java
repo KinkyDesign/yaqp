@@ -14,7 +14,6 @@ import org.opentox.resource.AbstractResource;
 import org.opentox.namespaces.AlgorithmTypes;
 import org.opentox.resource.AbstractResource.URIs;
 import org.restlet.data.MediaType;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 
 /**
@@ -27,7 +26,6 @@ import org.restlet.representation.Representation;
 public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
 
-    private Status internalStatus = Status.SUCCESS_ACCEPTED;
 
     public AlgorithmReporter(){
         super();
@@ -154,27 +152,6 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
 
 
-    /**
-     * Suggest a status for the Resource calling the trainer. The status can be
-     * updated only in the following cases:
-     * <ul>
-     * <li>The current status is less than 300, i.e. No errors occured up to the current state</li>
-     * <li>The current status is 4XX and the new status is also
-     * a 4XX or a 5XX status (client or server error).</li>
-     * <li>If the current status is a 5XX (eg 500), it will not be updated</li>
-     * </ul>
-     * @param status The status
-     */
-    public void setInternalStatus(Status status){
-        if ( ((internalStatus.getCode()>=400)&&(internalStatus.getCode()<500)&&status.getCode()>=400)||
-                ((internalStatus.getCode())<300)){
-            this.internalStatus=status;
-        }
-    }
-
-    public Status getInternalStatus(){
-        return this.internalStatus;
-    }
 
 
 

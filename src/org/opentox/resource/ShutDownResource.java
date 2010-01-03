@@ -48,7 +48,7 @@ public class ShutDownResource extends AbstractResource {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(20000);
+                        Thread.sleep(2000);
                         Server.shutdown();
                     } catch (Exception ex) {
                         System.exit(0);

@@ -18,7 +18,6 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.ReferenceList;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
@@ -33,8 +32,6 @@ import org.restlet.resource.ResourceException;
  */
 public class ModelInfoResource extends AbstractResource {
 
-
-    private Status internalStatus = Status.SUCCESS_ACCEPTED;
 
     private String model_id, info;
 
