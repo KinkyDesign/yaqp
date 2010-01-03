@@ -1,28 +1,78 @@
-
-              et:Algorthm .
-t:      <http://opentox.org/api/1.1/#> .
 @prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix ot:      <http://www.opentox.org/api/1.1#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-<http://opentox.ntua.gr:3000/algorithm/example_algorithm>
+dc:relation
+      a       owl:AnnotationProperty .
+
+dc:description
+      a       owl:AnnotationProperty .
+
+ot:isA
+      a       owl:AnnotationProperty .
+
+dc:identifier
+      a       owl:AnnotationProperty .
+
+dc:contributor
+      a       owl:AnnotationProperty .
+
+dc:rights
+      a       owl:AnnotationProperty .
+
+ot:Parameter
+      a       owl:Class .
+
+<http://opentox.ntua.gr:3000/algorithm/mlr>
+      a       ot:Algorithm ;
+      dc:contributor "http://opentox.org/"^^xsd:anyURI ;
+      dc:creator "http://opentox.ntua.gr:3000"^^xsd:anyURI ;
+      dc:date "2009/16/12"^^xsd:date ;
+      dc:description "Multiple Linear Regression Training Algorithm"^^xsd:anyURI ;
+      dc:identifier "http://opentox.ntua.gr:3000/algorithm/mlr"^^xsd:anyURI ;
+      dc:publisher "http://opentox.ntua.gr:3000"^^xsd:anyURI ;
+      dc:relation "http://opentox.org/"^^xsd:anyURI ;
+      dc:rights "http://www.gnu.org/licenses/gpl.txt"^^xsd:anyURI ;
+      dc:source "http://opentox.ntua.gr:3000"^^xsd:anyURI ;
+      dc:title "mlr"^^xsd:string ;
+      ot:isA  ot:RegressionEagerSingleTarget ;
       ot:parameters
-              [ ot:paramScope "mandatory"^^<http://www.w3.org/2001/XMLSchema#string> ;
-                ot:paramValue "114432"^^<http://www.w3.org/2001/XMLSchema#double> ;
-                dc:title "property_1"^^<http://www.w3.org/2001/XMLSchema#string> ;
-                dc:type ot:Parameter
+              [ a       ot:Parameter ;
+                dc:title "target" ;
+                ot:paramScope "mandatory"^^xsd:string ;
+                ot:paramValue "http://someserver.com/feature/100"^^xsd:anyURI
               ] ;
-      ot:parameters
-              [ ot:paramScope "mandatory"^^<http://www.w3.org/2001/XMLSchema#string> ;
-                ot:paramValue "99827"^^<http://www.w3.org/2001/XMLSchema#double> ;
-                dc:title "property_2"^^<http://www.w3.org/2001/XMLSchema#string> ;
-                dc:type ot:Parameter
-              ] ;
-      ot:statisticsSupported
-              [ a       ot:Statistic ;
-                dc:title "my_statistic_2"^^<http://www.w3.org/2001/XMLSchema#string>
-              ] ;
-      ot:statisticsSupported
-              [ a       ot:Statistic ;
-                dc:title "my_statistic_1"^^<http://www.w3.org/2001/XMLSchema#string>
-              ] ;
-      dc:identifier "http://opentox.ntua.gr:3000/algorithm/example_algorithm" ;
-      dc:type ot:Algorithm .
+      owl:sameAs ot:RegressionEagerSingleTarget .
+
+ot:RegressionEagerSingleTarget
+      a       ot:Algorithm .
+
+dc:creator
+      a       owl:AnnotationProperty .
+
+ot:Algorithm
+      a       owl:Class .
+
+dc:date
+      a       owl:AnnotationProperty .
+
+ot:paramValue
+      a       owl:AnnotationProperty .
+
+dc:publisher
+      a       owl:AnnotationProperty .
+
+ot:paramScope
+      a       owl:AnnotationProperty .
+
+ot:parameters
+      a       owl:AnnotationProperty .
+
+dc:source
+      a       owl:AnnotationProperty .
+
+dc:title
+      a       owl:AnnotationProperty .

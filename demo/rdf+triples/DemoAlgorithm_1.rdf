@@ -1,33 +1,85 @@
+<!-- http://opentox.ntua.gr:3000/algorithm/mlr 
+RDF representation of MLR 
+MIME: application/rdf+xml 
+-->
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:ot="http://www.opentox.org/api/1.1#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:ot="http://opentox.org/api/1.1/#" > 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/relation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/description">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.opentox.org/api/1.1#isA">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/identifier">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/contributor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/rights">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.opentox.org/api/1.1#Parameter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opentox.ntua.gr:3000/algorithm/mlr">
+    <ot:parameters rdf:nodeID="A0"/>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mlr</dc:title>
+    <dc:relation rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://opentox.org/</dc:relation>
+    <dc:source rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://opentox.ntua.gr:3000</dc:source>
+    <dc:publisher rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://opentox.ntua.gr:3000</dc:publisher>
+    <rdf:type rdf:resource="http://www.opentox.org/api/1.1#Algorithm"/>
+    <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009/16/12</dc:date>
+    <dc:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.gnu.org/licenses/gpl.txt</dc:rights>
+    <owl:sameAs rdf:resource="http://www.opentox.org/api/1.1#RegressionEagerSingleTarget"/>
+    <dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://opentox.ntua.gr:3000/algorithm/mlr</dc:identifier>
+    <dc:contributor rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://opentox.org/</dc:contributor>
+    <ot:isA rdf:resource="http://www.opentox.org/api/1.1#RegressionEagerSingleTarget"/>
+    <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://opentox.ntua.gr:3000</dc:creator>
+    <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">Multiple Linear Regression Training Algorithm</dc:description>
+  </rdf:Description>
   <rdf:Description rdf:nodeID="A0">
-    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">my_statistic_1</dc:title>
-    <rdf:type rdf:resource="http://opentox.org/api/1.1/#Statistic"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A1">
-    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">my_statistic_2</dc:title>
-    <rdf:type rdf:resource="http://opentox.org/api/1.1/#Statistic"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://opentox.ntua.gr:3000/algorithm/example_algorithm">
-    <ot:statisticsSupported rdf:nodeID="A1"/>
-    <ot:statisticsSupported rdf:nodeID="A0"/>
-    <ot:parameters rdf:nodeID="A2"/>
-    <ot:parameters rdf:nodeID="A3"/>
-    <dc:type rdf:resource="http://opentox.org/api/1.1/#Algorithm"/>
-    <dc:identifier>http://opentox.ntua.gr:3000/algorithm/example_algorithm</dc:identifier>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A2">
-    <dc:type rdf:resource="http://opentox.org/api/1.1/#Parameter"/>
-    <ot:paramValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">99827</ot:paramValue>
     <ot:paramScope rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mandatory</ot:paramScope>
-    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">property_2</dc:title>
+    <ot:paramValue rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://someserver.com/feature/100</ot:paramValue>
+    <dc:title>target</dc:title>
+    <rdf:type rdf:resource="http://www.opentox.org/api/1.1#Parameter"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A3">
-    <dc:type rdf:resource="http://opentox.org/api/1.1/#Parameter"/>
-    <ot:paramValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">114432</ot:paramValue>
-    <ot:paramScope rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mandatory</ot:paramScope>
-    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">property_1</dc:title>
+  <rdf:Description rdf:about="http://www.opentox.org/api/1.1#RegressionEagerSingleTarget">
+    <rdf:type rdf:resource="http://www.opentox.org/api/1.1#Algorithm"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/creator">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.opentox.org/api/1.1#Algorithm">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/date">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.opentox.org/api/1.1#paramValue">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/publisher">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.opentox.org/api/1.1#paramScope">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/source">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.opentox.org/api/1.1#parameters">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/elements/1.1/title">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
   </rdf:Description>
 </rdf:RDF>
