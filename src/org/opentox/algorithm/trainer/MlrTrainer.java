@@ -59,7 +59,7 @@ import weka.core.Instances;
     public synchronized Representation train() {
         Representation representation = null;
         int model_id = 0;
-        model_id = ModelsDB.getModelsStack() + 1;
+        model_id = ModelsDB.INSTANCE.getModelsStack() + 1;
 
 
         errorRep = (ErrorRepresentation) checkParameters();
@@ -158,10 +158,13 @@ import weka.core.Instances;
                 try {
                     dataseturi = new URI(form.getFirstValue("dataset_uri"));
                     dataseturi.toURL();
+
                     if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
+
                         errorRep.append(new Exception(), "The dataset uri that client provided "
                                 + "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
                     }
+
                 } catch (MalformedURLException ex) {
                     errorDetails = "The client did not post a valid URI for the dataset";
                     errorRep.append(ex, errorDetails, clientPostedWrongParametersStatus);

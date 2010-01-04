@@ -187,7 +187,7 @@ public class ErrorRepresentation extends OutputRepresentation {
                 outputMessage = outputMessage + ("Explanation: "+e.getKey()+"\n");
                 outputMessage = outputMessage + ("For debugging reasons we provide a brief list of the exceptions: \n");
                 StackTraceElement[] ste = e.getValue().getStackTrace();
-                for (int j=0;j<Math.min(10, ste.length);j++){
+                for (int j=0;j<Math.min(20, ste.length);j++){
                     outputMessage = outputMessage + "- " +ste[j].toString()+"\n";
                 }
                 outputMessage = outputMessage + "\n\n";

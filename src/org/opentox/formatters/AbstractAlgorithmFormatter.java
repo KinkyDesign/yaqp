@@ -1,6 +1,6 @@
 package org.opentox.formatters;
 
-import org.opentox.algorithm.AlgorithmMetaInf;
+import org.opentox.namespaces.AlgorithmMetaInf;
 import org.opentox.error.ErrorSource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;

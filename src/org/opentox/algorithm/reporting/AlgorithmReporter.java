@@ -2,7 +2,7 @@ package org.opentox.algorithm.reporting;
 
 import org.opentox.algorithm.ConstantParameters;
 import org.opentox.algorithm.AlgorithmParameter;
-import org.opentox.algorithm.AlgorithmMetaInf;
+import org.opentox.namespaces.AlgorithmMetaInf;
 import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.formatters.AlgorithmYamlFormatter;
 import org.opentox.formatters.AlgorithmXmlFormatter;

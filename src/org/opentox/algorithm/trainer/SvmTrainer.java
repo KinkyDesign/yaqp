@@ -86,7 +86,7 @@ import weka.core.converters.ArffSaver;
             DataCleanUp.removeStringAtts(dataInstances);
 
             // 3. Lock an ID for the model:
-            model_id = ModelsDB.getModelsStack() + 1;
+            model_id = ModelsDB.INSTANCE.getModelsStack() + 1;
 
             // 4. Define the temporary arff file that will be used to store data
             //    and the path to the model file that will be created.
