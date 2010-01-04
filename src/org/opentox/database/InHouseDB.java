@@ -36,9 +36,6 @@ public final class InHouseDB implements DataBaseAccess {
      */
     public final static InHouseDB INSTANCE = getInstance();
 
-
-    
-
     /**
      * Database Constructor.
      * Connects to the existing database or creates a new one if database doesn't exist.
@@ -131,7 +128,7 @@ public final class InHouseDB implements DataBaseAccess {
                 ModelsDB.INSTANCE.createModelInfoTable();
             }
             if (!exists3) {
-                UsersDB.createUsersTable();
+                UsersDB.INSTANCE.createUsersTable();
             }
 
 
@@ -149,7 +146,7 @@ public final class InHouseDB implements DataBaseAccess {
     /**
      * If the database does not exist, it is created.
      */
-    private void createDataBase() {
+    private static void createDataBase() {
         OpenToxApplication.opentoxLogger.info("CREATING DATABASE :" + DATABASENAME);
         try {
             connection = DriverManager.getConnection(DB_URL + ";create=true", USER, PASSWORD);

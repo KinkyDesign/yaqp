@@ -55,7 +55,7 @@ public class opentoxClient implements AbstractClient{
     }
 
 
-      public static boolean IsMimeAvailable(URI serviceUri, MediaType mime, boolean followRedirects) {
+      public synchronized static boolean IsMimeAvailable(URI serviceUri, MediaType mime, boolean followRedirects) {
 
         HttpURLConnection.setFollowRedirects(followRedirects);
         HttpURLConnection con = null;

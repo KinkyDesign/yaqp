@@ -67,9 +67,9 @@ public class ListModels extends AbstractResource {
         Representation rep = null;
         ReferenceList list = new ReferenceList();
         if (!(searchAlgorithm == null)) {
-            list = ModelsDB.getReferenceListFromAlgId(searchAlgorithm);
+            list = ModelsDB.INSTANCE.getReferenceListFromAlgId(searchAlgorithm);
         } else {
-            list = ModelsDB.getModelsAsReferenceList();
+            list = ModelsDB.INSTANCE.getModelsAsReferenceList();
         }
 
 

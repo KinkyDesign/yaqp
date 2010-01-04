@@ -165,7 +165,7 @@ import weka.core.converters.ArffSaver;
                         // if status is OK(200), register the new model in the database and
                         // return the URI to the client.
                         representation = new StringRepresentation(URIs.modelURI + "/"
-                                + ModelsDB.registerNewModel(URIs.svmAlgorithmURI) + "\n");
+                                + ModelsDB.INSTANCE.registerNewModel(URIs.svmAlgorithmURI) + "\n");
                     }
                 }
             } catch (AssertionError ex) {

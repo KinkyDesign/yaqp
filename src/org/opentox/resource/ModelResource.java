@@ -62,7 +62,7 @@ public class ModelResource extends AbstractResource {
         variants.add(new Variant(MediaType.APPLICATION_XML));
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
-        algorithm = ModelsDB.getAlgorithm(model_id);
+        algorithm = ModelsDB.INSTANCE.getAlgorithm(model_id);
     }
 
     /**
@@ -132,7 +132,7 @@ public class ModelResource extends AbstractResource {
         try {
             if (opentoxClient.IsMimeAvailable(new URI("http://localhost:3000/model/" + model_id),
                     MediaType.TEXT_XML, false)) {
-                ModelsDB.removeModel(model_id);
+                ModelsDB.INSTANCE.removeModel(model_id);
                 File modelFile = new File(Directories.modelRdfDir + "/" + model_id);
                 responseText = "The resource was detected and removed from OT database successfully!";
                 if (modelFile.exists()) {

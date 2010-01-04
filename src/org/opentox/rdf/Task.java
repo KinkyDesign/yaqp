@@ -1,6 +1,5 @@
 package org.opentox.rdf;
 
-import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
@@ -15,11 +14,6 @@ import java.io.Serializable;
  * @version 1.3.3 (Last update: Dec 23, 2009)
  */
 public class Task extends RDFHandler  implements Serializable {
-
-    public void createNewTask(OutputStream out){
-
-    }
-
 
 }
 

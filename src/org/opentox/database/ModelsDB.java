@@ -19,6 +19,7 @@ import org.opentox.resource.AbstractResource.URIs;
 public class ModelsDB implements DataBaseAccess {
 
     protected static int modelsStack;
+
     protected final static String COL_MODEL_ID = "MODEL_ID",
             COL_MODEL_URI = "MODEL_URI",
             COL_ALGORITHM_ID = "ALGORITHM_ID",
@@ -27,16 +28,16 @@ public class ModelsDB implements DataBaseAccess {
 
     private static ModelsDB instanceOfThis = null;
 
-    public static ModelsDB INSTANCE = getInstance();
-
-    private ModelsDB() {
-    }
+    public final static ModelsDB INSTANCE = getInstance();
 
     private static ModelsDB getInstance(){
         if (instanceOfThis == null){
-            return new ModelsDB();
+            instanceOfThis = new ModelsDB();
         }
         return instanceOfThis;
+    }
+
+    private ModelsDB() {
     }
 
     /**
@@ -123,31 +124,26 @@ public class ModelsDB implements DataBaseAccess {
      * of a new model when the model is registered in the database.
      * @see ModelsDB#registerNewModel(java.lang.String)
      */
-    private void IncreaseModelStack() {
-
-
-            String increaseValue = "update " + MODELS_STACK_TABLE + " set STACK = " + (modelsStack + 1)
-                    + " where STACK = " + modelsStack;
-            try {
-                Statement stmt = InHouseDB.connection.createStatement();
+    private synchronized void IncreaseModelStack() {
+        String increaseValue = "update " + MODELS_STACK_TABLE + " set STACK = " + (modelsStack + 1)
+                + " where STACK = " + modelsStack;
+        try {
+            Statement stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
                 stmt.executeUpdate(increaseValue);
-            } catch (SQLException ex) {
-                OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
             }
-            modelsStack++;
-        
-
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+        modelsStack++;
     }
 
     /**
      * Returns the number of models currently in the database.
      * @return the first available model id.
      */
-    public int getModelsStack() {
-        
-            return modelsStack;
-        
-
+    public synchronized int getModelsStack() {
+        return modelsStack;
     }
 
     /**
@@ -158,26 +154,22 @@ public class ModelsDB implements DataBaseAccess {
      * @see ModelsDB#removeModel(java.lang.String)
      */
     @Registration
-    public static int registerNewModel(String AlgID) {
-
-
-
-            int id = INSTANCE.getModelsStack() + 1;
-            String uri = URIs.baseURI + "/model/" + id;
-            String CreateValue = "INSERT INTO " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
-            Statement stmt;
-            try {
-                stmt = InHouseDB.connection.createStatement();
+    public synchronized int registerNewModel(String AlgID) {
+        int id = getModelsStack() + 1;
+        String uri = URIs.baseURI + "/model/" + id;
+        String CreateValue = "INSERT INTO " + MODEL_INFO_TABLE + " values (" + id + ",'" + AlgID + "','" + uri + "')";
+        Statement stmt;
+        try {
+            stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
                 stmt.executeUpdate(CreateValue);
-                INSTANCE.IncreaseModelStack();
-
-            } catch (SQLException ex) {
-                OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+                IncreaseModelStack();
             }
-            return id;
-        
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
 
-
+        return id;
     }
 
     /**
@@ -186,20 +178,17 @@ public class ModelsDB implements DataBaseAccess {
      * @see ModelsDB#registerNewModel(java.lang.String) 
      */
     @Removal
-    public static void removeModel(String ID) {
-
-        
-            String removeModel = "DELETE FROM " + MODEL_INFO_TABLE + " WHERE " + COL_MODEL_ID + "=" + ID;
-            Statement stmt;
-            try {
-                stmt = InHouseDB.connection.createStatement();
-
+    public synchronized void removeModel(String ID) {
+        String removeModel = "DELETE FROM " + MODEL_INFO_TABLE + " WHERE " + COL_MODEL_ID + "=" + ID;
+        Statement stmt;
+        try {
+            stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
                 stmt.executeUpdate(removeModel);
-
-            } catch (SQLException ex) {
-                OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
             }
-        
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -212,25 +201,23 @@ public class ModelsDB implements DataBaseAccess {
      * @see ModelsDB#removeModel(java.lang.String)
      * @see ModelsDB#getAlgorithm(java.lang.String)
      */
-    public static synchronized boolean isModel(String ID, String Model) {
-        
-            boolean result = false;
-            String searchMLR = "SELECT * FROM " + MODEL_INFO_TABLE
-                    + " WHERE " + COL_MODEL_ID + "=" + ID
-                    + " AND " + COL_ALGORITHM_ID + " LIKE '%" + Model + "%'";
-            Statement stmt;
-            ResultSet rs = null;
-            try {
-                stmt = InHouseDB.connection.createStatement();
-
+    public synchronized boolean isModel(String ID, String Model) {
+        boolean result = false;
+        String searchMLR = "SELECT * FROM " + MODEL_INFO_TABLE
+                + " WHERE " + COL_MODEL_ID + "=" + ID
+                + " AND " + COL_ALGORITHM_ID + " LIKE '%" + Model + "%'";
+        Statement stmt;
+        ResultSet rs = null;
+        try {
+            stmt = InHouseDB.connection.createStatement();
+            synchronized (stmt) {
                 rs = stmt.executeQuery(searchMLR);
                 result = rs.next();
-
-            } catch (SQLException ex) {
-                OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
             }
-            return result;
-        
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+        return result;
     }
 
     /**
@@ -240,7 +227,7 @@ public class ModelsDB implements DataBaseAccess {
      * @return Algorithm Enumeration Object for the given ID.
      * @see ModelsDB#isModel(java.lang.String, java.lang.String)
      */
-    public static AlgorithmEnum getAlgorithm(String ID) {
+    public AlgorithmEnum getAlgorithm(String ID) {
         AlgorithmEnum algorithm = AlgorithmEnum.unknown;
         if (isModel(ID, "svm")) {
             algorithm = AlgorithmEnum.svm;
@@ -256,7 +243,7 @@ public class ModelsDB implements DataBaseAccess {
      *
      * @return all Models as a list of references.
      */
-    public static ReferenceList getModelsAsReferenceList() {
+    public ReferenceList getModelsAsReferenceList() {
 
         String SelectAllModels = "SELECT * FROM " + MODEL_INFO_TABLE;
         ResultSet rs = null;
@@ -282,8 +269,7 @@ public class ModelsDB implements DataBaseAccess {
      * @param algorithmId
      * @return Reference list for the given algorithm id.
      */
-    public static ReferenceList getReferenceListFromAlgId(String algorithmId) {
-
+    public ReferenceList getReferenceListFromAlgId(String algorithmId) {
         String SelectAllSvc = "SELECT * FROM " + MODEL_INFO_TABLE
                 + " WHERE " + COL_ALGORITHM_ID + " LIKE '%" + algorithmId + "%'";
         ResultSet rs = null;
@@ -301,4 +287,5 @@ public class ModelsDB implements DataBaseAccess {
         }
         return list;
     }
+
 }

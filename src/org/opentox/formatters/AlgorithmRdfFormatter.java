@@ -1,6 +1,6 @@
 package org.opentox.formatters;
 
-import org.opentox.namespaces.AlgorithmMetaInf;
+import org.opentox.algorithm.AlgorithmMetaInf;
 import org.opentox.namespaces.OT;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
