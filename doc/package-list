@@ -13,5 +13,6 @@ org.opentox.namespaces
 org.opentox.prediction
 org.opentox.rdf
 org.opentox.resource
+org.opentox.util
 org.opentox.util.converters
 org.opentox.util.libSVM
