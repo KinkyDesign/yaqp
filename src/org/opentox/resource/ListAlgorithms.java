@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.resource.*;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -30,6 +31,7 @@ import org.restlet.resource.ResourceException;
 public class ListAlgorithms extends AbstractResource {
 
     private static final long serialVersionUID = 98723648273928734L;
+    
     
 
     /**

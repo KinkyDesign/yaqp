@@ -16,9 +16,10 @@ import org.opentox.resource.AbstractResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.algorithm.trainer.AbstractTrainer.Classification;
 import org.opentox.client.opentoxClient;
-import org.opentox.database.ModelsDB;
-import org.opentox.rdf.Dataset;
-import org.opentox.rdf.Model;
+import org.opentox.database.ModelsTable;
+import org.opentox.ontology.meta.ModelMeta;
+import org.opentox.ontology.rdf.Dataset;
+import org.opentox.ontology.rdf.Model;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -40,10 +41,10 @@ import weka.core.converters.ArffSaver;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-@Classification(name="SVC") public class SvcTrainer extends AbstractTrainer {
+@Classification(name = "SVC")
+public class SvcTrainer extends AbstractTrainer {
 
     private static final long serialVersionUID = -6751396783635831385L;
-
     private int i;
     private double d;
     /**
@@ -93,7 +94,6 @@ import weka.core.converters.ArffSaver;
      */
     private Instances dataInstances;
 
-
     /**
      * Constructor of the trainer.
      * @param form The posted data.
@@ -103,8 +103,6 @@ import weka.core.converters.ArffSaver;
         super.form = form;
     }
 
-
-
     /**
      * Train a support vector machine classification model.
      * @return representation of the training result.
@@ -113,11 +111,11 @@ import weka.core.converters.ArffSaver;
     public Representation train() {
         Representation rep = checkParameters();
 
-        if (errorRep.getErrorLevel()==0) {
+        if (errorRep.getErrorLevel() == 0) {
             // 2. Remove all string attributes from the dataset:
             DataCleanUp.removeStringAtts(dataInstances);
             // 3. Lock an ID for the model:
-            model_id = ModelsDB.INSTANCE.getModelsStack() + 1;
+            model_id = ModelsTable.INSTANCE.getModelsStack() + 1;
 
             // 4. Define the temporary arff file that will be used to store data
             //    and the path to the model file that will be created.
@@ -135,10 +133,10 @@ import weka.core.converters.ArffSaver;
                 dataSaver.writeBatch();
 
                 // 6. Build the Classification Model:
-                
-                 weka.classifiers.functions.SMO classifier = new SMO();
-                 classifier.setEpsilon(Double.parseDouble(epsilon));
-                 classifier.setToleranceParameter(Double.parseDouble(tolerance));
+
+                weka.classifiers.functions.SMO classifier = new SMO();
+                classifier.setEpsilon(Double.parseDouble(epsilon));
+                classifier.setToleranceParameter(Double.parseDouble(tolerance));
 
                 Kernel svc_kernel = null;
                 if (this.kernel.equalsIgnoreCase("rbf")) {
@@ -152,14 +150,14 @@ import weka.core.converters.ArffSaver;
                     poly_kernel.setCacheSize(Integer.parseInt(cacheSize));
                     poly_kernel.setUseLowerOrder(true);
                     svc_kernel = poly_kernel;
-                } else if (this.kernel.equalsIgnoreCase("linear")) {                    
+                } else if (this.kernel.equalsIgnoreCase("linear")) {
                     PolyKernel linear_kernel = new PolyKernel();
                     linear_kernel.setExponent((double) 1.0);
                     linear_kernel.setCacheSize(Integer.parseInt(cacheSize));
                     linear_kernel.setUseLowerOrder(true);
                     svc_kernel = linear_kernel;
-                }                
-                classifier.setKernel(svc_kernel);                
+                }
+                classifier.setKernel(svc_kernel);
 
                 String[] generalOptions = {
                     "-c", Integer.toString(dataInstances.classIndex() + 1),
@@ -189,19 +187,21 @@ import weka.core.converters.ArffSaver;
 
                     Model opentoxModel = new Model();
 
-                    opentoxModel.createModel(Integer.toString(model_id),
+                    opentoxModel.createModel(
+                            new ModelMeta(
+                            Integer.toString(model_id),
                             dataseturi.toString(),
                             dataInstances,
                             paramList,
-                            URIs.svcAlgorithmURI,
+                            URIs.svcAlgorithmURI),
                             new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
                     //setInternalStatus(opentoxModel.internalStatus);
 
-                    if (errorRep.getErrorLevel()==0) {
+                    if (errorRep.getErrorLevel() == 0) {
                         // if status is OK(200), register the new model in the database and
                         // return the URI to the client.
                         rep = new StringRepresentation(URIs.modelURI + "/"
-                                + ModelsDB.INSTANCE.registerNewModel(URIs.svcAlgorithmURI) + "\n");
+                                + ModelsTable.INSTANCE.registerNewModel(URIs.svcAlgorithmURI) + "\n");
                     } else {
                         //rep = new StringRepresentation(internalStatus.toString());
                     }
@@ -210,12 +210,12 @@ import weka.core.converters.ArffSaver;
                 rep = new StringRepresentation("It seems the dataset you posted is void!\n");
                 //setInternalStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             } catch (IOException ex) {
-                rep = new StringRepresentation("Communications error while trainig an SVC model!\n" +
-                        "Error Details: "+ex+"\n");
+                rep = new StringRepresentation("Communications error while trainig an SVC model!\n"
+                        + "Error Details: " + ex + "\n");
                 //setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             } catch (Exception ex) {
-                rep = new StringRepresentation("The traing was terminated unexpectedly\n" +
-                        "Error Details: "+ex+"\n");
+                rep = new StringRepresentation("The traing was terminated unexpectedly\n"
+                        + "Error Details: " + ex + "\n");
                 //setInternalStatus(Status.SERVER_ERROR_INTERNAL);
             }
         }
@@ -469,9 +469,4 @@ import weka.core.converters.ArffSaver;
         return errorRep;
 
     }
-
-
-
-
-
 }

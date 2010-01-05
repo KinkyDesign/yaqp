@@ -1,6 +1,6 @@
 package org.opentox.formatters;
 
-import org.opentox.algorithm.AlgorithmMetaInf;
+import org.opentox.ontology.meta.AlgorithmMeta;
 import org.opentox.namespaces.OT;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
@@ -35,7 +35,7 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
      * @param metainf Algorithm Meta-information one has to provide to
      * construct an AlgorithmRdfFormater object.
      */
-    public AlgorithmRdfFormatter(AlgorithmMetaInf metainf) {
+    public AlgorithmRdfFormatter(AlgorithmMeta metainf) {
         super.metainf = metainf;
     }
 

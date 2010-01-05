@@ -13,7 +13,7 @@ import org.opentox.prediction.SvmPredictor;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.client.opentoxClient;
-import org.opentox.database.ModelsDB;
+import org.opentox.database.ModelsTable;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.error.ErrorSource;
 import org.opentox.formatters.ModelFormatter;
@@ -62,7 +62,7 @@ public class ModelResource extends AbstractResource {
         variants.add(new Variant(MediaType.APPLICATION_XML));
         getVariants().put(Method.GET, variants);
         model_id = Reference.decode(getRequest().getAttributes().get("model_id").toString());
-        algorithm = ModelsDB.INSTANCE.getAlgorithm(model_id);
+        algorithm = ModelsTable.INSTANCE.getAlgorithm(model_id);
     }
 
     /**
@@ -132,7 +132,7 @@ public class ModelResource extends AbstractResource {
         try {
             if (opentoxClient.IsMimeAvailable(new URI("http://localhost:3000/model/" + model_id),
                     MediaType.TEXT_XML, false)) {
-                ModelsDB.INSTANCE.removeModel(model_id);
+                ModelsTable.INSTANCE.removeModel(model_id);
                 File modelFile = new File(Directories.modelRdfDir + "/" + model_id);
                 responseText = "The resource was detected and removed from OT database successfully!";
                 if (modelFile.exists()) {

@@ -1,7 +1,7 @@
 package org.opentox.auth;
 
 import org.opentox.OpenToxApplication;
-import org.opentox.database.UsersDB;
+import org.opentox.database.UsersTables;
 import org.restlet.security.SecretVerifier;
 
 /**
@@ -49,18 +49,18 @@ public class CredentialsVerifier extends SecretVerifier {
      */
     @Override
     public boolean verify(String identifier, char[] inputSecret) {
-        System.out.println(UsersDB.INSTANCE.getAuthorizationForUser(identifier).compareTo(authorizationLevel));
+        System.out.println(UsersTables.INSTANCE.getAuthorizationForUser(identifier).compareTo(authorizationLevel));
         
         if (authorizationLevel.equals(Priviledges.GUEST)){
             return true;
         }else{
 
-        if (UsersDB.INSTANCE.getAuthorizationForUser(identifier).compareTo(authorizationLevel)>=0){
+        if (UsersTables.INSTANCE.getAuthorizationForUser(identifier).compareTo(authorizationLevel)>=0){
             String pass="";
             for (int i=0;i<inputSecret.length;i++){
                 pass = pass + inputSecret[i];
             }
-            if (UsersDB.INSTANCE.verifyCredentials(identifier, pass)){
+            if (UsersTables.INSTANCE.verifyCredentials(identifier, pass)){
                 return true;
             }else{
                 return false;

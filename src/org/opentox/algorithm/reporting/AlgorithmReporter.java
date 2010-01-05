@@ -2,7 +2,7 @@ package org.opentox.algorithm.reporting;
 
 import org.opentox.algorithm.ConstantParameters;
 import org.opentox.algorithm.AlgorithmParameter;
-import org.opentox.algorithm.AlgorithmMetaInf;
+import org.opentox.ontology.meta.AlgorithmMeta;
 import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.formatters.AlgorithmYamlFormatter;
 import org.opentox.formatters.AlgorithmXmlFormatter;
@@ -64,7 +64,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
     }
 
     private Representation getRepresentationForMetaInf(
-            AlgorithmMetaInf metainf, MediaType media) {
+            AlgorithmMeta metainf, MediaType media) {
         Representation representation = null;
         if ((MediaType.APPLICATION_RDF_XML.equals(media))
                 || (MediaType.APPLICATION_RDF_TURTLE.equals(media))
@@ -91,7 +91,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
         Representation representation = null;
 
-        AlgorithmMetaInf genericMetaInf = new AlgorithmMetaInf();
+        AlgorithmMeta genericMetaInf = new AlgorithmMeta();
         genericMetaInf.type = ("http://purl.org/dc/dcmitype/Service");
         genericMetaInf.rights = (AbstractResource.URIs.licenceUri);
         genericMetaInf.language = ("en");
@@ -107,42 +107,39 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
 
         if (algorithm == AlgorithmEnum.mlr) {
-            AlgorithmMetaInf MlrMetaInf = genericMetaInf;
+            AlgorithmMeta MlrMetaInf = genericMetaInf;
             MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.title = ("mlr");
             MlrMetaInf.subject = ("MLR, Multiple Linear Regression");
             MlrMetaInf.algorithmType = AlgorithmTypes.Class.RegressionEagerSingleTarget;
             MlrMetaInf.description = ("Multiple Linear Regression Training Algorithm");
             MlrMetaInf.identifier = (AbstractResource.URIs.mlrAlgorithmURI);
-            MlrMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.mlr),
-                    Parameters(AlgorithmEnum.mlr));
+            MlrMetaInf.setParameters(Parameters(AlgorithmEnum.mlr));
 
             representation = getRepresentationForMetaInf(MlrMetaInf, media);
 
         } else if (algorithm == AlgorithmEnum.svm) {
-            AlgorithmMetaInf SvmMetaInf = genericMetaInf;
+            AlgorithmMeta SvmMetaInf = genericMetaInf;
             SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
             SvmMetaInf.title = ("svm");
             SvmMetaInf.subject = ("SVM Regression");
             SvmMetaInf.algorithmType = AlgorithmTypes.Class.RegressionEagerSingleTarget;
             SvmMetaInf.description = ("Training Algorithm for Support Vector"
                     + "Machine Regression Models");
-            SvmMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svm),
-                    Parameters(AlgorithmEnum.svm));
+            SvmMetaInf.setParameters(Parameters(AlgorithmEnum.svm));
             SvmMetaInf.identifier = (AbstractResource.URIs.svmAlgorithmURI);
 
             representation = getRepresentationForMetaInf(SvmMetaInf, media);
 
         } else if (algorithm == AlgorithmEnum.svc) {
-            AlgorithmMetaInf SvcMetaInf = genericMetaInf;
+            AlgorithmMeta SvcMetaInf = genericMetaInf;
             SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
             SvcMetaInf.title = ("svc");
             SvcMetaInf.subject = ("SVC Classification");
             SvcMetaInf.algorithmType = AlgorithmTypes.Class.ClassificationEagerSingleTarget;
             SvcMetaInf.description = ("Training Algorithm for Support Vector"
                     + "Machine Classification Models");
-            SvcMetaInf.setAlgorithm(statisticsSupported(AlgorithmEnum.svc),
-                    Parameters(AlgorithmEnum.svc));
+            SvcMetaInf.setParameters(Parameters(AlgorithmEnum.svc));
             SvcMetaInf.identifier = (AbstractResource.URIs.svcAlgorithmURI);
 
             representation = getRepresentationForMetaInf(SvcMetaInf, media);

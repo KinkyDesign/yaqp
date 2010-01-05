@@ -13,7 +13,7 @@ import org.opentox.OpenToxApplication;
  * The contructor of InHouseDB is private and cannot be accessed from other classes and
  * what is more, InHouseDB cannot be subclassed. The interface {@link  DataBaseAccess } provides
  * an API for classes used to access certain tables of the database such as the Models' and
- * the Users' ones. 
+ * the Users' ones.
  *
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
@@ -21,6 +21,9 @@ import org.opentox.OpenToxApplication;
  * @version 1.3.3 (Last update: Dec 28, 2009)
  */
 public final class InHouseDB implements DataBaseAccess {
+
+    private final static String DB_USER = "itsme";
+    private final static String DB_PASSWORD = "letmein";
 
     /**
      * Static Connection to the databse.
@@ -80,7 +83,7 @@ public final class InHouseDB implements DataBaseAccess {
 
         try {
             OpenToxApplication.opentoxLogger.info("Attempting connection to " + DATABASENAME);
-            connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
             OpenToxApplication.opentoxLogger.info("Successfully connected to " + DATABASENAME);
         } catch (SQLException e) {
             if (e.getErrorCode() == 40000) {
@@ -109,33 +112,33 @@ public final class InHouseDB implements DataBaseAccess {
             rs = md.getTables(null, null, "%", null);
 
             while (rs.next() && !(exists1 && exists2 && exists3)) {
-                if (rs.getString(3).equals(ModelsDB.MODELS_STACK_TABLE)) {
+                if (rs.getString(3).equals(ModelsTable.MODELS_STACK_TABLE)) {
                     exists1 = true;
                 }
-                if (rs.getString(3).equals(ModelsDB.MODEL_INFO_TABLE)) {
+                if (rs.getString(3).equals(ModelsTable.MODEL_INFO_TABLE)) {
                     exists2 = true;
                 }
-                if (rs.getString(3).equals(UsersDB.USER_ACCOUNTS_TABLE)) {
+                if (rs.getString(3).equals(UsersTables.USER_ACCOUNTS_TABLE)) {
                     exists3 = true;
                 }
             }
 
 
             if (!exists1) {
-                ModelsDB.INSTANCE.createModelsStackTable();
+                ModelsTable.INSTANCE.createModelsStackTable();
             }
             if (!exists2) {
-                ModelsDB.INSTANCE.createModelInfoTable();
+                ModelsTable.INSTANCE.createModelInfoTable();
             }
             if (!exists3) {
-                UsersDB.INSTANCE.createUsersTable();
+                UsersTables.INSTANCE.create();
             }
 
 
             stmt = connection.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM " + ModelsDB.MODELS_STACK_TABLE);
+            rs = stmt.executeQuery("SELECT * FROM " + ModelsTable.MODELS_STACK_TABLE);
             while (rs.next()) {
-                ModelsDB.modelsStack = rs.getInt("STACK");
+                ModelsTable.modelsStack = rs.getInt("STACK");
             }
 
         } catch (SQLException ex) {
@@ -149,14 +152,19 @@ public final class InHouseDB implements DataBaseAccess {
     private static void createDataBase() {
         OpenToxApplication.opentoxLogger.info("CREATING DATABASE :" + DATABASENAME);
         try {
-            connection = DriverManager.getConnection(DB_URL + ";create=true", USER, PASSWORD);
+            connection = DriverManager.getConnection(DB_URL + ";create=true", DB_USER, DB_PASSWORD);
 
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.severe("InHouseDB Exception with error code :" + ex.getErrorCode() + "\n"
                     + "Details: " + ex.getMessage());
         }
     }
-    
+
+    public void getRidOf() {
+        UsersTables.INSTANCE.getRidOf();
+        ModelsTable.INSTANCE.getRidOf();
+    }
+
 
 
 }// end of class

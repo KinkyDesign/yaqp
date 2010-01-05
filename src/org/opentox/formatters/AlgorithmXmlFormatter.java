@@ -1,7 +1,7 @@
 package org.opentox.formatters;
 
 
-import org.opentox.algorithm.AlgorithmMetaInf;
+import org.opentox.ontology.meta.AlgorithmMeta;
 import org.opentox.resource.AbstractResource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -17,7 +17,7 @@ public class AlgorithmXmlFormatter extends AbstractAlgorithmFormatter{
 
     private static final MediaType mime = MediaType.TEXT_XML;
 
-    public AlgorithmXmlFormatter(AlgorithmMetaInf metainf){
+    public AlgorithmXmlFormatter(AlgorithmMeta metainf){
         super.metainf = metainf;
     }
 
@@ -37,15 +37,7 @@ public class AlgorithmXmlFormatter extends AbstractAlgorithmFormatter{
    
         builder.append("</Parameters>\n");
 
-        if (metainf.statisticsSupported.isEmpty()) {
-            builder.append("<statisticsSupported/>\n");
-        } else {
-            builder.append("<statisticsSupported>\n");
-            for (int i = 0; i < metainf.statisticsSupported.size(); i++) {
-                builder.append("<statistic>" + metainf.statisticsSupported.get(i) + "</statistic>\n");
-            }
-            builder.append("</statisticsSupported>\n");
-        }
+        
         builder.append("</algorithm>\n");
         return new StringRepresentation(builder.toString(), mime);
     }

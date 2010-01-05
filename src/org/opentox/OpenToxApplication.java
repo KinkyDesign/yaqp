@@ -11,7 +11,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import javax.security.auth.Subject;
 import org.opentox.resource.AbstractResource;
 import org.opentox.resource.Algorithm;
 import org.opentox.resource.ModelResource;
@@ -24,21 +23,13 @@ import org.opentox.auth.CredentialsVerifier;
 import org.opentox.auth.GuardDog;
 import org.restlet.Application;
 import org.restlet.Restlet;
-import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Request;
 import org.opentox.database.InHouseDB;
 import org.opentox.auth.Priviledges;
 import org.opentox.resource.TaskResource;
 import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.restlet.routing.Router;
-import org.restlet.security.ChallengeAuthenticator;
-import org.restlet.security.ChallengeGuard;
-import org.restlet.security.Enroler;
-import org.restlet.security.MethodAuthorizer;
 import org.restlet.security.UniformGuard;
 import org.restlet.security.Verifier;
-import org.restlet.service.TaskService;
 import org.restlet.util.Template;
 
 /**
@@ -152,23 +143,22 @@ public class OpenToxApplication extends Application {
         /**
          * Authenticate authorized users.
          */
-        Verifier verifier = new CredentialsVerifier(this, Priviledges.USER);
+        Verifier model_verifier = new CredentialsVerifier(this, Priviledges.USER);
         List<Method> modelMethods = new ArrayList<Method>();
-        modelMethods.add(Method.GET);
-        modelMethods.add(Method.POST);
-        modelMethods.add(Method.DELETE);
+          modelMethods.add(Method.GET);
+          modelMethods.add(Method.POST);
+          modelMethods.add(Method.DELETE);
         List<Method> modelFreeMethods = new ArrayList<Method>();
-        modelFreeMethods.add(Method.GET);
-        modelFreeMethods.add(Method.POST);
+          modelFreeMethods.add(Method.GET);
+          modelFreeMethods.add(Method.POST);
         UniformGuard modelKerberos = new GuardDog().
                 createGuard(
                 this,
-                verifier,
+                model_verifier,
                 false,
                 modelMethods,
                 modelFreeMethods,
-                ModelResource.class);
-        modelKerberos.setNext(ModelResource.class);
+                ModelResource.class);        
 
         Router router = new Router(getContext());
 

@@ -18,9 +18,10 @@ import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.client.opentoxClient;
-import org.opentox.database.ModelsDB;
-import org.opentox.rdf.Dataset;
-import org.opentox.rdf.Model;
+import org.opentox.database.ModelsTable;
+import org.opentox.ontology.meta.ModelMeta;
+import org.opentox.ontology.rdf.Dataset;
+import org.opentox.ontology.rdf.Model;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -86,7 +87,7 @@ import weka.core.converters.ArffSaver;
             DataCleanUp.removeStringAtts(dataInstances);
 
             // 3. Lock an ID for the model:
-            model_id = ModelsDB.INSTANCE.getModelsStack() + 1;
+            model_id = ModelsTable.INSTANCE.getModelsStack() + 1;
 
             // 4. Define the temporary arff file that will be used to store data
             //    and the path to the model file that will be created.
@@ -153,11 +154,13 @@ import weka.core.converters.ArffSaver;
 
                     Model opentoxModel = new Model();
 
-                    opentoxModel.createModel(Integer.toString(model_id),
+                    ModelMeta meta = new ModelMeta(
+                            Integer.toString(model_id),
                             dataseturi.toString(),
                             dataInstances,
                             paramList,
-                            URIs.svmAlgorithmURI,
+                            URIs.svmAlgorithmURI);
+                    opentoxModel.createModel(meta,
                             new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
                     errorRep.append(opentoxModel.errorRep);
 
@@ -165,7 +168,7 @@ import weka.core.converters.ArffSaver;
                         // if status is OK(200), register the new model in the database and
                         // return the URI to the client.
                         representation = new StringRepresentation(URIs.modelURI + "/"
-                                + ModelsDB.INSTANCE.registerNewModel(URIs.svmAlgorithmURI) + "\n");
+                                + ModelsTable.INSTANCE.registerNewModel(URIs.svmAlgorithmURI) + "\n");
                     }
                 }
             } catch (AssertionError ex) {

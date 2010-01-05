@@ -9,12 +9,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *
+ * Use FileRepresentation instead.
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  * @version 1.1 (Last Update: Aug 18, 2009)
  * @since 1.0
+ * @deprecated 
  */
+@Deprecated
 public class RepresentationFactory {
 
     private static final long serialVersionUID=100121700078001L;

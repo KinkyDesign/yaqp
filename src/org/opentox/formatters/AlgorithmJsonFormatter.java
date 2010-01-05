@@ -1,6 +1,6 @@
 package org.opentox.formatters;
 
-import org.opentox.algorithm.AlgorithmMetaInf;
+import org.opentox.ontology.meta.AlgorithmMeta;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -16,7 +16,7 @@ public class AlgorithmJsonFormatter extends AbstractAlgorithmFormatter {
     private static final MediaType mime = MediaType.APPLICATION_JSON;
 
 
-    public AlgorithmJsonFormatter(AlgorithmMetaInf metainf) {
+    public AlgorithmJsonFormatter(AlgorithmMeta metainf) {
         super();
         super.metainf = metainf;
     }
@@ -35,11 +35,8 @@ public class AlgorithmJsonFormatter extends AbstractAlgorithmFormatter {
                     metainf.Parameters.get(i).dataType.toString()+
                     "\" , \"defaultValue\"  :\""+metainf.Parameters.get(i).paramValue.toString()+"\"\n");
         }
-        builder.append("},\n");
-        builder.append("\"statisticsSupported\" : {\n");
-        for (int i=0;i<metainf.statisticsSupported.size();i++){
-            builder.append("\"statistic\" : \""+metainf.statisticsSupported.get(i)+"\",\n");
-        }        
+        builder.append("}\n");
+        
         builder.append("}\n");
         return new StringRepresentation(builder.toString(), mime);
     }

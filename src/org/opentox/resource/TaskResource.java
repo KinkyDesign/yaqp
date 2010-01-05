@@ -22,6 +22,12 @@ public class TaskResource extends AbstractResource {
 
     }
 
+    /**
+     * TODO: Return a representation of the task - use org.opentox.rdf.Task.
+     * @param variant
+     * @return
+     * @throws ResourceException
+     */
     @Override
     protected Representation get(Variant variant) throws ResourceException {
         throw new UnsupportedOperationException("Not supported yet!");

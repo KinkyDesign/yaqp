@@ -23,9 +23,10 @@ import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.client.opentoxClient;
-import org.opentox.database.ModelsDB;
-import org.opentox.rdf.Dataset;
-import org.opentox.rdf.Model;
+import org.opentox.database.ModelsTable;
+import org.opentox.ontology.meta.ModelMeta;
+import org.opentox.ontology.rdf.Dataset;
+import org.opentox.ontology.rdf.Model;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -59,7 +60,7 @@ import weka.core.Instances;
     public synchronized Representation train() {
         Representation representation = null;
         int model_id = 0;
-        model_id = ModelsDB.INSTANCE.getModelsStack() + 1;
+        model_id = ModelsTable.INSTANCE.getModelsStack() + 1;
 
 
         errorRep = (ErrorRepresentation) checkParameters();
@@ -96,11 +97,11 @@ import weka.core.Instances;
                 /**
                  * Store the model as RDF...
                  */
-                model.createModel(Integer.toString(model_id),
+                model.createModel(new ModelMeta(Integer.toString(model_id),
                         dataseturi.toString(),
                         data,
                         paramList,
-                        URIs.mlrAlgorithmURI,
+                        URIs.mlrAlgorithmURI),
                         new FileOutputStream(Directories.modelRdfDir + "/" + model_id));
 
 
@@ -108,7 +109,7 @@ import weka.core.Instances;
                 if (model.errorRep.getErrorLevel() == 0) {
 
                     representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
-                            + ModelsDB.INSTANCE.registerNewModel(
+                            + ModelsTable.INSTANCE.registerNewModel(
                             AbstractResource.URIs.mlrAlgorithmURI) + "\n");
 
                 }

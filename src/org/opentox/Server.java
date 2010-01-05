@@ -23,14 +23,13 @@ public class Server {
 
     public static String __PORT_ = "3000";
     public static String __DOMAIN_NAME_ = "opentox.ntua.gr";
-    public static String __DATABASE_NAME = "modelsDb";
+    public static String __DATABASE_NAME_ = "modelsDb";
     private static Component component;
-
 
     public static void exitWithHelp() {
         System.out.println("\nUsage: \n"
-                + "java -jar server.jar [--port 1234] [--serverName localhost] " +
-                "[--dataBase myDataBase]or "
+                + "java -jar server.jar [--port 1234] [--serverName localhost] "
+                + "[--dataBase myDataBase] or \n"
                 + "java -jar server.jar [-p 1234] [-s localhost] [-d myDataBase]\n"
                 + "Make sure that you use the sun Java version 6!\n\n");
         System.exit(10012);
@@ -55,7 +54,7 @@ public class Server {
                         __DOMAIN_NAME_ = args[i + 1];
                     }
                     if ((args[i].equals("--dataBase")) || (args[i].equals("-d"))) {
-                        __DATABASE_NAME = args[i + 1];
+                        __DATABASE_NAME_ = args[i + 1];
                     }
 
                 }
@@ -124,6 +123,4 @@ public class Server {
         OpenToxApplication.opentoxLogger.info("Server is shutting down Gracefully");
         component.stop();
     }
-
-   
 }

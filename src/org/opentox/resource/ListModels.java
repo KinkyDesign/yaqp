@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.resource.*;
-import org.opentox.database.ModelsDB;
+import org.opentox.database.ModelsTable;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -67,9 +67,9 @@ public class ListModels extends AbstractResource {
         Representation rep = null;
         ReferenceList list = new ReferenceList();
         if (!(searchAlgorithm == null)) {
-            list = ModelsDB.INSTANCE.getReferenceListFromAlgId(searchAlgorithm);
+            list = ModelsTable.INSTANCE.getReferenceListFromAlgId(searchAlgorithm);
         } else {
-            list = ModelsDB.INSTANCE.getModelsAsReferenceList();
+            list = ModelsTable.INSTANCE.getModelsAsReferenceList();
         }
 
 

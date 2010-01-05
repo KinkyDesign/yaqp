@@ -1,5 +1,7 @@
 package org.opentox.algorithm;
 
+import java.util.Iterator;
+
 /**
  * Enumeration of all available algorithms on the server. If one needs to extend
  * the services to support one more algorithm,this is the place to start.
@@ -8,7 +10,7 @@ package org.opentox.algorithm;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public enum AlgorithmEnum {
+public enum AlgorithmEnum implements Iterable<String>{
     /**
      * Support Vector Machines Regression Algorithm.
      */
@@ -61,6 +63,15 @@ public enum AlgorithmEnum {
         }catch(IllegalArgumentException ex){
            return unknown;
         }
+    }
+
+
+    /**
+     * TODO: Implement this method!
+     * @return
+     */
+    public Iterator<String> iterator() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 

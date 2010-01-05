@@ -17,6 +17,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.ReferenceList;
+import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -93,7 +94,7 @@ public class Algorithm extends AbstractResource {
      */
     @Override
     protected Representation get(Variant variant) {
-
+               
 
         Representation representation = null;
 
