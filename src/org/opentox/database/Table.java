@@ -12,6 +12,7 @@ public interface Table {
     /**
      * Creates the table.
      */
-    public void create();
+    @DataBaseAccess.CreateTable public void create();
+        
 
 }

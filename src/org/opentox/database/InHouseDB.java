@@ -2,6 +2,7 @@ package org.opentox.database;
 
 import java.sql.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.opentox.OpenToxApplication;
 
 /**
@@ -118,23 +119,24 @@ public final class InHouseDB implements DataBaseAccess {
                 if (rs.getString(3).equals(ModelsTable.MODEL_INFO_TABLE)) {
                     exists2 = true;
                 }
-                if (rs.getString(3).equals(UsersTables.USER_ACCOUNTS_TABLE)) {
+                if (rs.getString(3).equals(UsersTable.USER_ACCOUNTS_TABLE)) {
                     exists3 = true;
                 }
             }
 
 
-            if (!exists1) {
-                ModelsTable.INSTANCE.createModelsStackTable();
+            if ((!exists1)||(!exists2)) {
+                ModelsTable.INSTANCE.create();
             }
-            if (!exists2) {
-                ModelsTable.INSTANCE.createModelInfoTable();
-            }
+            
             if (!exists3) {
-                UsersTables.INSTANCE.create();
+                UsersTable.INSTANCE.create();
             }
 
-
+            /**
+             * When loading the tables,
+             * update the entry of MODELS_STACK_TABLE...
+             */
             stmt = connection.createStatement();
             rs = stmt.executeQuery("SELECT * FROM " + ModelsTable.MODELS_STACK_TABLE);
             while (rs.next()) {
@@ -160,10 +162,14 @@ public final class InHouseDB implements DataBaseAccess {
         }
     }
 
-    public void getRidOf() {
-        UsersTables.INSTANCE.getRidOf();
-        ModelsTable.INSTANCE.getRidOf();
-    }
+   public void close(){
+        try {
+            connection.close();
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.severe("Database Connection could not close");
+        }
+   }
+
 
 
 

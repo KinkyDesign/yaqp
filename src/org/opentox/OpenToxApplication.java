@@ -71,7 +71,7 @@ public class OpenToxApplication extends Application {
      */
     public static Logger opentoxLogger;
     public static ExecutorService executor;
-    private static final int THREADS = 100;
+    private static final int THREADS = 50;
 
     private static OpenToxApplication instanceOfThis = null;
 
@@ -142,6 +142,7 @@ public class OpenToxApplication extends Application {
 
         /**
          * Authenticate authorized users.
+         * Access Level: USER
          */
         Verifier model_verifier = new CredentialsVerifier(this, Priviledges.USER);
         List<Method> modelMethods = new ArrayList<Method>();
@@ -204,9 +205,9 @@ public class OpenToxApplication extends Application {
 
 
         /**
-         * Shutdown Resource
+         * Shutdown Resource.
+         * Access Level: ADMIN
          */
-
         CredentialsVerifier shutDownVerifier = new CredentialsVerifier(this, Priviledges.ADMIN);
         List<Method> shutdownMethods = new ArrayList<Method>();
         shutdownMethods.add(Method.GET);

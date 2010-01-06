@@ -50,7 +50,7 @@ public final class Priviledges implements AuthorizationHierarchy{
     /**
      * Administrators.
      */
-    public static Priviledges ADMIN = new Priviledges("user/admin");
+    public static Priviledges ADMIN = new Priviledges("admin/admin");
 
     
 

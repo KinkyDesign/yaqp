@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.client.opentoxClient;
+import org.opentox.database.InHouseDB;
 import org.opentox.resource.AbstractResource.URIs;
 import org.restlet.Application;
 import org.restlet.Component;
@@ -120,6 +121,8 @@ public class Server {
      * @throws Exception
      */
     public static void shutdown() throws Exception {
+        OpenToxApplication.opentoxLogger.info("Closing Database Connection...");
+        InHouseDB.INSTANCE.close();
         OpenToxApplication.opentoxLogger.info("Server is shutting down Gracefully");
         component.stop();
     }

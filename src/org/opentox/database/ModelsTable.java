@@ -19,6 +19,7 @@ import org.opentox.resource.AbstractResource.URIs;
 public class ModelsTable implements DataBaseAccess, Table {
 
     protected static int modelsStack;
+
     protected final static String COL_MODEL_ID = "MODEL_ID",
             COL_MODEL_URI = "MODEL_URI",
             COL_ALGORITHM_ID = "ALGORITHM_ID",
@@ -68,7 +69,6 @@ public class ModelsTable implements DataBaseAccess, Table {
      */
     @CreateTable
     protected void createModelsStackTable() {
-        System.out.println();
         OpenToxApplication.opentoxLogger.info("Creating Table : " + MODELS_STACK_TABLE);
         String CreateTable = "create table " + MODELS_STACK_TABLE + "(STACK INTEGER)";
 
@@ -85,6 +85,7 @@ public class ModelsTable implements DataBaseAccess, Table {
         try {
             Statement stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(CreateValue);
+            stmt.close();
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -138,9 +139,8 @@ public class ModelsTable implements DataBaseAccess, Table {
                 + " where STACK = " + modelsStack;
         try {
             Statement stmt = InHouseDB.connection.createStatement();
-            synchronized (stmt) {
-                stmt.executeUpdate(increaseValue);
-            }
+            stmt.executeUpdate(increaseValue);
+            stmt.close();
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -170,10 +170,9 @@ public class ModelsTable implements DataBaseAccess, Table {
         Statement stmt;
         try {
             stmt = InHouseDB.connection.createStatement();
-            synchronized (stmt) {
-                stmt.executeUpdate(CreateValue);
-                IncreaseModelStack();
-            }
+            stmt.executeUpdate(CreateValue);
+            IncreaseModelStack();
+            stmt.close();
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -192,9 +191,8 @@ public class ModelsTable implements DataBaseAccess, Table {
         Statement stmt;
         try {
             stmt = InHouseDB.connection.createStatement();
-            synchronized (stmt) {
-                stmt.executeUpdate(removeModel);
-            }
+            stmt.executeUpdate(removeModel);
+            stmt.close();
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -219,10 +217,9 @@ public class ModelsTable implements DataBaseAccess, Table {
         ResultSet rs = null;
         try {
             stmt = InHouseDB.connection.createStatement();
-            synchronized (stmt) {
-                rs = stmt.executeQuery(searchMLR);
-                result = rs.next();
-            }
+            rs = stmt.executeQuery(searchMLR);
+            result = rs.next();
+            stmt.close();
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -265,6 +262,7 @@ public class ModelsTable implements DataBaseAccess, Table {
             while (rs.next()) {
                 list.add(rs.getString(COL_MODEL_URI));
             }
+            stmt.close();
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -291,6 +289,7 @@ public class ModelsTable implements DataBaseAccess, Table {
             while (rs.next()) {
                 list.add(rs.getString(COL_MODEL_URI));
             }
+            stmt.close();
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
@@ -315,4 +314,6 @@ public class ModelsTable implements DataBaseAccess, Table {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
     }
+
+
 }

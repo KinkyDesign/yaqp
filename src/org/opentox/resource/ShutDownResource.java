@@ -57,9 +57,8 @@ public class ShutDownResource extends AbstractResource {
 
         if (sentShutDownRequest) {
             long timeLeft = 10500L-(System.currentTimeMillis()-timeOfShutDownRequest);
-            System.out.println(timeLeft);
             return new StringRepresentation("\n--\nShutDown request has already been sent! Time left: "
-                    + timeLeft +"ms\n");
+                    + timeLeft +"ms\n\n");
         } else {
             if ((doShutDown.equals("tRue")) && (verifyShutDown.equals("iMeanIt!"))) {
 
@@ -79,7 +78,7 @@ public class ShutDownResource extends AbstractResource {
                 };
 
                 rep = new StringRepresentation("\n--\nSending graceful shutdown request to the server....\n"
-                        + "Server will be down in about 20secs\n"
+                        + "Server will be down in 10secs\n"
                         + "Goodbye!!!\n\n");
                 stoppingServer.start();
             } else {

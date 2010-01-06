@@ -13,8 +13,6 @@ public interface DataBaseAccess {
     final static String DATABASENAME = Server.__DATABASE_NAME_;
     final static String DB_URL = "jdbc:derby:" + DATABASENAME;
     
-
-
     
 
     @Inherited public @interface CreateTable{
