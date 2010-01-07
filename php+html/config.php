@@ -20,7 +20,7 @@
 
     $github = "http://github.com/sopasakis/yaqp";
 
-    $pages_size = 8;
+    $pages_size = 9;
 
     $pages[0][0] = "home";
     $pages[0][1] = "home.php";
@@ -45,5 +45,8 @@
 
     $pages[7][0] = "trainmlr";
     $pages[7][1] = "trainmlr.php";
+
+    $pages[8][0] = "news";
+    $pages[8][1] = "news.php";
 ?>
 

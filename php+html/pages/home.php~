@@ -1,4 +1,4 @@
-<?php require("navigation/navigation_home.php"); ?>
+<?php require("navigation_home.php"); ?>
 
 <div id="content-wrapper">
 	<div class="center-wrapper">

@@ -83,11 +83,10 @@
 								
 								<a href="snapshots/snp1.jpg" class="thumb"><img src="snapshots/snp1.jpg" width="64" height="64" alt="" /></a>
 								<a href="snapshots/snp2.jpg" class="thumb"><img src="snapshots/snp2.jpg" width="64" height="64" alt="" /></a>
-								<a href="snapshots/snp3.jpg" class="thumb"><img src="snapshots/snp3.jpg" width="64" height="64" alt="" /></a>
-								<a href="snapshots/snp4.jpg" class="thumb"><img src="snapshots/snp4.jpg" width="64" height="64" alt="" /></a>
-								<a href="snapshots/snp5.jpg" class="thumb"><img src="snapshots/snp5.jpg" width="64" height="64" alt="" /></a>
-								<a href="snapshots/snp6.jpg" class="thumb"><img src="snapshots/snp6.jpg" width="64" height="64" alt="" /></a>
-								
+								<a href="snapshots/snp3.jpg" class="thumb"><img src="snapshots/snp4.jpg" width="64" height="64" alt="" /></a>
+								<a href="#" class="thumb"><img src="sample-thumbnail.jpg" width="64" height="64" alt="" /></a>
+								<a href="#" class="thumb"><img src="sample-thumbnail.jpg" width="64" height="64" alt="" /></a>
+								<a href="#" class="thumb"><img src="sample-thumbnail.jpg" width="64" height="64" alt="" /></a>
 
 								<div class="clearer">&nbsp;</div>
 
