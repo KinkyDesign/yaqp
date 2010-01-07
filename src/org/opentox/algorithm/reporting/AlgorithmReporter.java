@@ -10,9 +10,9 @@ import org.opentox.formatters.AlgorithmRdfFormatter;
 import org.opentox.formatters.AlgorithmJsonFormatter;
 import java.util.ArrayList;
 import org.opentox.media.OpenToxMediaType;
-import org.opentox.resource.AbstractResource;
+import org.opentox.resource.OTResource;
 import org.opentox.namespaces.AlgorithmTypes;
-import org.opentox.resource.AbstractResource.URIs;
+import org.opentox.resource.OTResource.URIs;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 
@@ -93,10 +93,10 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
         AlgorithmMeta genericMetaInf = new AlgorithmMeta();
         genericMetaInf.type = ("http://purl.org/dc/dcmitype/Service");
-        genericMetaInf.rights = (AbstractResource.URIs.licenceUri);
+        genericMetaInf.rights = (OTResource.URIs.licenceUri);
         genericMetaInf.language = ("en");
-        genericMetaInf.creator = (AbstractResource.URIs.baseURI);
-        genericMetaInf.publisher = (AbstractResource.URIs.baseURI);
+        genericMetaInf.creator = (OTResource.URIs.baseURI);
+        genericMetaInf.publisher = (OTResource.URIs.baseURI);
         genericMetaInf.contributor = ("http://opentox.org/");
         genericMetaInf.date = ("2009-11-18");
         genericMetaInf.format = (MediaType.TEXT_XML.toString());
@@ -108,39 +108,39 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
         if (algorithm == AlgorithmEnum.mlr) {
             AlgorithmMeta MlrMetaInf = genericMetaInf;
-            MlrMetaInf.setAbout(AbstractResource.URIs.mlrAlgorithmURI);
+            MlrMetaInf.setAbout(OTResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.title = ("mlr");
             MlrMetaInf.subject = ("MLR, Multiple Linear Regression");
             MlrMetaInf.algorithmType = AlgorithmTypes.Class.RegressionEagerSingleTarget;
             MlrMetaInf.description = ("Multiple Linear Regression Training Algorithm");
-            MlrMetaInf.identifier = (AbstractResource.URIs.mlrAlgorithmURI);
+            MlrMetaInf.identifier = (OTResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.setParameters(Parameters(AlgorithmEnum.mlr));
 
             representation = getRepresentationForMetaInf(MlrMetaInf, media);
 
         } else if (algorithm == AlgorithmEnum.svm) {
             AlgorithmMeta SvmMetaInf = genericMetaInf;
-            SvmMetaInf.setAbout(AbstractResource.URIs.svmAlgorithmURI);
+            SvmMetaInf.setAbout(OTResource.URIs.svmAlgorithmURI);
             SvmMetaInf.title = ("svm");
             SvmMetaInf.subject = ("SVM Regression");
             SvmMetaInf.algorithmType = AlgorithmTypes.Class.RegressionEagerSingleTarget;
             SvmMetaInf.description = ("Training Algorithm for Support Vector"
                     + "Machine Regression Models");
             SvmMetaInf.setParameters(Parameters(AlgorithmEnum.svm));
-            SvmMetaInf.identifier = (AbstractResource.URIs.svmAlgorithmURI);
+            SvmMetaInf.identifier = (OTResource.URIs.svmAlgorithmURI);
 
             representation = getRepresentationForMetaInf(SvmMetaInf, media);
 
         } else if (algorithm == AlgorithmEnum.svc) {
             AlgorithmMeta SvcMetaInf = genericMetaInf;
-            SvcMetaInf.setAbout(AbstractResource.URIs.svcAlgorithmURI);
+            SvcMetaInf.setAbout(OTResource.URIs.svcAlgorithmURI);
             SvcMetaInf.title = ("svc");
             SvcMetaInf.subject = ("SVC Classification");
             SvcMetaInf.algorithmType = AlgorithmTypes.Class.ClassificationEagerSingleTarget;
             SvcMetaInf.description = ("Training Algorithm for Support Vector"
                     + "Machine Classification Models");
             SvcMetaInf.setParameters(Parameters(AlgorithmEnum.svc));
-            SvcMetaInf.identifier = (AbstractResource.URIs.svcAlgorithmURI);
+            SvcMetaInf.identifier = (OTResource.URIs.svcAlgorithmURI);
 
             representation = getRepresentationForMetaInf(SvcMetaInf, media);
         }

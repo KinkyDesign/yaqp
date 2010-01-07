@@ -16,9 +16,9 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.OpenToxApplication;
-import org.opentox.resource.AbstractResource;
-import org.opentox.resource.AbstractResource.Directories;
-import org.opentox.resource.AbstractResource.URIs;
+import org.opentox.resource.OTResource;
+import org.opentox.resource.OTResource.Directories;
+import org.opentox.resource.OTResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
@@ -79,7 +79,7 @@ import weka.core.Instances;
 
 
             try {
-                data = dataset.getWekaDatasetForTraining(null, false);
+                data = dataset.getInstaces(null, false);
                 data.setClass(data.attribute(targeturi.toString()));
                 DataCleanUp.removeStringAtts(data);
                 LinearRegression linreg = new LinearRegression();
@@ -108,9 +108,9 @@ import weka.core.Instances;
                 // return the URI of generated model:
                 if (model.errorRep.getErrorLevel() == 0) {
 
-                    representation = new StringRepresentation(AbstractResource.URIs.modelURI + "/"
+                    representation = new StringRepresentation(OTResource.URIs.modelURI + "/"
                             + ModelsTable.INSTANCE.registerNewModel(
-                            AbstractResource.URIs.mlrAlgorithmURI) + "\n");
+                            OTResource.URIs.mlrAlgorithmURI) + "\n");
 
                 }
 
@@ -238,11 +238,11 @@ import weka.core.Instances;
      */
     private void generatePMML(double[] coefficients, int model_id) {
         StringBuilder pmml = new StringBuilder();
-        pmml.append(AbstractResource.xmlIntro);
-        pmml.append(AbstractResource.PMMLIntro);
+        pmml.append(OTResource.xmlIntro);
+        pmml.append(OTResource.PMMLIntro);
         pmml.append("<Model ID=\"" + model_id + "\" Name=\"MLR Model\">\n");
-        pmml.append("<link href=\"" + AbstractResource.URIs.modelURI + "/" + model_id + "\" />\n");
-        pmml.append("<AlgorithmID href=\"" + AbstractResource.URIs.mlrAlgorithmURI + "\"/>\n");
+        pmml.append("<link href=\"" + OTResource.URIs.modelURI + "/" + model_id + "\" />\n");
+        pmml.append("<AlgorithmID href=\"" + OTResource.URIs.mlrAlgorithmURI + "\"/>\n");
         pmml.append("<DatasetID href=\"" + dataseturi.toString() + "\"/>\n");
         pmml.append("<AlgorithmParameters />\n");
         pmml.append("<FeatureDefinitions>\n");
@@ -264,7 +264,7 @@ import weka.core.Instances;
         }
         pmml.append("</DataDictionary>\n");
         // RegressionModel
-        pmml.append("<RegressionModel modelName=\"" + AbstractResource.URIs.modelURI + "/" + model_id + "\""
+        pmml.append("<RegressionModel modelName=\"" + OTResource.URIs.modelURI + "/" + model_id + "\""
                 + " functionName=\"regression\""
                 + " modelType=\"linearRegression\""
                 + " algorithmName=\"linearRegression\""
@@ -300,7 +300,7 @@ import weka.core.Instances;
         pmml.append("</RegressionModel>\n");
         pmml.append("</PMML>\n\n");
         try {
-            FileWriter fwriter = new FileWriter(AbstractResource.Directories.modelPmmlDir
+            FileWriter fwriter = new FileWriter(OTResource.Directories.modelPmmlDir
                     + "/" + model_id);
             BufferedWriter writer = new BufferedWriter(fwriter);
             writer.write(pmml.toString());

@@ -11,8 +11,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentox.error.ErrorRepresentation;
-import org.opentox.resource.AbstractResource.Directories;
-import org.opentox.resource.AbstractResource.URIs;
+import org.opentox.resource.OTResource.Directories;
+import org.opentox.resource.OTResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.algorithm.trainer.AbstractTrainer.Classification;
 import org.opentox.client.opentoxClient;
@@ -314,7 +314,7 @@ public class SvcTrainer extends AbstractTrainer {
         Dataset dataset = new Dataset(dataseturi);
         errorRep.append(dataset.errorRep);
         try {
-            dataInstances = dataset.getWekaDatasetForTraining(null, false);
+            dataInstances = dataset.getInstaces(null, false);
 
             /**
              * If the data were successfully parsed, try to set the class attribute.

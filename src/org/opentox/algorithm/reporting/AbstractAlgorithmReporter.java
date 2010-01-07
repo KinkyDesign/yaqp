@@ -4,7 +4,6 @@ import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.error.ErrorSource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 
 /**
  *

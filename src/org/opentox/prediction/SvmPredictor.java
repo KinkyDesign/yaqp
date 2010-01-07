@@ -1,5 +1,6 @@
 package org.opentox.prediction;
 
+import org.opentox.interfaces.IPredictor;
 import org.opentox.resource.ModelResource;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentox.resource.AbstractResource.Directories;
+import org.opentox.resource.OTResource.Directories;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.ontology.rdf.Dataset;
 import org.opentox.ontology.rdf.Model;
@@ -27,7 +28,7 @@ import weka.core.SerializationHelper;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class SvmPredictor implements Predictor {
+public class SvmPredictor implements IPredictor {
 
     public Representation predict(Form form, String model_id) {
         Representation rep = null;
@@ -44,7 +45,7 @@ public class SvmPredictor implements Predictor {
             con.addRequestProperty("Accept", "application/rdf+xml");
 
             Dataset wekaData = new Dataset(con.getInputStream());
-            Instances testData = wekaData.getWekaDatasetForTraining(null, false);
+            Instances testData = wekaData.getInstaces(null, false);
             DataCleanUp.removeStringAtts(testData);
 
             testData.setClass(testData.attribute("http://sth.com/feature/1"));

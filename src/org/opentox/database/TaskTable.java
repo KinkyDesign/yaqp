@@ -1,10 +1,13 @@
 package org.opentox.database;
 
+import org.opentox.interfaces.ITable;
+import org.opentox.interfaces.IDataBaseAccess;
+
 /**
  *
  * @author Sopasakis Pantelis
  */
-public final class TaskTable implements DataBaseAccess, Table {
+public final class TaskTable implements IDataBaseAccess, ITable {
 
     private static TaskTable instanceOfThis = null;
     public final static TaskTable INSTANCE = getInstance();

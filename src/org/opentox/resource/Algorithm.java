@@ -12,12 +12,13 @@ import org.opentox.media.OpenToxMediaType;
 import org.opentox.algorithm.reporting.AlgorithmReporter;
 
 import org.opentox.algorithm.reporting.AlgorithmReporter.*;
+import org.opentox.interfaces.IAcceptsRepresentation;
+import org.opentox.interfaces.IProvidesHttpAccess;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.ReferenceList;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -31,7 +32,8 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class Algorithm extends AbstractResource {
+public class Algorithm extends OTResource
+        implements IAcceptsRepresentation, IProvidesHttpAccess{
 
     private static final long serialVersionUID = 8992374761250990L;
     /**
@@ -93,7 +95,7 @@ public class Algorithm extends AbstractResource {
      * @return XML representation of algorithm
      */
     @Override
-    protected Representation get(Variant variant) {
+    public Representation get(Variant variant) {
                
 
         Representation representation = null;
@@ -127,7 +129,7 @@ public class Algorithm extends AbstractResource {
      * @throws ResourceException
      */
     @Override
-    protected Representation post(Representation entity)
+    public Representation post(Representation entity)
             throws ResourceException {
 
         

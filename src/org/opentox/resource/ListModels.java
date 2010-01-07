@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import org.opentox.database.ModelsTable;
+import org.opentox.interfaces.IProvidesHttpAccess;
 import org.opentox.media.OpenToxMediaType;
-import org.opentox.namespaces.OT;
+import org.opentox.namespaces.OTClass;
+import org.opentox.namespaces.OTProperties;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -28,7 +30,8 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class ListModels extends AbstractResource {
+public class ListModels extends OTResource
+        implements IProvidesHttpAccess{
 
     private static final long serialVersionUID = 203859831723987321L;
     /**
@@ -106,16 +109,16 @@ public class ListModels extends AbstractResource {
             ByteArrayOutputStream outStream = null;
             OntModel jenaModel = null;
 
-            jenaModel = OT.createModel();
+            jenaModel = OTProperties.createModel();
 
 
-            OT.Class.Model.createOntClass(jenaModel);
+            OTClass.Model.createOntClass(jenaModel);
 
             Individual model;
 
             for (Iterator<Reference> it = list.iterator(); it.hasNext();) {
                 model = jenaModel.createIndividual(it.next().getIdentifier(),
-                        jenaModel.createOntResource(OT.Class.Model.getURI()));
+                        jenaModel.createOntResource(OTClass.Model.getURI()));
 
             }
 

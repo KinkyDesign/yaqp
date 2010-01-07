@@ -1,6 +1,6 @@
 package org.opentox.ontology.rdf;
 
-import org.opentox.namespaces.OT;
+import org.opentox.namespaces.OTProperties;
 import org.opentox.namespaces.Namespace;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -47,7 +47,7 @@ public abstract class RDFHandler extends ErrorSource {
      */
     public RDFHandler(InputStream in) {
         try {
-            jenaModel = OT.createModel();
+            jenaModel = OTProperties.createModel();
             jenaModel.read(in, null);
         } catch (Exception ex) {
             Logger.getLogger(Dataset.class.getName()).log(Level.SEVERE, null, ex);

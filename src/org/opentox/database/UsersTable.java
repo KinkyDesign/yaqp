@@ -1,5 +1,7 @@
 package org.opentox.database;
 
+import org.opentox.interfaces.ITable;
+import org.opentox.interfaces.IDataBaseAccess;
 import org.opentox.auth.Priviledges;
 import java.sql.*;
 import java.util.HashMap;
@@ -12,7 +14,7 @@ import static org.opentox.auth.DigestGenerator.*;
  *
  * @author Sopasakis Pantelis
  */
-public class UsersTable implements DataBaseAccess, Table {
+public class UsersTable implements IDataBaseAccess, ITable {
 
     protected final static String USER_ACCOUNTS_TABLE = "USERS";
     private final static String

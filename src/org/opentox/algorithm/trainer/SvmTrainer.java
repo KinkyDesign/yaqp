@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.opentox.resource.AbstractResource.Directories;
-import org.opentox.resource.AbstractResource.URIs;
+import org.opentox.resource.OTResource.Directories;
+import org.opentox.resource.OTResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
 import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
@@ -293,7 +293,7 @@ import weka.core.converters.ArffSaver;
                 Dataset dataset = new Dataset(dataseturi);
                 errorRep.append(dataset.errorRep);
                 try {
-                    dataInstances = dataset.getWekaDatasetForTraining(null, false);
+                    dataInstances = dataset.getInstaces(null, false);
                     /**
                      * If the data were successfully parsed, try to set the class attribute.
                      */

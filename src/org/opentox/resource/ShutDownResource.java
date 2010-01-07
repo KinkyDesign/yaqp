@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentox.OpenToxApplication;
 import org.opentox.Server;
+import org.opentox.interfaces.IAcceptsRepresentation;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -18,7 +19,7 @@ import org.restlet.resource.ResourceException;
  *
  * @author chung
  */
-public class ShutDownResource extends AbstractResource {
+public class ShutDownResource extends OTResource implements IAcceptsRepresentation {
 
     private static boolean sentShutDownRequest = false;
     private static long timeOfShutDownRequest = 0;
@@ -39,7 +40,7 @@ public class ShutDownResource extends AbstractResource {
     }
 
     @Override
-    protected Representation post(Representation entity) throws ResourceException {
+    public Representation post(Representation entity) throws ResourceException {
 
         Representation rep = new StringRepresentation("Will not shut down!\n");
         Form form = new Form(entity);
@@ -70,7 +71,7 @@ public class ShutDownResource extends AbstractResource {
                     public void run() {
                         try {
                             Thread.sleep(10000);
-                            Server.shutdown();
+                            Server.INSTANCE.shutdown();
                         } catch (Exception ex) {
                             System.exit(0);
                         }

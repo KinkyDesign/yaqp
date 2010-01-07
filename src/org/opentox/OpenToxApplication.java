@@ -11,7 +11,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import org.opentox.resource.AbstractResource;
+import org.opentox.resource.OTResource;
 import org.opentox.resource.Algorithm;
 import org.opentox.resource.ModelResource;
 import org.opentox.resource.ListModels;
@@ -95,12 +95,12 @@ public class OpenToxApplication extends Application {
      * Constructor.
      */
     private OpenToxApplication() throws IOException {
-        if (!(new File(AbstractResource.Directories.logDir)).exists()) {
-            new File(AbstractResource.Directories.logDir).mkdirs();
+        if (!(new File(OTResource.Directories.logDir)).exists()) {
+            new File(OTResource.Directories.logDir).mkdirs();
         }
-        AbstractResource.Directories.checkDirs();
+        OTResource.Directories.checkDirs();
         opentoxLogger = Logger.getLogger("org.restlet");
-        FileHandler fileHand = new FileHandler(AbstractResource.Directories.logDir + "/" + new Date());
+        FileHandler fileHand = new FileHandler(OTResource.Directories.logDir + "/" + new Date());
         fileHand.setFormatter(new SimpleFormatter());
         opentoxLogger.addHandler(fileHand);
         opentoxLogger.setLevel(Level.INFO);

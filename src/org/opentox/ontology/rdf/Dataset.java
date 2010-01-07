@@ -1,6 +1,7 @@
 package org.opentox.ontology.rdf;
 
-import org.opentox.namespaces.OT;
+import org.opentox.interfaces.IDataset;
+import org.opentox.namespaces.OTProperties;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -32,7 +33,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.opentox.resource.AbstractResource.URIs;
+import org.opentox.namespaces.OTClass;
+import org.opentox.resource.OTResource.URIs;
 import org.restlet.data.Status;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -44,7 +46,7 @@ import weka.filters.unsupervised.attribute.NumericToNominal;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class Dataset extends RDFHandler implements Serializable{
+public class Dataset extends RDFHandler implements Serializable, IDataset{
 
     private static final long serialVersionUID = -920482801546239926L;
 
@@ -80,7 +82,7 @@ public class Dataset extends RDFHandler implements Serializable{
             con.setDoOutput(true);
             con.setUseCaches(false);
             con.addRequestProperty("Accept", "application/rdf+xml");
-            jenaModel = OT.createModel();
+            jenaModel = OTProperties.createModel();
             jenaModel.read(con.getInputStream(), null);
 
         } catch (MalformedURLException ex) {
@@ -134,7 +136,7 @@ public class Dataset extends RDFHandler implements Serializable{
         Set<String> set = new HashSet<String>();
         StmtIterator features =
                 jenaModel.listStatements(
-                new SimpleSelector(null, RDF.type, OT.Class.Feature.getOntClass(jenaModel)));
+                new SimpleSelector(null, RDF.type, OTClass.Feature.getOntClass(jenaModel)));
         while (features.hasNext()) {
             set.add(features.next().getSubject().toString());
         }
@@ -174,7 +176,7 @@ public class Dataset extends RDFHandler implements Serializable{
      * be nominal.
      * @return The Instances object which encapsulates the data in the RDF document.
      */
-    public Instances getWekaDatasetForTraining(String target, boolean isClassNominal) throws Exception {
+    public Instances getInstaces(String target, boolean isClassNominal) throws Exception {
 
         /**
          * Check if some error occured while constructing the
@@ -188,9 +190,9 @@ public class Dataset extends RDFHandler implements Serializable{
 
         // A1. Some initial definitions:
 
-        Resource dataEntryResource = OT.Class.DataEntry.getOntClass(jenaModel),
-                dataSetResource = OT.Class.Dataset.getOntClass(jenaModel),
-                featureResource = OT.Class.Feature.getOntClass(jenaModel);
+        Resource dataEntryResource = OTClass.DataEntry.getOntClass(jenaModel),
+                dataSetResource = OTClass.Dataset.getOntClass(jenaModel),
+                featureResource = OTClass.Feature.getOntClass(jenaModel);
         FastVector attributes = null;
         Instances data = null;
         StmtIterator dataSetIterator = null,
@@ -233,13 +235,13 @@ public class Dataset extends RDFHandler implements Serializable{
 
             // A4. For every single feature in the dataset, pick a "values" node.
             valuesIterator =
-                    jenaModel.listStatements(new SimpleSelector(null, OT.feature, feature.getSubject()));
+                    jenaModel.listStatements(new SimpleSelector(null, OTProperties.feature, feature.getSubject()));
             if (valuesIterator.hasNext()) {
                 Statement values = valuesIterator.next();
 
                 // A5. For this values node, get the value
                 StmtIterator valueInValuesIter =
-                        jenaModel.listStatements(new SimpleSelector(values.getSubject(), OT.value, (Resource) null));
+                        jenaModel.listStatements(new SimpleSelector(values.getSubject(), OTProperties.value, (Resource) null));
                 if (valueInValuesIter.hasNext()) {
                     featureTypeMap.put(feature.getSubject(), valueInValuesIter.next().getLiteral().getDatatypeURI());
                 }
@@ -272,7 +274,7 @@ public class Dataset extends RDFHandler implements Serializable{
              */
             Instance temp = null;
             valuesIterator =
-                    jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OT.values, (Resource) null));
+                    jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OTProperties.values, (Resource) null));
 
             double[] vals = new double[data.numAttributes()];
             for (int i = 0; i < data.numAttributes(); i++) {
@@ -280,7 +282,7 @@ public class Dataset extends RDFHandler implements Serializable{
             }
 
             StmtIterator compoundNamesIterator =
-                    jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OT.compound, (Resource) null));
+                    jenaModel.listStatements(new SimpleSelector(dataEntry.getSubject(), OTProperties.compound, (Resource) null));
             String compoundName = null;
             if (compoundNamesIterator.hasNext()) {
                 compoundName = compoundNamesIterator.next().getObject().as(Resource.class).getURI();
@@ -298,9 +300,9 @@ public class Dataset extends RDFHandler implements Serializable{
                  */
 
                 // atVal is the value of the attribute
-                String atVal = values.getProperty(OT.value).getObject().as(Literal.class).getValue().toString();
+                String atVal = values.getProperty(OTProperties.value).getObject().as(Literal.class).getValue().toString();
                 // and atName is the name of the corresponding attribute.
-                String atName = values.getProperty(OT.feature).getObject().as(Resource.class).getURI();
+                String atName = values.getProperty(OTProperties.feature).getObject().as(Resource.class).getURI();
 
 
 
@@ -370,16 +372,14 @@ public class Dataset extends RDFHandler implements Serializable{
     
 
     /**
-     * Similar to {@link org.opentox.rdf.Dataset#getWekaDatasetForTraining(java.lang.String, boolean)  }
+     * Similar to {@link org.opentox.ontology.rdf.Dataset#getInstaces(java.lang.String, boolean)
      * but the generated Instances is constructed with respect to a certain model.
      * @param model_id
      * @return Instances for prediction using a given model.
      */
-    public Instances getWekaDatasetForPrediction(String model_id) {
+    public Instances getInstances(String model_id) {
         return null;
-    }
-
-    ;
+    };
 
     /**
      * The set of XSD data types that should be cast as numeric.
@@ -455,17 +455,17 @@ public class Dataset extends RDFHandler implements Serializable{
             OutputStream out, String Lang) {
         OntModel datasetModel;
         try {
-            datasetModel = OT.createModel();
+            datasetModel = OTProperties.createModel();
             Individual dataset = datasetModel.createIndividual("http://sth.com/dataset/1",
-                    datasetModel.getOntClass(OT.Class.Dataset.getURI()));
-            dataset.addRDFType(OT.Class.Dataset.createProperty(datasetModel));
+                    datasetModel.getOntClass(OTClass.Dataset.getURI()));
+            dataset.addRDFType(OTClass.Dataset.createProperty(datasetModel));
 
 
-            OT.Class.Dataset.createOntClass(datasetModel);
-            OT.Class.DataEntry.createOntClass(datasetModel);
-            OT.Class.Feature.createOntClass(datasetModel);
-            OT.Class.FeatureValue.createOntClass(datasetModel);
-            OT.Class.Compound.createOntClass(datasetModel);
+            OTClass.Dataset.createOntClass(datasetModel);
+            OTClass.DataEntry.createOntClass(datasetModel);
+            OTClass.Feature.createOntClass(datasetModel);
+            OTClass.FeatureValue.createOntClass(datasetModel);
+            OTClass.Compound.createOntClass(datasetModel);
 
 
             Individual dataEntry = null, compound = null, feature = null, featureValue = null;
@@ -473,24 +473,24 @@ public class Dataset extends RDFHandler implements Serializable{
 
 
             for (int i = 0; i < numOfCompounds; i++) {
-                dataEntry = datasetModel.createIndividual(OT.Class.DataEntry.getOntClass(datasetModel));
-                dataset.addProperty(OT.dataEntry, dataEntry);
+                dataEntry = datasetModel.createIndividual(OTClass.DataEntry.getOntClass(datasetModel));
+                dataset.addProperty(OTProperties.dataEntry, dataEntry);
 
                 compound = datasetModel.createIndividual(
-                        "http://sth.com/compound/" + i, OT.Class.Compound.getOntClass(datasetModel));
-                dataEntry.addProperty(OT.compound, compound);
+                        "http://sth.com/compound/" + i, OTClass.Compound.getOntClass(datasetModel));
+                dataEntry.addProperty(OTProperties.compound, compound);
 
                 for (int j = 0; j < numOfFeatures; j++) {
                     feature = datasetModel.createIndividual("http://sth.com/feature/" + j,
-                            OT.Class.Feature.getOntClass(datasetModel));
+                            OTClass.Feature.getOntClass(datasetModel));
                     featureValue = datasetModel.createIndividual(
-                            OT.Class.FeatureValue.getOntClass(datasetModel));
-                    featureValue.addProperty(OT.feature, feature);
-                    featureValue.addLiteral(OT.value, datasetModel.createTypedLiteral(Math.random(), XSDDatatype.XSDdouble));
-                    dataEntry.addProperty(OT.values, featureValue);
+                            OTClass.FeatureValue.getOntClass(datasetModel));
+                    featureValue.addProperty(OTProperties.feature, feature);
+                    featureValue.addLiteral(OTProperties.value, datasetModel.createTypedLiteral(Math.random(), XSDDatatype.XSDdouble));
+                    dataEntry.addProperty(OTProperties.values, featureValue);
                 }
 
-                dataset.addProperty(OT.dataEntry, dataEntry);
+                dataset.addProperty(OTProperties.dataEntry, dataEntry);
 
             }
             if (out == null) {
@@ -515,19 +515,19 @@ public class Dataset extends RDFHandler implements Serializable{
     public synchronized Dataset populateDataset(Instances predictedData) {
         OntModel datasetModel = null;
         try {
-            datasetModel = OT.createModel();
-            Individual dataset = datasetModel.createIndividual(OT.Class.Dataset.createOntClass(datasetModel));
-            dataset.addRDFType(OT.Class.Dataset.createProperty(datasetModel));
+            datasetModel = OTProperties.createModel();
+            Individual dataset = datasetModel.createIndividual(OTClass.Dataset.createOntClass(datasetModel));
+            dataset.addRDFType(OTClass.Dataset.createProperty(datasetModel));
             dataset.addProperty(jenaModel.createAnnotationProperty(DC.creator.getURI()), URIs.baseURI);
             dataset.addProperty(jenaModel.createAnnotationProperty(RDFS.comment.getURI()),
                     predictedData.relationName());
 
 
-            OT.Class.Dataset.createOntClass(datasetModel);
-            OT.Class.DataEntry.createOntClass(datasetModel);
-            OT.Class.Feature.createOntClass(datasetModel);
-            OT.Class.FeatureValue.createOntClass(datasetModel);
-            OT.Class.Compound.createOntClass(datasetModel);
+            OTClass.Dataset.createOntClass(datasetModel);
+            OTClass.DataEntry.createOntClass(datasetModel);
+            OTClass.Feature.createOntClass(datasetModel);
+            OTClass.FeatureValue.createOntClass(datasetModel);
+            OTClass.Compound.createOntClass(datasetModel);
 
 
             Individual dataEntry = null, compound = null, feature = null, featureValue = null;
@@ -535,25 +535,24 @@ public class Dataset extends RDFHandler implements Serializable{
 
 
             for (int i = 0; i < predictedData.numInstances(); i++) {
-                dataEntry = datasetModel.createIndividual(OT.Class.DataEntry.getOntClass(datasetModel));
-                dataset.addProperty(OT.dataEntry, dataEntry);
+                dataEntry = datasetModel.createIndividual(OTClass.DataEntry.getOntClass(datasetModel));
+                dataset.addProperty(OTProperties.dataEntry, dataEntry);
 
                 compound = datasetModel.createIndividual(
                         predictedData.instance(i).stringValue(predictedData.attribute("compound_uri")),
-                        OT.Class.Compound.getOntClass(datasetModel));
-                dataEntry.addProperty(OT.compound, compound);
+                        OTClass.Compound.getOntClass(datasetModel));
+                dataEntry.addProperty(OTProperties.compound, compound);
 
                 feature = datasetModel.createIndividual(predictedData.attribute(1).name(),
-                        OT.Class.Feature.getOntClass(datasetModel));
+                        OTClass.Feature.getOntClass(datasetModel));
                 featureValue = datasetModel.createIndividual(
-                        OT.Class.FeatureValue.getOntClass(datasetModel));
-                featureValue.addProperty(OT.feature, feature);
-                featureValue.addLiteral(OT.value, datasetModel.createTypedLiteral(predictedData.instance(i).value(1),
+                        OTClass.FeatureValue.getOntClass(datasetModel));
+                featureValue.addProperty(OTProperties.feature, feature);
+                featureValue.addLiteral(OTProperties.value, datasetModel.createTypedLiteral(predictedData.instance(i).value(1),
                         XSDDatatype.XSDdouble));
-                dataEntry.addProperty(OT.values, featureValue);
+                dataEntry.addProperty(OTProperties.values, featureValue);
 
-
-                dataset.addProperty(OT.dataEntry, dataEntry);
+                dataset.addProperty(OTProperties.dataEntry, dataEntry);
 
             }
 
@@ -569,6 +568,6 @@ public class Dataset extends RDFHandler implements Serializable{
 
     public static void main(String[] atts) throws URISyntaxException, Exception {
         Dataset ds = new Dataset(new URI("http://localhost/small.rdf"));
-        System.out.println(ds.getWekaDatasetForTraining(null, false));
+        System.out.println(ds.getInstaces(null, false));
     }
 }

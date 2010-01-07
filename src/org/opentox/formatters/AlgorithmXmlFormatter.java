@@ -2,7 +2,7 @@ package org.opentox.formatters;
 
 
 import org.opentox.ontology.meta.AlgorithmMeta;
-import org.opentox.resource.AbstractResource;
+import org.opentox.resource.OTResource;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -23,7 +23,7 @@ public class AlgorithmXmlFormatter extends AbstractAlgorithmFormatter{
 
     public Representation getRepresentation(MediaType mediatype) {
         StringBuilder builder = new StringBuilder();
-        builder.append(AbstractResource.xmlIntro);
+        builder.append(OTResource.xmlIntro);
         builder.append("<algorithm name=\"" + metainf.title + "\" id=\"" + metainf.identifier + "\">\n");
         builder.append("<algorithmType>" + metainf.algorithmType + "</algorithmType>\n");
 

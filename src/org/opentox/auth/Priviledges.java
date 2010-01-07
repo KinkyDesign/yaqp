@@ -1,5 +1,7 @@
 package org.opentox.auth;
 
+import org.opentox.interfaces.IAuthorizationHierarchy;
+
 
 
 /**
@@ -10,7 +12,7 @@ package org.opentox.auth;
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
-public final class Priviledges implements AuthorizationHierarchy {
+public final class Priviledges implements IAuthorizationHierarchy {
 
     /**
      * Constructor.
@@ -69,7 +71,7 @@ public final class Priviledges implements AuthorizationHierarchy {
      * @return integer used for the comparison.
      */
     @Override
-    public int compareTo(AuthorizationHierarchy other) {
+    public int compareTo(IAuthorizationHierarchy other) {
 
         if (Priviledges.GUEST.getLevel().equals(level)){ /** this=guest **/
             if (other.getLevel().equals(level)){

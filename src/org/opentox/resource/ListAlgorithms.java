@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import org.opentox.interfaces.IProvidesHttpAccess;
 import org.opentox.media.OpenToxMediaType;
-import org.opentox.namespaces.OT;
+import org.opentox.namespaces.OTClass;
+import org.opentox.namespaces.OTProperties;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.ReferenceList;
@@ -32,7 +34,8 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class ListAlgorithms extends AbstractResource {
+public class ListAlgorithms extends OTResource
+        implements IProvidesHttpAccess{
 
     private static final long serialVersionUID = 75712481009764L;
 
@@ -88,16 +91,16 @@ public class ListAlgorithms extends AbstractResource {
             ByteArrayOutputStream outStream = null;
             OntModel jenaModel = null;
 
-            jenaModel = OT.createModel();
+            jenaModel = OTProperties.createModel();
 
 
-            OT.Class.Algorithm.createOntClass(jenaModel);
+            OTClass.Algorithm.createOntClass(jenaModel);
 
             Individual algorithm;
             algorithmIterator = algorithms.iterator();
             while (algorithmIterator.hasNext()) {                
                 algorithm = jenaModel.createIndividual(URIs.algorithmURI+"/"+algorithmIterator.next(),
-                        jenaModel.createOntResource(OT.Class.Algorithm.getURI()));
+                        jenaModel.createOntResource(OTClass.Algorithm.getURI()));
 
             }
 

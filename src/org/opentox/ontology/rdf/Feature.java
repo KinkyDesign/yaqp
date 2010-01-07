@@ -1,7 +1,8 @@
 package org.opentox.ontology.rdf;
 
+import org.opentox.interfaces.IFeature;
 import java.io.IOException;
-import org.opentox.namespaces.OT;
+import org.opentox.namespaces.OTProperties;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
@@ -9,7 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
-import org.opentox.resource.AbstractResource;
+import org.opentox.namespaces.OTClass;
+import org.opentox.resource.OTResource;
 import org.restlet.Client;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
@@ -26,7 +28,7 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 23, 2009)
  */
-public class Feature extends RDFHandler  implements Serializable {
+public class Feature extends RDFHandler  implements Serializable, IFeature {
 
     public Feature() {
         super();
@@ -39,13 +41,13 @@ public class Feature extends RDFHandler  implements Serializable {
      * @param output Outputstream used to write the output.
      */
     public void createNewFeature(String sameAs, OutputStream output) {
-        OntModel featureModel = OT.createModel();
-        Individual feature = featureModel.createIndividual(featureModel.getOntClass(OT.Class.Dataset.getURI()));
-        feature.addRDFType(OT.Class.Feature.createProperty(featureModel));
+        OntModel featureModel = OTProperties.createModel();
+        Individual feature = featureModel.createIndividual(featureModel.getOntClass(OTClass.Dataset.getURI()));
+        feature.addRDFType(OTClass.Feature.createProperty(featureModel));
         feature.addProperty(featureModel.createAnnotationProperty(DC.creator.getURI()),
-                featureModel.createTypedLiteral(AbstractResource.URIs.baseURI));
-        feature.setSameAs(featureModel.createResource(sameAs, OT.Class.Feature.getResource()));
-        OT.Class.Feature.createOntClass(featureModel);
+                featureModel.createTypedLiteral(OTResource.URIs.baseURI));
+        feature.setSameAs(featureModel.createResource(sameAs, OTClass.Feature.getResource()));
+        OTClass.Feature.createOntClass(featureModel);
         featureModel.write(output);
     }
 

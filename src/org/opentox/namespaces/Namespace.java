@@ -3,7 +3,6 @@ package org.opentox.namespaces;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -11,6 +10,7 @@ import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.OWL;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentox.interfaces.IOntClass;
 
 /**
  * Superclass for all Namespaces introduced in opentox such as {@link org.opentox.namespaces.AlgorithmTypes }
@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class Namespace {
+public abstract class Namespace implements IOntClass {
 
     private static final long serialVersionUID = 569539073288446072L;
 
@@ -27,8 +27,7 @@ public abstract class Namespace {
 
     public static final String NS = String.format(_NS, "");
 
-        
-    
+            
     protected static OntModel m_model = createModel();
 
 
@@ -111,4 +110,5 @@ public abstract class Namespace {
             return this.resource;
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package org.opentox.util.converters;
 
-import com.hp.hpl.jena.util.FileManager;
+
+import org.opentox.interfaces.IConverter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
@@ -14,7 +15,7 @@ import org.opentox.algorithm.dataprocessing.DataCleanUp;
 * @author Sarimveis Harry
 * @author Kolotouros Dimitris
 */
-public class Converter implements  AbstractConverter{
+public class Converter implements  IConverter{
 
     private static final long serialVersionUID = 85251113527439L;
 

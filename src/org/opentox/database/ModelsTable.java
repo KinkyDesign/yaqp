@@ -1,13 +1,15 @@
 package org.opentox.database;
 
+import org.opentox.interfaces.ITable;
 import java.sql.*;
 import java.util.logging.Level;
 import org.restlet.data.ReferenceList;
 import org.opentox.OpenToxApplication;
 import org.opentox.algorithm.AlgorithmEnum;
-import org.opentox.database.DataBaseAccess.CreateTable;
-import org.opentox.database.DataBaseAccess.Removal;
-import org.opentox.resource.AbstractResource.URIs;
+import org.opentox.interfaces.IDataBaseAccess;
+import org.opentox.interfaces.IDataBaseAccess.CreateTable;
+import org.opentox.interfaces.IDataBaseAccess.Removal;
+import org.opentox.resource.OTResource.URIs;
 
 /**
  *
@@ -16,7 +18,7 @@ import org.opentox.resource.AbstractResource.URIs;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 28, 2009)
  */
-public class ModelsTable implements DataBaseAccess, Table {
+public class ModelsTable implements IDataBaseAccess, ITable {
 
     protected static int modelsStack;
     protected final static String COL_MODEL_ID = "MODEL_ID",

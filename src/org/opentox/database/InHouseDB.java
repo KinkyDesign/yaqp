@@ -1,5 +1,6 @@
 package org.opentox.database;
 
+import org.opentox.interfaces.IDataBaseAccess;
 import java.sql.*;
 import java.util.logging.Level;
 import org.opentox.OpenToxApplication;
@@ -20,7 +21,7 @@ import org.opentox.OpenToxApplication;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 28, 2009)
  */
-public final class InHouseDB implements DataBaseAccess {
+public final class InHouseDB implements IDataBaseAccess {
 
     private final static String DB_USER = "itsme";
     private final static String DB_PASSWORD = "letmein";

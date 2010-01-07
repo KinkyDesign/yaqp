@@ -1,6 +1,5 @@
 package org.opentox.namespaces;
 
-import org.opentox.namespaces.Namespace;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -9,7 +8,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public class AlgorithmTypes extends Namespace{
+public class AlgorithmTypes extends AbsOntClass{
 
     private static final long serialVersionUID = -6959757110626828334L;
 

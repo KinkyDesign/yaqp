@@ -1,16 +1,17 @@
 package org.opentox.prediction;
 
+import org.opentox.interfaces.IPredictor;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.opentox.resource.AbstractResource.Directories;
+import org.opentox.resource.OTResource.Directories;
 import org.opentox.error.ErrorSource;
 import org.opentox.ontology.rdf.Dataset;
 import org.opentox.ontology.rdf.Model;
-import org.opentox.resource.AbstractResource.URIs;
+import org.opentox.resource.OTResource.URIs;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -31,7 +32,7 @@ import weka.core.pmml.PMMLModel;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class MlrPredictor extends ErrorSource implements Predictor {
+public class MlrPredictor extends ErrorSource implements IPredictor {
 
     /**
      * Constructor.
@@ -70,7 +71,7 @@ public class MlrPredictor extends ErrorSource implements Predictor {
             test_dataset = new Dataset(d_set);
 
             // The dataset content as an instance of weka.core.Instances (testData):
-            Instances testData = test_dataset.getWekaDatasetForTraining(null, false);
+            Instances testData = test_dataset.getInstaces(null, false);
 
 
             // check the compatibility of the model with the testData:

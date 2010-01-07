@@ -1,5 +1,6 @@
 package org.opentox.formatters;
 
+import org.opentox.interfaces.IFormatter;
 import org.opentox.ontology.meta.AlgorithmMeta;
 import org.opentox.error.ErrorSource;
 import org.restlet.data.MediaType;
@@ -11,7 +12,7 @@ import org.restlet.representation.Representation;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class AbstractAlgorithmFormatter extends ErrorSource implements Formatter{
+public abstract class AbstractAlgorithmFormatter extends ErrorSource implements IFormatter{
 
     public AlgorithmMeta metainf;
 

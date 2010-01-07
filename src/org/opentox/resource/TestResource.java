@@ -20,7 +20,7 @@ import org.restlet.resource.ResourceException;
  *
  * @author chung
  */
-public class TestResource extends AbstractResource {
+public class TestResource extends OTResource {
 
     @Override
     public void doInit() throws ResourceException {

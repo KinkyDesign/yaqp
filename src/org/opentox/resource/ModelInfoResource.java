@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.namespaces.Namespace;
-import org.opentox.namespaces.OT;
+import org.opentox.namespaces.OTProperties;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
@@ -30,7 +30,7 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class ModelInfoResource extends AbstractResource {
+public class ModelInfoResource extends OTResource {
 
 
     private String model_id, info;
@@ -70,11 +70,11 @@ public class ModelInfoResource extends AbstractResource {
             ReferenceList uri_list = new ReferenceList();
             Property prop = null;
             if (info.equalsIgnoreCase("dependent")) {
-                prop = OT.dependentVariables;
+                prop = OTProperties.dependentVariables;
             } else if (info.equalsIgnoreCase("independent")) {
-                prop = OT.independentVariables;
+                prop = OTProperties.independentVariables;
             } else if (info.equalsIgnoreCase("predicted")) {
-                prop = OT.predictedVariables;
+                prop = OTProperties.predictedVariables;
             }
             stmtIt = jenaModel.listStatements(new SimpleSelector(null, prop, (Resource) null));
             while (stmtIt.hasNext()) {

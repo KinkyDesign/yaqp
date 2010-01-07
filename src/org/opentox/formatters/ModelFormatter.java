@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
-import org.opentox.resource.AbstractResource.Directories;
+import org.opentox.resource.OTResource.Directories;
 import org.opentox.namespaces.Namespace;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;

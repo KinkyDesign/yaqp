@@ -90,15 +90,19 @@ public enum AlgorithmEnum implements Iterable<String> {
     }
 
     /**
-     * TODO: Implement this method!
+     * Iterator over all algorithm names.
      * @return
      */
     public Iterator<String> iterator() {
         return new IteratorImpl();
     }
 
+    public static Iterator<String> getIterator() {
+        return AlgorithmEnum.mlr.iterator();
+    }
+
     public static void main(String[] args) {
-        Iterator<String> it = AlgorithmEnum.mlr.iterator();
+        Iterator<String> it = AlgorithmEnum.getIterator();
         while (it.hasNext()) {
             System.out.println(it.next());
         }

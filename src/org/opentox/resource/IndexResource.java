@@ -2,6 +2,7 @@ package org.opentox.resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentox.interfaces.IProvidesHttpAccess;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.representation.Representation;
@@ -17,7 +18,8 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class IndexResource extends AbstractResource {
+public class IndexResource extends OTResource
+        implements IProvidesHttpAccess{
 
     private static final long serialVersionUID = 10012190003302L;
     private static int views = 0;

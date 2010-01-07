@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import org.opentox.OpenToxApplication;
 import org.opentox.prediction.MlrPredictor;
-import org.opentox.prediction.Predictor;
+import org.opentox.interfaces.IPredictor;
 import org.opentox.prediction.SvcPredictor;
 import org.opentox.prediction.SvmPredictor;
 import org.opentox.media.OpenToxMediaType;
@@ -17,6 +17,7 @@ import org.opentox.database.ModelsTable;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.error.ErrorSource;
 import org.opentox.formatters.ModelFormatter;
+import org.opentox.interfaces.IAcceptsRepresentation;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -36,7 +37,7 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class ModelResource extends AbstractResource {
+public class ModelResource extends OTResource implements IAcceptsRepresentation {
 
     private static final long serialVersionUID = 26047187263491246L;
     private String model_id;
@@ -87,14 +88,14 @@ public class ModelResource extends AbstractResource {
     }
 
     @Override
-    protected Representation post(Representation entity) {
+    public Representation post(Representation entity) {
         Representation rep = null;
 
         /** Get the posted parameters **/
         Form form = new Form(entity);
 
 
-        Predictor predictor = null;
+        IPredictor predictor = null;
         switch (algorithm) {
             case svc:
                 predictor = new SvcPredictor();

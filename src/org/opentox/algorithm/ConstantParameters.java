@@ -1,6 +1,5 @@
 package org.opentox.algorithm;
 
-import org.opentox.algorithm.AlgorithmParameter;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 
 /**

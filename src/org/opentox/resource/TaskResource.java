@@ -12,7 +12,7 @@ import org.restlet.resource.ResourceException;
  *
  * @author chung
  */
-public class TaskResource extends AbstractResource {
+public class TaskResource extends OTResource {
 
     @Override
     public void doInit() throws ResourceException {
