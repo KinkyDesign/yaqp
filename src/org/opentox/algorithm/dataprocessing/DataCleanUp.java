@@ -1,6 +1,7 @@
 package org.opentox.algorithm.dataprocessing;
 
 import org.opentox.OpenToxApplication;
+import org.opentox.interfaces.IPreprocessing;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.Normalize;
 
@@ -12,7 +13,7 @@ import weka.filters.unsupervised.attribute.Normalize;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class DataCleanUp implements Preprocessing{
+public class DataCleanUp implements IPreprocessing{
 
 
     /**
