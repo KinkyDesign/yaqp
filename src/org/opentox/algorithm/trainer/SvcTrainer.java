@@ -294,7 +294,7 @@ public class SvcTrainer extends AbstractTrainer {
          * Check the target parameter.........
          */
         try {
-            targeturi = new URI(form.getFirstValue("target"));
+            targeturi = new URI(form.getFirstValue("prediction_feature"));
             targeturi.toURL();
             targetAttribute = targeturi.toString();
         } catch (MalformedURLException ex) {

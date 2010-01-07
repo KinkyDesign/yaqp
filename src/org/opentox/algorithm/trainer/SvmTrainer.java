@@ -273,7 +273,7 @@ import weka.core.converters.ArffSaver;
                  * Check the target parameter.........
                  */
                 try {
-                    targeturi = new URI(form.getFirstValue("target"));
+                    targeturi = new URI(form.getFirstValue("prediction_feature"));
                     targeturi.toURL();
                     prm.targetAttribute = targeturi.toString();
                 } catch (MalformedURLException ex) {

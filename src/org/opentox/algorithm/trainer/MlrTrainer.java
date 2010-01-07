@@ -189,7 +189,7 @@ import weka.core.Instances;
             public void run() {
                 String errorDetails;
                 try {
-                    targeturi = new URI(form.getFirstValue("target"));
+                    targeturi = new URI(form.getFirstValue("prediction_feature"));
                     targeturi.toURL();
                 } catch (MalformedURLException ex) {
                     errorDetails = "[Wrong Posted Parameter ]: The client did"
