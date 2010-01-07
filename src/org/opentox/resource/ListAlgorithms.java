@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-import org.opentox.algorithm.AlgorithmEnum;
-import org.opentox.resource.*;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.ReferenceList;
@@ -72,11 +70,9 @@ public class ListAlgorithms extends AbstractResource {
         rep.setMediaType(MediaType.TEXT_HTML);
     }
     
-
     getResponse().setStatus(Status.SUCCESS_OK);
-
     return rep;
-
+    
 
     }
 }

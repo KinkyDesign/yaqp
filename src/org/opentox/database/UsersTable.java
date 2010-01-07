@@ -15,6 +15,10 @@ import static org.opentox.auth.DigestGenerator.*;
 public class UsersTable implements DataBaseAccess, Table {
 
     protected final static String USER_ACCOUNTS_TABLE = "USERS";
+    private final static String
+            COL_USER_NAME = "USER_NAME",
+            COL_USER_PASSWRD = "USER_PASSWORD",
+            COL_USER_AUTH = "AUTH";
     private static UsersTable instanceOfThis = null;
     public final static UsersTable INSTANCE = getInstance();
 
@@ -49,9 +53,9 @@ public class UsersTable implements DataBaseAccess, Table {
     public void create() {
         OpenToxApplication.opentoxLogger.info("Creating table: " + USER_ACCOUNTS_TABLE);
         String CreateTable = "create table " + USER_ACCOUNTS_TABLE + "("
-                + "USER_NAME VARCHAR(20), "
-                + "USER_PASSWORD VARCHAR(150),"
-                + "AUTH VARCHAR(20))";
+                + COL_USER_NAME + " VARCHAR(20), "
+                + COL_USER_PASSWRD +" VARCHAR(150),"
+                + COL_USER_AUTH +" VARCHAR(20))";
         try {
             Statement stmt = InHouseDB.connection.createStatement();
             stmt.executeUpdate(CreateTable);
@@ -90,7 +94,7 @@ public class UsersTable implements DataBaseAccess, Table {
      */
     @Removal
     public void removeUser(String UserName) {
-        String removeUser = "DELETE FROM " + USER_ACCOUNTS_TABLE + " WHERE USER_NAME = '" + UserName + "'";
+        String removeUser = "DELETE FROM " + USER_ACCOUNTS_TABLE + " WHERE "+COL_USER_NAME+" = '" + UserName + "'";
         Statement stmt;
         try {
             stmt = InHouseDB.connection.createStatement();
@@ -104,7 +108,8 @@ public class UsersTable implements DataBaseAccess, Table {
 
     public Priviledges getAuthorizationForUser(String username) {
         Priviledges priviledges = Priviledges.GUEST;
-        String dbQuery = "SELECT * FROM " + USER_ACCOUNTS_TABLE + " WHERE USER_NAME = '" + username + "'";
+        String dbQuery = "SELECT * FROM " + USER_ACCOUNTS_TABLE + " WHERE "+COL_USER_NAME+
+                " = '" + username + "'";
         ResultSet rs = null;
         try {
             Statement stmt = InHouseDB.connection.createStatement();
@@ -135,8 +140,8 @@ public class UsersTable implements DataBaseAccess, Table {
      * @return true/false.
      */
     public boolean verifyCredentials(String userName, String password) {
-        String dbQuery = "SELECT * FROM " + USER_ACCOUNTS_TABLE + " WHERE USER_NAME='" + userName
-                + "' AND USER_PASSWORD ='" + 
+        String dbQuery = "SELECT * FROM " + USER_ACCOUNTS_TABLE + " WHERE "+COL_USER_NAME+"='" + userName
+                + "' AND "+COL_USER_PASSWRD+" ='" +
                 generateDigest(generateDigest(password, DigestAlgorithm.MD5), DigestAlgorithm.SHA_512) + "'";
         ResultSet rs = null;
         boolean verify = false;
@@ -151,7 +156,6 @@ public class UsersTable implements DataBaseAccess, Table {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
         }
         return verify;
-
     }
 
     /**
@@ -168,7 +172,7 @@ public class UsersTable implements DataBaseAccess, Table {
             Statement stmt = InHouseDB.connection.createStatement();
             rs = stmt.executeQuery(getCredentials);
             while (rs.next()) {
-                secret.put(rs.getString("USER_NAME"), rs.getString("USER_PASSWORD").toCharArray());
+                secret.put(rs.getString(COL_USER_NAME), rs.getString(COL_USER_PASSWRD).toCharArray());
             }
             stmt.close();
         } catch (SQLException ex) {
@@ -190,8 +194,8 @@ public class UsersTable implements DataBaseAccess, Table {
             Statement stmt = InHouseDB.connection.createStatement();
             rs = stmt.executeQuery(content);
             while (rs.next()) {
-                builder.append("* "+rs.getString("USER_NAME") + " (" + rs.getString("AUTH") + ") ,"
-                        + rs.getString("USER_PASSWORD") + "\n");
+                builder.append("* "+rs.getString(COL_USER_NAME) + " (" + rs.getString(COL_USER_AUTH) + ") ,"
+                        + rs.getString(COL_USER_PASSWRD) + "\n");
             }
             stmt.close();
         } catch (SQLException ex) {
@@ -216,8 +220,8 @@ public class UsersTable implements DataBaseAccess, Table {
         }
     }
 
-//    public static void main(String[] args) {
-//        UsersTable udb = UsersTable.INSTANCE;
-//        System.out.println(udb);
-//    }
+    public static void main(String[] args) {
+        UsersTable udb = UsersTable.INSTANCE;
+        System.out.println(udb);
+    }
 }

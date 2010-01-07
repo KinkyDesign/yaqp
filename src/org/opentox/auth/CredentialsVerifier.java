@@ -13,7 +13,6 @@ import org.restlet.security.SecretVerifier;
  */
 public class CredentialsVerifier extends SecretVerifier {
 
-
     private OpenToxApplication application;
     private Priviledges authorizationLevel;
 
@@ -38,8 +37,6 @@ public class CredentialsVerifier extends SecretVerifier {
         this.authorizationLevel = authorizationLevel;
     }
 
-
-
     /**
      * Verify if a given pair of username and password are valid performing
      * a database query.
@@ -49,28 +46,25 @@ public class CredentialsVerifier extends SecretVerifier {
      */
     @Override
     public boolean verify(String identifier, char[] inputSecret) {
-        System.out.println(UsersTable.INSTANCE.getAuthorizationForUser(identifier).compareTo(authorizationLevel));
-        
-        if (authorizationLevel.equals(Priviledges.GUEST)){
-            return true;
-        }else{
 
-        if (UsersTable.INSTANCE.getAuthorizationForUser(identifier).compareTo(authorizationLevel)>=0){
-            String pass="";
-            for (int i=0;i<inputSecret.length;i++){
-                pass = pass + inputSecret[i];
-            }
-            if (UsersTable.INSTANCE.verifyCredentials(identifier, pass)){
-                return true;
-            }else{
+        if (authorizationLevel.equals(Priviledges.GUEST)) {
+            return true;
+        } else {
+
+            if (UsersTable.INSTANCE.getAuthorizationForUser(identifier).compareTo(authorizationLevel) >= 0) {
+                String pass = "";
+                for (int i = 0; i < inputSecret.length; i++) {
+                    pass = pass + inputSecret[i];
+                }
+                if (UsersTable.INSTANCE.verifyCredentials(identifier, pass)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
                 return false;
             }
-        }else{
-            return false;
-        }
 
         }
     }
-
-
 }

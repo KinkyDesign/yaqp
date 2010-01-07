@@ -10,8 +10,9 @@ org.opentox.error
 org.opentox.formatters
 org.opentox.media
 org.opentox.namespaces
+org.opentox.ontology.meta
+org.opentox.ontology.rdf
 org.opentox.prediction
-org.opentox.rdf
 org.opentox.resource
 org.opentox.util
 org.opentox.util.converters

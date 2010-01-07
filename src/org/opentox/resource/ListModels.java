@@ -1,12 +1,7 @@
 package org.opentox.resource;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.opentox.resource.*;
 import org.opentox.database.ModelsTable;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -14,7 +9,6 @@ import org.restlet.data.Method;
 import org.restlet.data.ReferenceList;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 

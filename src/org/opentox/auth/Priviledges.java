@@ -1,10 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.opentox.auth;
-
-import org.opentox.auth.AuthorizationHierarchy;
 
 
 
@@ -16,7 +10,7 @@ import org.opentox.auth.AuthorizationHierarchy;
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
-public final class Priviledges implements AuthorizationHierarchy{
+public final class Priviledges implements AuthorizationHierarchy {
 
     /**
      * Constructor.

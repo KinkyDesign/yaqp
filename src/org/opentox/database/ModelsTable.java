@@ -19,7 +19,6 @@ import org.opentox.resource.AbstractResource.URIs;
 public class ModelsTable implements DataBaseAccess, Table {
 
     protected static int modelsStack;
-
     protected final static String COL_MODEL_ID = "MODEL_ID",
             COL_MODEL_URI = "MODEL_URI",
             COL_ALGORITHM_ID = "ALGORITHM_ID",
@@ -62,10 +61,10 @@ public class ModelsTable implements DataBaseAccess, Table {
      * |      *       |
      * </pre>
      *
-     * @see ModelsDB#createModelInfoTable()
-     * @see ModelsDB#isModel(java.lang.String, java.lang.String)
-     * @see ModelsDB#registerNewModel(java.lang.String)
-     * @see ModelsDB#removeModel(java.lang.String)
+     * @see ModelsTable#createModelInfoTable()
+     * @see ModelsTable#isModel(java.lang.String, java.lang.String)
+     * @see ModelsTable#registerNewModel(java.lang.String)
+     * @see ModelsTable#removeModel(java.lang.String)
      */
     @CreateTable
     protected void createModelsStackTable() {
@@ -315,5 +314,31 @@ public class ModelsTable implements DataBaseAccess, Table {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("DATABASE : " + DB_URL + "\n");
+        builder.append("TABLE    : " + MODEL_INFO_TABLE + "\n\n");
+        builder.append("----------------   DATA   ----------------\n");
+        String content = "SELECT * FROM " + MODEL_INFO_TABLE;
+        ResultSet rs = null;
+        try {
+            Statement stmt = InHouseDB.connection.createStatement();
+            rs = stmt.executeQuery(content);
+            while (rs.next()) {
+                builder.append("* " + rs.getString(COL_MODEL_ID) + " , " + rs.getString(COL_ALGORITHM_ID) + " ,"
+                        + rs.getString(COL_MODEL_URI) + "\n");
+            }
+            stmt.close();
+        } catch (SQLException ex) {
+            OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);
+        }
+        builder.append("---------------- END DATA ----------------\n");
+        return builder.toString();
+    }
 
+//    public static void main(String[] args) {
+//        ModelsTable mdb = ModelsTable.INSTANCE;
+//        System.out.println(mdb);
+//    }
 }
