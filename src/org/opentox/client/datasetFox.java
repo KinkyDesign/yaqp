@@ -27,7 +27,7 @@ import weka.core.Instances;
  * @see opentoxClient
  */
 @Deprecated
-public class datasetFox extends Thread implements AbstractClient{
+public class datasetFox extends Thread implements IClient{
 
     private static final long serialVersionUID = -2854689332253394849L;
 
