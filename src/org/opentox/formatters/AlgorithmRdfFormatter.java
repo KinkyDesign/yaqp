@@ -1,7 +1,7 @@
 package org.opentox.formatters;
 
 import org.opentox.ontology.meta.AlgorithmMeta;
-import org.opentox.namespaces.OTProperties;
+import org.opentox.ontology.namespaces.OTProperties;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
-import org.opentox.namespaces.OTClass;
+import org.opentox.ontology.namespaces.OTClass;
 import org.opentox.resource.OTResource;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;

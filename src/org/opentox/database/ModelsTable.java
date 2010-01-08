@@ -273,7 +273,6 @@ public class ModelsTable implements IDataBaseAccess, ITable {
     /**
      * Returns a reference list for the models that where trained usign a
      * specific.
-     * TODO: Change String algorithmId to AlgorithmEnum algorithm
      * @param algorithmId
      * @return Reference list for the given algorithm id.
      */

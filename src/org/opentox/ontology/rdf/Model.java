@@ -1,8 +1,7 @@
 package org.opentox.ontology.rdf;
 
 import org.opentox.interfaces.IModel;
-import java.io.FileNotFoundException;
-import org.opentox.namespaces.OTProperties;
+import org.opentox.ontology.namespaces.OTProperties;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
@@ -20,10 +19,9 @@ import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-import org.opentox.namespaces.OTClass;
-import org.opentox.resource.OTResource;
+import org.opentox.interfaces.IFeature;
+import org.opentox.ontology.namespaces.OTClass;
 import org.opentox.resource.OTResource.URIs;
 import org.opentox.ontology.meta.ModelMeta;
 import org.restlet.data.Response;
@@ -129,7 +127,7 @@ public class Model extends RDFHandler  implements Serializable, IModel{
      */
     public void createModel(ModelMeta meta, OutputStream out) {
         try {
-            jenaModel = org.opentox.namespaces.Namespace.createModel();
+            jenaModel = org.opentox.ontology.namespaces.AbsOntClass.createModel();
 
             OTClass.Dataset.createOntClass(jenaModel);
             OTClass.Feature.createOntClass(jenaModel);
@@ -177,7 +175,7 @@ public class Model extends RDFHandler  implements Serializable, IModel{
             /**
              * Generate a new feature in AMBIT ( http://ambit.uni-plovdiv.bg:8080/ambit2/feature )....
              */
-            Feature featurec = new Feature();
+            IFeature featurec = new Feature();
             Response response = featurec.createNewFeature(targeturi,
                     new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/feature"));
 

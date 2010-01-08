@@ -2,6 +2,7 @@ package org.opentox.algorithm.reporting;
 
 import org.opentox.algorithm.ConstantParameters;
 import org.opentox.algorithm.AlgorithmParameter;
+import org.opentox.error.ErrorRepresentation;
 import org.opentox.ontology.meta.AlgorithmMeta;
 import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.formatters.AlgorithmYamlFormatter;
@@ -9,9 +10,12 @@ import org.opentox.formatters.AlgorithmXmlFormatter;
 import org.opentox.formatters.AlgorithmRdfFormatter;
 import org.opentox.formatters.AlgorithmJsonFormatter;
 import java.util.ArrayList;
+import org.opentox.error.ErrorSource;
+import org.opentox.interfaces.IAlgorithmReporter;
+import org.opentox.interfaces.IFormatter;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.resource.OTResource;
-import org.opentox.namespaces.AlgorithmTypes;
+import org.opentox.ontology.namespaces.AlgorithmTypes;
 import org.opentox.resource.OTResource.URIs;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -23,7 +27,7 @@ import org.restlet.representation.Representation;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 28, 2009)
  */
-public class AlgorithmReporter extends AbstractAlgorithmReporter {
+public class AlgorithmReporter extends ErrorSource implements  IAlgorithmReporter {
 
 
 
@@ -65,21 +69,22 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
 
     private Representation getRepresentationForMetaInf(
             AlgorithmMeta metainf, MediaType media) {
+        IFormatter formater;
         Representation representation = null;
         if ((MediaType.APPLICATION_RDF_XML.equals(media))
                 || (MediaType.APPLICATION_RDF_TURTLE.equals(media))
                 || (OpenToxMediaType.TEXT_N3.equals(media))
                 || (OpenToxMediaType.TEXT_TRIPLE.equals(media))) {
-            AlgorithmRdfFormatter formater = new AlgorithmRdfFormatter(metainf);
+            formater = new AlgorithmRdfFormatter(metainf);
             representation = formater.getRepresentation(media);
         } else if (MediaType.APPLICATION_JSON.equals(media)) {
-            AlgorithmJsonFormatter formater = new AlgorithmJsonFormatter(metainf);
+            formater = new AlgorithmJsonFormatter(metainf);
             representation = formater.getRepresentation(media);
         } else if (MediaType.TEXT_XML.equals(media)) {
-            AlgorithmXmlFormatter formater = new AlgorithmXmlFormatter(metainf);
+            formater = new AlgorithmXmlFormatter(metainf);
             representation = formater.getRepresentation(media);
         } else if (OpenToxMediaType.TEXT_YAML.equals(media)) {
-            AlgorithmYamlFormatter formater = new AlgorithmYamlFormatter(metainf);
+            formater = new AlgorithmYamlFormatter(metainf);
             representation = formater.getRepresentation(media);
         } else {
         }
@@ -87,7 +92,7 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
     }
 
     @Override
-    public Representation FormatedRepresntation(MediaType media, AlgorithmEnum algorithm) {
+    public Representation formatedRepresntation(MediaType media, AlgorithmEnum algorithm) {
 
         Representation representation = null;
 
@@ -145,6 +150,11 @@ public class AlgorithmReporter extends AbstractAlgorithmReporter {
             representation = getRepresentationForMetaInf(SvcMetaInf, media);
         }
         return representation;
+    }
+
+    @Override
+    public ErrorRepresentation getErrorRep() {
+        return errorRep;
     }
 
 

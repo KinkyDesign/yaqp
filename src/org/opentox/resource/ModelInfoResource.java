@@ -12,8 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentox.namespaces.Namespace;
-import org.opentox.namespaces.OTProperties;
+import org.opentox.ontology.namespaces.AbsOntClass;
+import org.opentox.ontology.namespaces.OTProperties;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
@@ -64,7 +64,7 @@ public class ModelInfoResource extends OTResource {
         Representation rep = null;
         try {
             FileInputStream in = new FileInputStream(Directories.modelRdfDir + "/" + model_id);
-            OntModel jenaModel = Namespace.createModel();
+            OntModel jenaModel = AbsOntClass.createModel();
             jenaModel.read(in, null);
             StmtIterator stmtIt = null;
             ReferenceList uri_list = new ReferenceList();

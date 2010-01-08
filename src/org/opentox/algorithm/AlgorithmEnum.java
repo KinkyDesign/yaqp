@@ -13,6 +13,8 @@ import java.util.NoSuchElementException;
  */
 public enum AlgorithmEnum implements Iterable<String> {
 
+    
+
     /**
      * Support Vector Machines Regression Algorithm.
      */
@@ -101,10 +103,5 @@ public enum AlgorithmEnum implements Iterable<String> {
         return AlgorithmEnum.mlr.iterator();
     }
 
-    public static void main(String[] args) {
-        Iterator<String> it = AlgorithmEnum.getIterator();
-        while (it.hasNext()) {
-            System.out.println(it.next());
-        }
-    }
+
 }

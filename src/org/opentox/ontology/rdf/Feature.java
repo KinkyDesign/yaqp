@@ -2,7 +2,7 @@ package org.opentox.ontology.rdf;
 
 import org.opentox.interfaces.IFeature;
 import java.io.IOException;
-import org.opentox.namespaces.OTProperties;
+import org.opentox.ontology.namespaces.OTProperties;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
-import org.opentox.namespaces.OTClass;
+import org.opentox.ontology.namespaces.OTClass;
 import org.opentox.resource.OTResource;
 import org.restlet.Client;
 import org.restlet.data.MediaType;
@@ -61,7 +61,7 @@ public class Feature extends RDFHandler  implements Serializable, IFeature {
      */
     public Response createNewFeature(String sameAs, URI featureService) throws ResourceException, IOException{
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Feature feature = new Feature();
+        IFeature feature = new Feature();
         feature.createNewFeature(sameAs, out);
         Representation featureToPost = new StringRepresentation(out.toString());
         featureToPost.setMediaType(MediaType.APPLICATION_RDF_XML);

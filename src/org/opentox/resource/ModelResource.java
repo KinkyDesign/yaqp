@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.opentox.OpenToxApplication;
+import org.opentox.Server;
 import org.opentox.prediction.MlrPredictor;
 import org.opentox.interfaces.IPredictor;
 import org.opentox.prediction.SvcPredictor;
@@ -131,7 +132,7 @@ public class ModelResource extends OTResource implements IAcceptsRepresentation 
     protected Representation delete() {
         String responseText = null;
         try {
-            if (opentoxClient.IsMimeAvailable(new URI("http://localhost:3000/model/" + model_id),
+            if (opentoxClient.INSTANCE.IsMimeAvailable(new URI("http://localhost:"+Server.__PORT_+"/model/" + model_id),
                     MediaType.TEXT_XML, false)) {
                 ModelsTable.INSTANCE.removeModel(model_id);
                 File modelFile = new File(Directories.modelRdfDir + "/" + model_id);

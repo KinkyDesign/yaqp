@@ -14,6 +14,7 @@ import org.opentox.algorithm.reporting.AlgorithmReporter;
 import org.opentox.algorithm.reporting.AlgorithmReporter.*;
 import org.opentox.interfaces.IAcceptsRepresentation;
 import org.opentox.interfaces.IProvidesHttpAccess;
+import org.opentox.interfaces.ITrainer;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -110,7 +111,7 @@ public class Algorithm extends OTResource
                 case svm:
                 case mlr:
                 case svc:
-                    representation = new AlgorithmReporter().FormatedRepresntation(
+                    representation = new AlgorithmReporter().formatedRepresntation(
                             variant.getMediaType(), algorithm);
                     break;
                 default:
@@ -136,7 +137,7 @@ public class Algorithm extends OTResource
         Representation representation = null;
         Status status = Status.SUCCESS_ACCEPTED;
 
-        AbstractTrainer trainer = null;        
+        ITrainer trainer = null;
         
 
 
@@ -162,7 +163,7 @@ public class Algorithm extends OTResource
         }
 
 
-        getResponse().setStatus(trainer.errorRep.getStatus().getCode()==202 ? Status.SUCCESS_OK : trainer.errorRep.getStatus());
+        getResponse().setStatus(trainer.getErrorRep().getStatus().getCode()==202 ? Status.SUCCESS_OK : trainer.getErrorRep().getStatus());
         return representation;
     }
 }

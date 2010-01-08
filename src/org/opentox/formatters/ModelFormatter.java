@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.resource.OTResource.Directories;
-import org.opentox.namespaces.Namespace;
+import org.opentox.ontology.namespaces.AbsOntClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
@@ -49,7 +49,7 @@ public class ModelFormatter extends AbstractModelFormatter {
                 FileInputStream in = new FileInputStream(Directories.modelRdfDir + "/" + model_id);
                 try {
 
-                    OntModel jenaModel = Namespace.createModel();
+                    OntModel jenaModel = AbsOntClass.createModel();
                     jenaModel.read(in, null);
                     ByteArrayOutputStream str = new ByteArrayOutputStream();
                     jenaModel.write(str, Lang);

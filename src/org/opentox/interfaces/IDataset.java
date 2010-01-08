@@ -12,7 +12,7 @@ import weka.core.Instances;
  *
  * @author chung
  */
-public interface IDataset {
+public interface IDataset extends IProne2Error{
 
     /**
      * This method is used to encapsulate the data of the RDF document in a

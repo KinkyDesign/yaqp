@@ -1,16 +1,11 @@
 package org.opentox.client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.opentox.media.OpenToxMediaType;
+import org.opentox.interfaces.IClient;
 import org.restlet.data.MediaType;
-import weka.core.Instances;
 
 /**
  * This class is used to make HTTP requests to other servers.
@@ -19,12 +14,26 @@ import weka.core.Instances;
  * @author Kolotouros Dimitris
  * @author Sarimveis Harry
  */
-public class opentoxClient implements IClient{
+public class opentoxClient implements IClient {
 
     private static final long serialVersionUID = -2394809235191723442L;
 
+    private static opentoxClient instanceOfThis = null;
 
-      public synchronized static boolean isServerAlive(URI serverUri, int attempts) throws InterruptedException {
+    public static opentoxClient INSTANCE = getInstance();
+
+    private static opentoxClient getInstance() {
+        if (instanceOfThis == null) {
+            instanceOfThis = new opentoxClient();
+        }
+        return instanceOfThis;
+    }
+
+    private opentoxClient(){
+        
+    }
+
+    public boolean isServerAlive(URI serverUri, int attempts) throws InterruptedException {
         java.net.Socket soc = null;
 
         int i = 1;
@@ -47,15 +56,14 @@ public class opentoxClient implements IClient{
         if (!(soc == null)) {
             try {
                 soc.close();
-            } catch (IOException ex) {                
+            } catch (IOException ex) {
             }
         }
         return isalive;
 
     }
 
-
-      public synchronized static boolean IsMimeAvailable(URI serviceUri, MediaType mime, boolean followRedirects) {
+    public boolean IsMimeAvailable(URI serviceUri, MediaType mime, boolean followRedirects) {
 
         HttpURLConnection.setFollowRedirects(followRedirects);
         HttpURLConnection con = null;
@@ -65,7 +73,7 @@ public class opentoxClient implements IClient{
             con.setDoOutput(true);
             con.setUseCaches(false);
             con.addRequestProperty("Accept", mime.toString());
-            
+
             if ((con.getResponseCode() >= 200) && (con.getResponseCode() < 300)) {
                 return true;
             } else {
@@ -76,40 +84,5 @@ public class opentoxClient implements IClient{
             return false;
         }
     }
-
-
-      public static Instances getInstances(URI uri) {
-        HttpURLConnection.setFollowRedirects(false);
-        HttpURLConnection con = null;
-        boolean isMimeAvailable; //?????
-        try {
-            con = (HttpURLConnection) uri.toURL().openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.addRequestProperty("Accept", OpenToxMediaType.TEXT_YAML.toString());
-
-
-            if ((con.getResponseCode() >= 200) && (con.getResponseCode() < 300)) {
-                isMimeAvailable=true;
-            } else {
-                isMimeAvailable=false;
-            }
-
-        } catch (IOException ex) {
-            /** Cannot read from that resource**/
-            isMimeAvailable=false;
-        }
-        try {
-            Instances data = new Instances(new BufferedReader(new InputStreamReader(con.getInputStream())));
-            return data;
-        } catch (IOException ex) {
-            /** No ARFF representations available... **/
-            Logger.getLogger(opentoxClient.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-          
-      }
-
 
 }

@@ -1,4 +1,4 @@
-package org.opentox.namespaces;
+package org.opentox.ontology.namespaces;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 

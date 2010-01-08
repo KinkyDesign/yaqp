@@ -14,7 +14,7 @@ import weka.core.Instances;
  *
  * @author chung
  */
-public interface IModel {
+public interface IModel extends IProne2Error{
 
     /**
      * Check the assertion that a certain weka.core.Instances object is

@@ -1,10 +1,11 @@
 package org.opentox.algorithm.trainer;
 
+import org.opentox.interfaces.ITrainer;
 import java.net.URI;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.error.ErrorSource;
+import org.opentox.interfaces.IProne2Error;
 import org.restlet.data.Form;
-import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
 
 
@@ -15,7 +16,7 @@ import org.restlet.resource.ServerResource;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public abstract class AbstractTrainer extends ErrorSource{
+public abstract class AbstractTrainer extends ErrorSource implements ITrainer{
     
 
     protected URI targeturi;
@@ -38,21 +39,7 @@ public abstract class AbstractTrainer extends ErrorSource{
         this.resource = resource;
     }
 
-    /**
-     * Applies a Learning Algorithm to train a new Model. The general process
-     * consists of the following steps:
-     * <ul>
-     * <li>A new model id is selected using the database {@link org.opentox.database.InHouseDB}</li>
-     * <li>The posted parameters are checked for consistency.</li>
-     * <li>The algorithm is applied to the data and a new model is generated</li>
-     * <li>The model is stored as a file on the server</li>
-     * <li>The database is now updated and the URI of the created model is returned to the client
-     * in text/plain format</li>
-     * </ul>
-     * @return Representation of the model URI.
-     */
-    public abstract Representation train();
-
+    
 
     /**
      * Check the consistency of the posted parameters.

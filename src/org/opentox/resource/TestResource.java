@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentox.resource.*;
 
 import org.opentox.algorithm.reporting.AlgorithmReporter.*;
 import org.restlet.data.Form;

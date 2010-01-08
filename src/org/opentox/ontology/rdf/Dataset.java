@@ -1,7 +1,7 @@
 package org.opentox.ontology.rdf;
 
 import org.opentox.interfaces.IDataset;
-import org.opentox.namespaces.OTProperties;
+import org.opentox.ontology.namespaces.OTProperties;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -33,7 +33,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.opentox.namespaces.OTClass;
+import org.opentox.ontology.namespaces.OTClass;
 import org.opentox.resource.OTResource.URIs;
 import org.restlet.data.Status;
 import weka.core.Attribute;

@@ -12,7 +12,7 @@ import org.opentox.algorithm.AlgorithmParameter;
  */
 public class AlgorithmMeta extends DCMeta{
 
-    public org.opentox.namespaces.AlgorithmTypes.Class algorithmType;
+    public org.opentox.ontology.namespaces.AlgorithmTypes.Class algorithmType;
            
     
     public ArrayList<AlgorithmParameter> Parameters;

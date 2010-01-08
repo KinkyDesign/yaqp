@@ -1,5 +1,7 @@
 package org.opentox.error;
 
+import org.opentox.interfaces.IProne2Error;
+
 
 
 /**
@@ -11,9 +13,15 @@ package org.opentox.error;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public abstract class ErrorSource {
+public abstract class ErrorSource implements IProne2Error {
 
     public ErrorRepresentation errorRep = new ErrorRepresentation();
+
+    public ErrorRepresentation getErrorRep() {
+        return errorRep;
+    }
+
+
 
 
 }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class AlgorithmMetaInf {
 
-    public org.opentox.namespaces.AlgorithmTypes.Class algorithmType;
+    public org.opentox.ontology.namespaces.AlgorithmTypes.Class algorithmType;
     
     public String
             title,

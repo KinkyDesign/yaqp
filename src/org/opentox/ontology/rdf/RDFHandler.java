@@ -1,7 +1,7 @@
 package org.opentox.ontology.rdf;
 
-import org.opentox.namespaces.OTProperties;
-import org.opentox.namespaces.Namespace;
+import org.opentox.ontology.namespaces.OTProperties;
+import org.opentox.ontology.namespaces.AbsOntClass;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -23,7 +23,7 @@ import org.restlet.data.Status;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 23, 2009)
  */
-public abstract class RDFHandler extends ErrorSource {
+public class RDFHandler extends ErrorSource {
 
     private static final long serialVersionUID = 6602541954910338287L;
     
@@ -69,7 +69,7 @@ public abstract class RDFHandler extends ErrorSource {
      * this method.
      */
     public ExtendedIterator<? extends OntResource> getClassMemberIteratorFor(
-            Namespace.Class someClass) {
+            AbsOntClass.Class someClass) {
         OntClass myClass = someClass.getOntClass(jenaModel);
         return myClass.listInstances();
     }

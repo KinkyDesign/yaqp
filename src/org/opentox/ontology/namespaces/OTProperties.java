@@ -1,4 +1,4 @@
-package org.opentox.namespaces;
+package org.opentox.ontology.namespaces;
 
 
 import com.hp.hpl.jena.rdf.model.*;
@@ -9,7 +9,7 @@ import com.hp.hpl.jena.rdf.model.*;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class OTProperties extends Namespace {
+public class OTProperties extends AbsOntClass {
 
     private static final long serialVersionUID = 8498366532297574L;
 

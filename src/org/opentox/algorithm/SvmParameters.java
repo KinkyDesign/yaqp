@@ -6,6 +6,7 @@ import org.opentox.algorithm.AlgorithmParameter;
 import org.opentox.algorithm.ConstantParameters;
 
 /**
+ * TODO: Move this class.
  * Tuning Parameters for the SVM algorithm.
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis

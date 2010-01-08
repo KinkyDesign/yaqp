@@ -274,7 +274,7 @@ public class SvcTrainer extends AbstractTrainer {
         try {
             dataseturi = new URI(form.getFirstValue("dataset_uri"));
             dataseturi.toURL();
-            if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
+            if (!(opentoxClient.INSTANCE.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
                 errorRep.append(new Exception(), "The dataset uri that client provided "
                         + "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
             }

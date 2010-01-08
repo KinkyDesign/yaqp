@@ -1,12 +1,6 @@
 package org.opentox;
 
 import org.opentox.interfaces.IServer;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.opentox.client.opentoxClient;
 import org.opentox.database.InHouseDB;
 import org.opentox.resource.OTResource.URIs;
 import org.restlet.Application;
@@ -15,7 +9,6 @@ import org.restlet.data.Protocol;
 import org.restlet.service.LogService;
 
 /**
- * The Server that runs the services.
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
@@ -26,35 +19,26 @@ public class Server implements IServer {
     public static String __PORT_ = "3000";
     public static String __DOMAIN_NAME_ = "opentox.ntua.gr";
     public static String __DATABASE_NAME_ = "modelsDb";
-
     private static Server instanceOfThis = null;
-
     public static Server INSTANCE = getInstace();
 
-    private static Server getInstace(){
-        if (instanceOfThis == null){
+    private static Server getInstace() {
+        if (instanceOfThis == null) {
             instanceOfThis = new Server();
         }
         return instanceOfThis;
     }
-
     private static Component component;
+    
 
     /**
      * Private Constructor.
      */
-    private Server(){
-
+    private Server() {
+        
     }
 
-    private static void exitWithHelp() {
-        System.out.println("\nUsage: \n"
-                + "java -jar server.jar [--port 1234] [--serverName localhost] "
-                + "[--dataBase myDataBase] or \n"
-                + "java -jar server.jar [-p 1234] [-s localhost] [-d myDataBase]\n"
-                + "Make sure that you use the sun Java version 6!\n\n");
-        System.exit(10012);
-    }
+    
 
     /**
      * Gracefully terminates the server!
@@ -67,9 +51,9 @@ public class Server implements IServer {
         component.stop();
     }
 
-
-
     public void run() {
+
+        
         // Create a component
         component = new Component();
 
@@ -99,59 +83,5 @@ public class Server implements IServer {
         }
     }
 
-        /**
-     * Usage: Server --port PORT --serverName SERVER_NAME --dataBase DATABASE_NAME
-     * @param args
-     * @throws IOException
-     * @throws Exception
-     */
-    public static void main(String[] args) throws IOException, Exception {
-
-        try {
-            if (!(args.length == 0)) {
-                for (int i = 0; i < args.length; i++) {
-
-                    if ((args[i].equals("--port")) || (args[i].equals("-p"))) {
-                        __PORT_ = args[i + 1];
-                    }
-                    if ((args[i].equals("--serverName")) || (args[i].equals("-s"))) {
-                        __DOMAIN_NAME_ = args[i + 1];
-                    }
-                    if ((args[i].equals("--dataBase")) || (args[i].equals("-d"))) {
-                        __DATABASE_NAME_ = args[i + 1];
-                    }
-
-                }
-            }
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            exitWithHelp();
-        }
-
-
-        try {
-            if (opentoxClient.isServerAlive(new URI("http://localhost:" + URIs.port), 2)) {
-                System.out.println("Port " + URIs.port + " is busy! Seems this or another"
-                        + " server has locked and uses this port.\n"
-                        + "Try setting up the server on some other port.\n"
-                        + "The following ones are available:");
-                for (int i = 1; i < 6; i++) {
-                    if (!opentoxClient.isServerAlive(new URI("http://localhost:" + (Integer.parseInt(URIs.port) + i)), 2)) {
-                        System.out.println("* " + (Integer.parseInt(URIs.port) + i));
-                    }
-                }
-                System.out.println("Could not start OpenToxServer!");
-                System.exit(0);
-            }
-
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        Server.INSTANCE.run();
-
-    }
-
-
+    
 }

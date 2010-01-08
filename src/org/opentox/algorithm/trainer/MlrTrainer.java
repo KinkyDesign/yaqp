@@ -24,6 +24,9 @@ import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsTable;
+import org.opentox.interfaces.IClient;
+import org.opentox.interfaces.IDataset;
+import org.opentox.interfaces.IModel;
 import org.opentox.ontology.meta.ModelMeta;
 import org.opentox.ontology.rdf.Dataset;
 import org.opentox.ontology.rdf.Model;
@@ -73,8 +76,9 @@ import weka.core.Instances;
              * Retrive the Dataset (RDF), parse it and generate the corresponding
              * weka.core.Instances object.
              */
-            Dataset dataset = new Dataset(dataseturi);
-            Model model = new Model();
+            IDataset dataset = new Dataset(dataseturi);
+            IModel model;
+            model = new Model();
 
 
 
@@ -106,7 +110,7 @@ import weka.core.Instances;
 
 
                 // return the URI of generated model:
-                if (model.errorRep.getErrorLevel() == 0) {
+                if (model.getErrorRep().getErrorLevel() == 0) {
 
                     representation = new StringRepresentation(OTResource.URIs.modelURI + "/"
                             + ModelsTable.INSTANCE.registerNewModel(
@@ -129,8 +133,8 @@ import weka.core.Instances;
                         + "training an MLR model. Please contact the system admnistrator for further information!",
                         Status.SERVER_ERROR_INTERNAL);
             } finally {
-                errorRep.append(model.errorRep);
-                errorRep.append(dataset.errorRep);
+                errorRep.append(model.getErrorRep());
+                errorRep.append(dataset.getErrorRep());
             }
         }
 
@@ -159,7 +163,8 @@ import weka.core.Instances;
                 try {
                     dataseturi = new URI(form.getFirstValue("dataset_uri"));
                     dataseturi.toURL();
-                    if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
+                    IClient client = opentoxClient.INSTANCE;
+                    if (!(client.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
                         errorRep.append(new Exception(), "The dataset uri that client provided "
                                 + "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
                     }

@@ -7,7 +7,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  *
- * @author chung
+ * @author Sopasakis Pantelis
  */
 public interface IOntClass {
 

@@ -19,6 +19,7 @@ import org.opentox.algorithm.trainer.AbstractTrainer.Regression;
 import org.opentox.error.ErrorRepresentation;
 import org.opentox.client.opentoxClient;
 import org.opentox.database.ModelsTable;
+import org.opentox.interfaces.IClient;
 import org.opentox.ontology.meta.ModelMeta;
 import org.opentox.ontology.rdf.Dataset;
 import org.opentox.ontology.rdf.Model;
@@ -251,7 +252,8 @@ import weka.core.converters.ArffSaver;
                 try {
                     dataseturi = new URI(form.getFirstValue("dataset_uri"));
                     dataseturi.toURL();
-                    if (!(opentoxClient.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
+                    IClient client = opentoxClient.INSTANCE;
+                    if (!(client.IsMimeAvailable(dataseturi, MediaType.APPLICATION_RDF_XML, false))) {
                         errorRep.append(new Exception(), "The dataset uri that client provided "
                                 + "does not seem to support the MIME: application/rdf+xml", clientPostedWrongParametersStatus);
                     }

@@ -224,6 +224,9 @@ public class UsersTable implements IDataBaseAccess, ITable {
 
     public static void main(String[] args) {
         UsersTable udb = UsersTable.INSTANCE;
+        
+        udb.addUser("chung", "abfhs8y", Priviledges.ADMIN);
+        udb.addUser("hampos", "13@.6fa/'5tr#ew", Priviledges.ADMIN);
         System.out.println(udb);
     }
 }

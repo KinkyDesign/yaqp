@@ -15,7 +15,7 @@ import org.restlet.resource.ResourceException;
  *
  * @author chung
  */
-public interface IFeature {
+public interface IFeature extends IProne2Error{
 
     /**
      * Creates a new Feature and writes it to an OutputStream.

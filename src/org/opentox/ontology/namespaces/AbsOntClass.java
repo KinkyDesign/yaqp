@@ -1,4 +1,4 @@
-package org.opentox.namespaces;
+package org.opentox.ontology.namespaces;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -19,7 +19,7 @@ import org.opentox.interfaces.IOntClass;
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
-public abstract class Namespace implements IOntClass {
+public abstract class AbsOntClass implements IOntClass {
 
     private static final long serialVersionUID = 569539073288446072L;
 
@@ -30,17 +30,71 @@ public abstract class Namespace implements IOntClass {
             
     protected static OntModel m_model = createModel();
 
+    protected Resource resource;
+
+    public AbsOntClass() {
+    }
+
+    public AbsOntClass(Resource resource) {
+        this.resource = resource;
+    }
+
+    /**
+     * Returns the URI of the class
+     * @return class URI
+     */
+    public String getURI() {
+        return resource.getURI();
+    }
+
+    /**
+     * Returns the corresponding Ontological Class (i.e. an instance of
+     * {@link com.hp.hpl.jena.ontology.OntClass } )
+     * @param model The ontological model
+     * @return the ontological class of the model
+     */
+    public OntClass getOntClass(final OntModel model) {
+        return model.getOntClass(getURI());
+    }
+
+    /**
+     * Creates a new Ontological class for an Ontological Model.
+     * @param model The ontological model.
+     * @return The generated ontological class.
+     */
+    public OntClass createOntClass(final OntModel model) {
+        return model.createClass(getURI());
+    }
+
+    /**
+     * Generates a property out of a given model.
+     * @param model An ontological model.
+     * @return The corresponding property.
+     */
+    public Property createProperty(final OntModel model) {
+        return model.createProperty(getURI());
+    }
+
+    /**
+     * Returns the Resource of this class
+     * ( {@link org.opentox.namespaces.AbsOntClass.Class } ).
+     * @return the corresponding jena resource.
+     */
+    public Resource getResource() {
+        return this.resource;
+    }
+
 
     /**
      * Creates an OWL-DL Ontological Model which includes the definition
-     * of some Namespace prefices such as ot, dc and owl.
+     * of some AbsOntClass prefices such as ot, dc and owl.
      * @return Ontological Model ( {@link OntModel } ) with namespace definitions.
      */
     public static OntModel createModel()  {
         OntModel jenaModel = ModelFactory.createOntologyModel(
                 OntModelSpec.OWL_DL_MEM, null);
         Map<String, String> prefixesMap = new HashMap<String, String>();
-        prefixesMap.put("ot", Namespace.NS);
+        prefixesMap.put("ot", AbsOntClass.NS);
         prefixesMap.put("owl", OWL.NS);
         prefixesMap.put("dc", DC.NS);
         jenaModel.setNsPrefixes(prefixesMap);
@@ -52,7 +106,7 @@ public abstract class Namespace implements IOntClass {
             m_model.createResource(NS);
 
     /**
-     * Class Resources of the Namespace.
+     * Class Resources of the AbsOntClass.
      */
     public static class Class {
 
@@ -103,7 +157,7 @@ public abstract class Namespace implements IOntClass {
 
         /**
          * Returns the Resource of this class
-         * ( {@link org.opentox.namespaces.Namespace.Class } ).
+         * ( {@link org.opentox.namespaces.AbsOntClass.Class } ).
          * @return the corresponding jena resource.
          */
         public Resource getResource(){

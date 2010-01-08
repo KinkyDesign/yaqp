@@ -1,4 +1,4 @@
-package org.opentox.namespaces;
+package org.opentox.ontology.namespaces;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -12,7 +12,7 @@ public class AlgorithmTypes extends AbsOntClass{
 
     private static final long serialVersionUID = -6959757110626828334L;
 
-    public static class Class extends Namespace.Class{
+    public static class Class extends AbsOntClass.Class{
 
         public Class(Resource resource){
             super(resource);

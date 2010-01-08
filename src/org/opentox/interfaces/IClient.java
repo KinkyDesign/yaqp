@@ -1,4 +1,7 @@
-package org.opentox.client;
+package org.opentox.interfaces;
+
+import java.net.URI;
+import org.restlet.data.MediaType;
 
 /**
  * For future developement.
@@ -7,6 +10,8 @@ package org.opentox.client;
  * @author Sarimveis Harry
  */
 public interface IClient {
-      
-        
+
+    public boolean isServerAlive(URI serverUri, int attempts) throws InterruptedException;
+
+    public boolean IsMimeAvailable(URI serviceUri, MediaType mime, boolean followRedirects);
 }
