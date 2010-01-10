@@ -8,12 +8,12 @@ org.opentox.client
 org.opentox.database
 org.opentox.error
 org.opentox.formatters
+org.opentox.interfaces
 org.opentox.media
-org.opentox.namespaces
 org.opentox.ontology.meta
+org.opentox.ontology.namespaces
 org.opentox.ontology.rdf
 org.opentox.prediction
 org.opentox.resource
-org.opentox.util
 org.opentox.util.converters
 org.opentox.util.libSVM
