@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import org.opentox.resource.OTResource;
-import org.opentox.resource.Algorithm;
+import org.opentox.resource.AlgorithmResource;
 import org.opentox.resource.ModelResource;
 import org.opentox.resource.ListModels;
 import org.opentox.resource.ListAlgorithms;
@@ -70,7 +70,9 @@ public class OpenToxApplication extends Application {
      * Server logs.
      */
     public static Logger opentoxLogger;
+
     public static ExecutorService executor;
+
     private static final int THREADS = 50;
 
     private static OpenToxApplication instanceOfThis = null;
@@ -195,7 +197,7 @@ public class OpenToxApplication extends Application {
          * OpenTox API specifications:
          */
         router.attach("/algorithm", ListAlgorithms.class);
-        router.attach("/algorithm/{id}", Algorithm.class);
+        router.attach("/algorithm/{id}", AlgorithmResource.class);
 
         router.attach("/model", ListModels.class);
         router.attach("/model/{model_id}", modelKerberos);  // The deletion of models is guarded!!!

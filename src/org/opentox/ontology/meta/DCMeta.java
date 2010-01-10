@@ -1,5 +1,7 @@
 package org.opentox.ontology.meta;
 
+import org.opentox.resource.OTResource.URIs;
+
 
 /**
  *
@@ -8,21 +10,21 @@ package org.opentox.ontology.meta;
 public class DCMeta {
     
     public String
-            title,
-            description,
-            subject,
-            type,
-            source,
-            relation,
-            rights,
-            provenance,
-            audience,
-            identifier,
-            date,
-            format,
-            language,
-            creator,
-            publisher,
-            contributor,
-            about;
+            title="",
+            description="",
+            subject="",
+            type="",
+            source=URIs.baseURI,
+            relation=URIs.OpentoxUri,
+            rights=URIs.licenceUri,
+            provenance="",
+            audience="",
+            identifier="",
+            date="",
+            format="",
+            language="en",
+            creator=URIs.baseURI,
+            publisher=URIs.baseURI,
+            contributor=URIs.OpentoxUri
+            ;
 }

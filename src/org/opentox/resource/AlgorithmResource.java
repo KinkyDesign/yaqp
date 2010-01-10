@@ -8,11 +8,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentox.media.OpenToxMediaType;
-import org.opentox.algorithm.reporting.AlgorithmReporter;
-
-import org.opentox.algorithm.reporting.AlgorithmReporter.*;
+import org.opentox.formatters.*;
 import org.opentox.interfaces.IAcceptsRepresentation;
-import org.opentox.interfaces.IAlgorithmReporter;
+import org.opentox.interfaces.IFormatter;
 import org.opentox.interfaces.IProvidesHttpAccess;
 import org.opentox.interfaces.ITrainer;
 import org.restlet.data.Form;
@@ -33,7 +31,7 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class Algorithm extends OTResource
+public class AlgorithmResource extends OTResource
         implements IAcceptsRepresentation, IProvidesHttpAccess {
 
     private static final long serialVersionUID = 8992374761250990L;
@@ -108,16 +106,32 @@ public class Algorithm extends OTResource
             representation = list.getTextRepresentation();
         } else {
             switch (algorithm) {
-                case svm:
-                case mlr:
-                case svc:
-                    IAlgorithmReporter algorithm_reporter = new AlgorithmReporter();
-                    representation = algorithm_reporter.formatedRepresntation(mediatype, algorithm);
-                    break;
-                default:
+                case unknown:
                     getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                     representation = new StringRepresentation("Algorithm Not Found!\n", MediaType.TEXT_PLAIN);
                     break;
+                default:
+                    IFormatter formater;
+
+                    if ((MediaType.APPLICATION_RDF_XML.equals(mediatype))
+                            || (MediaType.APPLICATION_RDF_TURTLE.equals(mediatype))
+                            || (OpenToxMediaType.TEXT_N3.equals(mediatype))
+                            || (OpenToxMediaType.TEXT_TRIPLE.equals(mediatype))) {
+                        formater = new AlgorithmRdfFormatter(algorithm.getAlgorithm().getMeta());
+                        representation = formater.getRepresentation(mediatype);
+                    } else if (MediaType.APPLICATION_JSON.equals(mediatype)) {
+                        formater = new AlgorithmJsonFormatter(algorithm.getAlgorithm().getMeta());
+                        representation = formater.getRepresentation(mediatype);
+                    } else if (MediaType.TEXT_XML.equals(mediatype)) {
+                        formater = new AlgorithmXmlFormatter(algorithm.getAlgorithm().getMeta());
+                        representation = formater.getRepresentation(mediatype);
+                    } else if (OpenToxMediaType.TEXT_YAML.equals(mediatype)) {
+                        formater = new AlgorithmYamlFormatter(algorithm.getAlgorithm().getMeta());
+                        representation = formater.getRepresentation(mediatype);
+                    } else {
+                    }
+                    break;
+
             }
         }
         return representation;

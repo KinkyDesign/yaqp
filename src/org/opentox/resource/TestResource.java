@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.opentox.algorithm.reporting.AlgorithmReporter.*;
+
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -41,9 +41,7 @@ public class TestResource extends OTResource {
         StringBuilder builder = new StringBuilder();
         Form form = new Form(entity);
         builder.append(form.getNames().toArray()[0] + "\n");
-        builder.append(form.getNames().toArray()[1] + "\n");
-        
-
+        builder.append(form.getNames().toArray()[1] + "\n");        
         return new StringRepresentation(builder.toString());
     }
 

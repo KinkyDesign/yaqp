@@ -19,18 +19,15 @@ public class AlgorithmMeta extends DCMeta {
 
 
     public AlgorithmMeta(){
-
+        super();
     }
 
 
     public AlgorithmMeta(String about){
-        this.about=about;
+        this.identifier=about;
     }
 
-
-    public void setAbout(String about) {
-        this.about = about;
-    }
+    
 
     public void setParameters(ArrayList<AlgorithmParameter> Parameters) {
         this.Parameters=Parameters;

@@ -1,6 +1,7 @@
 package org.opentox.interfaces;
 
 import java.lang.annotation.Inherited;
+import java.sql.Connection;
 import org.opentox.Server;
 
 /**
@@ -12,7 +13,8 @@ public interface IDataBaseAccess {
     final static String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
     final static String DATABASENAME = Server.__DATABASE_NAME_;
     final static String DB_URL = "jdbc:derby:" + DATABASENAME;
-    
+
+   
     
 
     /**

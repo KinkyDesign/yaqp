@@ -2,6 +2,7 @@ package org.opentox.algorithm;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import org.opentox.interfaces.IAlgorithm;
 
 /**
  * Enumeration of all available algorithms on the server. If one needs to extend
@@ -18,30 +19,37 @@ public enum AlgorithmEnum implements Iterable<String> {
     /**
      * Support Vector Machines Regression Algorithm.
      */
-    svm("svm"),
+    svm("svm", new SvmAlgorithm()),
     /**
      * Support Vector Machines Classification Algorithm.
      */
-    svc("svc"),
+    svc("svc", new SvcAlgorithm()),
     /**
      * Multiple Linear Regression Algorithm.
      */
-    mlr("mlr"),
+    mlr("mlr", new MlrAlgorithm()),
+    /**
+     * Data clean up service
+     */
+    cleanup("cleanup", new CleanUpAlgorithm()),
     /**
      * Unknown Algorithm.
      */
-    unknown("unknown");
+    unknown("unknown", null);
     /**
      * The name of the algorithm.
      */
     private final String name;
 
+    private IAlgorithm algorithm;
+
     /**
      * Private Constructor. Constructs an AlgorithmEnum object of a given name.
      * @param name
      */
-    private AlgorithmEnum(String name) {
+    private AlgorithmEnum(String name, IAlgorithm algorithm) {
         this.name = name;
+        this.algorithm = algorithm;
     }
 
     /**
@@ -50,6 +58,10 @@ public enum AlgorithmEnum implements Iterable<String> {
      */
     public String getAlgorithmName() {
         return name;
+    }
+
+    public IAlgorithm getAlgorithm(){
+        return algorithm;
     }
 
     /**
@@ -101,6 +113,14 @@ public enum AlgorithmEnum implements Iterable<String> {
 
     public static Iterator<String> getIterator() {
         return AlgorithmEnum.mlr.iterator();
+    }
+
+    public static void main(String[] args){
+        Iterator<String > it = AlgorithmEnum.getIterator();
+        while (it.hasNext()){
+            System.out.println(it.next());
+        }
+
     }
 
 

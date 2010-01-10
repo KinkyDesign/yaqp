@@ -6,7 +6,7 @@ import org.restlet.data.MediaType;
 /**
  * Interface for a general use client which manages the access to other web resources.
  * @author OpenTox - http://www.opentox.org
- * @aut hor Sopasakis Pantelis
+ * @author Sopasakis Pantelis
  * @author Sarimveis Harry
  */
 public interface IClient {

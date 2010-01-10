@@ -1,9 +1,11 @@
 package org.opentox.formatters;
 
+import com.hp.hpl.jena.rdf.model.Resource;
 import org.opentox.ontology.meta.AlgorithmMeta;
 import org.opentox.ontology.namespaces.OTProperties;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -54,6 +56,8 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             OTClass.Parameter.createOntClass(jenaModel);
             OTClass.Algorithm.createOntClass(jenaModel);
             metainf.algorithmType.createOntClass(jenaModel);
+            OntClass algorithmType = metainf.algorithmType.getOntClass(jenaModel);
+            algorithmType.setSuperClass(OTClass.Algorithm.getOntClass(jenaModel));
 
 
 
@@ -66,25 +70,28 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
                     jenaModel.createTypedLiteral(metainf.title, XSDDatatype.XSDstring));
             // dc:creator
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.creator.getURI()),
-                    jenaModel.createTypedLiteral(OTResource.URIs.baseURI, XSDDatatype.XSDanyURI));
+                    jenaModel.createTypedLiteral(metainf.creator, XSDDatatype.XSDanyURI));
             // dc:source
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.source.getURI()),
-                    jenaModel.createTypedLiteral(OTResource.URIs.baseURI, XSDDatatype.XSDanyURI));
+                    jenaModel.createTypedLiteral(metainf.source, XSDDatatype.XSDanyURI));
             // dc:publisher
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.publisher.getURI()),
-                    jenaModel.createTypedLiteral(OTResource.URIs.baseURI, XSDDatatype.XSDanyURI));
+                    jenaModel.createTypedLiteral(metainf.publisher, XSDDatatype.XSDanyURI));
             // dc:contributor
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.contributor.getURI()),
                     jenaModel.createTypedLiteral(OTResource.URIs.OpentoxUri, XSDDatatype.XSDanyURI));
             // dc:relation
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.relation.getURI()),
-                    jenaModel.createTypedLiteral(OTResource.URIs.OpentoxUri, XSDDatatype.XSDanyURI));
+                    jenaModel.createTypedLiteral(metainf.relation, XSDDatatype.XSDanyURI));
             // dc:rights
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.rights.getURI()),
-                    jenaModel.createTypedLiteral(OTResource.URIs.licenceUri, XSDDatatype.XSDanyURI));
+                    jenaModel.createTypedLiteral(metainf.rights, XSDDatatype.XSDanyURI));
             // dc:date
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.date.getURI()),
-                    jenaModel.createTypedLiteral("2009/16/12", XSDDatatype.XSDdate));
+                    jenaModel.createTypedLiteral(metainf.date, XSDDatatype.XSDdate));
+            // dc:audience
+            algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.NS+"#audience"),
+                    jenaModel.createTypedLiteral(metainf.audience, XSDDatatype.XSDstring));
             // dc:description
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.description.getURI()),
                     jenaModel.createTypedLiteral(metainf.description, XSDDatatype.XSDanyURI));

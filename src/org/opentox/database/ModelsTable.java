@@ -55,8 +55,7 @@ public class ModelsTable implements IDataBaseAccess, ITable {
      *
      * </pre>
      *
-     * @see ModelsTable#createModelsStackTable()
-     * @see ModelsTable#IncreaseModelStack()
+     * @see ModelsTable#create()
      * @see ModelsTable#isModel(java.lang.String, java.lang.String)
      * @see ModelsTable#register(java.lang.String)
      * @see ModelsTable#remove(java.lang.String)
@@ -106,7 +105,6 @@ public class ModelsTable implements IDataBaseAccess, ITable {
      * Registers a new trained model in database
      * @param AlgID URI of the algorithm used to train the model
      * @return New model's ID
-     * @see ModelsTable#IncreaseModelStack()
      * @see ModelsTable#remove(java.lang.String)
      */
     @Registration
@@ -305,6 +303,5 @@ public class ModelsTable implements IDataBaseAccess, ITable {
 
     public static void main(String[] args) throws SQLException {
         ModelsTable mdb = ModelsTable.INSTANCE;
-
     }
 }

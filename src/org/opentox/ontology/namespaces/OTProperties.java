@@ -15,62 +15,62 @@ public class OTProperties extends AbsOntClass {
 
     
     public static final Property dataEntry =
-            m_model.createProperty(String.format(_NS, "dataEntry"));
+            m_model.createProperty(String.format(_NS_OT, "dataEntry"));
     public static final Property compound =
-            m_model.createProperty(String.format(_NS, "compound"));
+            m_model.createProperty(String.format(_NS_OT, "compound"));
     public static final Property feature =
-            m_model.createProperty(String.format(_NS, "feature"));
+            m_model.createProperty(String.format(_NS_OT, "feature"));
     public static final Property values =
-            m_model.createProperty(String.format(_NS, "values"));
+            m_model.createProperty(String.format(_NS_OT, "values"));
     public static final Property hasSource =
-            m_model.createProperty(String.format(_NS, "hasSource"));
+            m_model.createProperty(String.format(_NS_OT, "hasSource"));
     public static final Property conformer =
-            m_model.createProperty(String.format(_NS, "conformer"));
+            m_model.createProperty(String.format(_NS_OT, "conformer"));
     @Deprecated
     public static final Property isA =
-            m_model.createProperty(String.format(_NS, "isA"));
+            m_model.createProperty(String.format(_NS_OT, "isA"));
     public static final Property model =
-            m_model.createProperty(String.format(_NS, "model"));
+            m_model.createProperty(String.format(_NS_OT, "model"));
     public static final Property report =
-            m_model.createProperty(String.format(_NS, "report"));
+            m_model.createProperty(String.format(_NS_OT, "report"));
     public static final Property algorithm =
-            m_model.createProperty(String.format(_NS, "algorithm"));
+            m_model.createProperty(String.format(_NS_OT, "algorithm"));
     public static final Property dependentVariables =
-            m_model.createProperty(String.format(_NS, "dependentVariables"));
+            m_model.createProperty(String.format(_NS_OT, "dependentVariables"));
     public static final Property independentVariables =
-            m_model.createProperty(String.format(_NS, "independentVariables"));
+            m_model.createProperty(String.format(_NS_OT, "independentVariables"));
     public static final Property predictedVariables =
-            m_model.createProperty(String.format(_NS, "predictedVariables"));
+            m_model.createProperty(String.format(_NS_OT, "predictedVariables"));
     public static final Property trainingDataset =
-            m_model.createProperty(String.format(_NS, "trainingDataset"));
+            m_model.createProperty(String.format(_NS_OT, "trainingDataset"));
     public static final Property validationReport =
-            m_model.createProperty(String.format(_NS, "validationReport"));
+            m_model.createProperty(String.format(_NS_OT, "validationReport"));
     public static final Property validation =
-            m_model.createProperty(String.format(_NS, "validation"));
+            m_model.createProperty(String.format(_NS_OT, "validation"));
     public static final Property hasValidationInfo =
-            m_model.createProperty(String.format(_NS, "hasValidationInfo"));
+            m_model.createProperty(String.format(_NS_OT, "hasValidationInfo"));
     public static final Property validationModel =
-            m_model.createProperty(String.format(_NS, "validationModel"));
+            m_model.createProperty(String.format(_NS_OT, "validationModel"));
     public static final Property validationPredictionDataset =
-            m_model.createProperty(String.format(_NS, "validationPredictionDataset"));
+            m_model.createProperty(String.format(_NS_OT, "validationPredictionDataset"));
     public static final Property validationTestDataset =
-            m_model.createProperty(String.format(_NS, "validationTestDataset"));
+            m_model.createProperty(String.format(_NS_OT, "validationTestDataset"));
     public static final Property value =
-            m_model.createProperty(String.format(_NS, "value"));
+            m_model.createProperty(String.format(_NS_OT, "value"));
     public static final Property units =
-            m_model.createProperty(String.format(_NS, "units"));
+            m_model.createProperty(String.format(_NS_OT, "units"));
     public static final Property has3Dstructure =
-            m_model.createProperty(String.format(_NS, "has3Dstructure"));
+            m_model.createProperty(String.format(_NS_OT, "has3Dstructure"));
     public static final Property hasStatus =
-            m_model.createProperty(String.format(_NS, "hasStatus"));
+            m_model.createProperty(String.format(_NS_OT, "hasStatus"));
     public static final Property paramScope =
-            m_model.createProperty(String.format(_NS, "paramScope"));
+            m_model.createProperty(String.format(_NS_OT, "paramScope"));
     public static final Property paramValue =
-            m_model.createProperty(String.format(_NS, "paramValue"));
+            m_model.createProperty(String.format(_NS_OT, "paramValue"));
     public static final Property statisticsSupported =
-            m_model.createProperty(String.format(_NS, "statisticsSupported"));
+            m_model.createProperty(String.format(_NS_OT, "statisticsSupported"));
     public static final Property parameters =
-            m_model.createProperty(String.format(_NS, "parameters"));
+            m_model.createProperty(String.format(_NS_OT, "parameters"));
 
     
 }

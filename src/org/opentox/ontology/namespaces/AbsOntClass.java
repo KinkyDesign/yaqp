@@ -26,9 +26,11 @@ public abstract class AbsOntClass implements IOntClass {
 
     private static final long serialVersionUID = 569539073288446072L;
 
-    protected static final String _NS = "http://www.opentox.org/api/1.1#%s";
+    protected static final String _NS_OT = "http://www.opentox.org/api/1.1#%s";
+    protected static final String _NS_AlgorithmTypes = "http://www.opentox.org/algorithmTypes.owl%s";
 
-    public static final String NS = String.format(_NS, "");
+    public static final String NS_OT = String.format(_NS_OT, "");
+    public static final String NS_AlgorithmTypes = String.format(_NS_AlgorithmTypes, "");
 
             
     protected static OntModel m_model = createModel();
@@ -97,16 +99,17 @@ public abstract class AbsOntClass implements IOntClass {
         OntModel jenaModel = ModelFactory.createOntologyModel(
                 OntModelSpec.OWL_DL_MEM, null);
         Map<String, String> prefixesMap = new HashMap<String, String>();
-        prefixesMap.put("ot", AbsOntClass.NS);
+        prefixesMap.put("ot", AbsOntClass.NS_OT);
         prefixesMap.put("owl", OWL.NS);
         prefixesMap.put("dc", DC.NS);
+        prefixesMap.put("ot_algorithmTypes", AbsOntClass.NS_AlgorithmTypes);
         jenaModel.setNsPrefixes(prefixesMap);
         return jenaModel;
     }
 
     /** <p>The namespace of the vocabalary as a Resource.</p> */
     public static final Resource NAMESPACE =
-            m_model.createResource(NS);
+            m_model.createResource(NS_OT);
 
     /**
      * Class Resources of the AbsOntClass.
