@@ -7,7 +7,7 @@ import org.opentox.interfaces.IProne2Error;
 /**
  * ErrorSource is an interface implemented by all those classes that may throw an
  * error that affects a service. Every class which contains methods which are invoked
- * by some child of {@link org.opentox.resource.AbstractResource } should implement this interface.
+ * by some child of {@link org.opentox.resource.OTResource } should implement this interface.
  * @author OpenTox - http://www.opentox.org/
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry

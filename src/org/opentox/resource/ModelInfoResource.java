@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opentox.interfaces.IProvidesHttpAccess;
 import org.opentox.ontology.namespaces.AbsOntClass;
 import org.opentox.ontology.namespaces.OTProperties;
 import org.restlet.data.MediaType;
@@ -30,7 +31,8 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class ModelInfoResource extends OTResource {
+public class ModelInfoResource extends OTResource
+        implements IProvidesHttpAccess {
 
 
     private String model_id, info;

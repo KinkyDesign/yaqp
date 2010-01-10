@@ -10,7 +10,7 @@ import org.opentox.algorithm.AlgorithmParameter;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class AlgorithmMeta extends DCMeta{
+public class AlgorithmMeta extends DCMeta {
 
     public org.opentox.ontology.namespaces.AlgorithmTypes.Class algorithmType;
            

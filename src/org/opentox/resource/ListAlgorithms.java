@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
+import org.opentox.algorithm.AlgorithmEnum;
 import org.opentox.interfaces.IProvidesHttpAccess;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.ontology.namespaces.OTClass;
@@ -35,7 +35,7 @@ import org.restlet.resource.ResourceException;
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class ListAlgorithms extends OTResource
-        implements IProvidesHttpAccess{
+        implements IProvidesHttpAccess {
 
     private static final long serialVersionUID = 75712481009764L;
 
@@ -64,12 +64,10 @@ public class ListAlgorithms extends OTResource
 
 
         Representation rep = null;
-        Set<String> algorithms = AlgorithmsSet();
-        Iterator<String> algorithmIterator;
+        Iterator<String> algorithmIterator = AlgorithmEnum.getIterator();
 
         if (mediatype.equals(MediaType.TEXT_URI_LIST)) {
             ReferenceList list = new ReferenceList();
-            algorithmIterator = algorithms.iterator();
             while (algorithmIterator.hasNext()) {
                 list.add(URIs.algorithmURI + "/" + algorithmIterator.next());
             }
@@ -77,7 +75,6 @@ public class ListAlgorithms extends OTResource
             rep.setMediaType(MediaType.TEXT_URI_LIST);
         } else if (mediatype.equals(MediaType.TEXT_HTML)) {
             ReferenceList list = new ReferenceList();
-            algorithmIterator = algorithms.iterator();
             while (algorithmIterator.hasNext()) {
                 list.add(URIs.algorithmURI + "/" + algorithmIterator.next());
             }
@@ -97,9 +94,8 @@ public class ListAlgorithms extends OTResource
             OTClass.Algorithm.createOntClass(jenaModel);
 
             Individual algorithm;
-            algorithmIterator = algorithms.iterator();
-            while (algorithmIterator.hasNext()) {                
-                algorithm = jenaModel.createIndividual(URIs.algorithmURI+"/"+algorithmIterator.next(),
+            while (algorithmIterator.hasNext()) {
+                algorithm = jenaModel.createIndividual(URIs.algorithmURI + "/" + algorithmIterator.next(),
                         jenaModel.createOntResource(OTClass.Algorithm.getURI()));
 
             }

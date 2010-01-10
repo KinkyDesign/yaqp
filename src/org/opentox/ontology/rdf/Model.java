@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+import org.opentox.algorithm.ConstantParameters;
 import org.opentox.interfaces.IFeature;
 import org.opentox.ontology.namespaces.OTClass;
 import org.opentox.resource.OTResource.URIs;
@@ -119,11 +120,8 @@ public class Model extends RDFHandler  implements Serializable, IModel{
      * of the dataset used to train it, its target feature, the Data and a List of
      * tuning parameters for the training algorithm. The RDF document is built according
      * to the specification of OpenTox API (v 1.1).
-     * @param model_id The id of the model (Integer).
-     * @param dataseturi The URI of the dataset used to train the model.
-     * @param data The Instances object containing the training data.
-     * @param algorithmParameters A List of the tuning parameters of the algorithm.
-     * @param out The output stream used to store the model.
+     * @param meta Meta-information about the model.
+     * @param out OutputStream used to write the RDF representation of the model.
      */
     public void createModel(ModelMeta meta, OutputStream out) {
         try {
@@ -166,7 +164,7 @@ public class Model extends RDFHandler  implements Serializable, IModel{
                         jenaModel.createTypedLiteral(meta.algorithmParameters.get(i).paramScope,
                         XSDDatatype.XSDstring));
                 ot_model.addProperty(jenaModel.createAnnotationProperty(OTProperties.parameters.getURI()), iparam);
-                if (meta.algorithmParameters.get(i).paramName.equalsIgnoreCase("target")) {
+                if (meta.algorithmParameters.get(i).paramName.equalsIgnoreCase(ConstantParameters.TARGET.paramName)) {
                     targeturi = (String) meta.algorithmParameters.get(i).paramValue;
                 }
             }
@@ -179,13 +177,11 @@ public class Model extends RDFHandler  implements Serializable, IModel{
             Response response = featurec.createNewFeature(targeturi,
                     new URI("http://ambit.uni-plovdiv.bg:8080/ambit2/feature"));
 
-            System.out.println(response.getEntity());
+            
 
-            if (!(response.getStatus().getCode() == 200)) {
-                System.out.println(targeturi);
-                System.out.println(response.getStatus().getCode());
+            if (!(response.getStatus().getCode() == 200)) {                
                 Exception failure = new Exception("Feature Generation Failure!");
-                errorRep.append(failure, "Could not generate a new feaure in AMBIT server",
+                errorRep.append(failure, "Could not generate a new feaure in dataset server",
                         Status.SERVER_ERROR_BAD_GATEWAY);
                 throw failure;
             }

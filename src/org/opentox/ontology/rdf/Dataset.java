@@ -372,7 +372,7 @@ public class Dataset extends RDFHandler implements Serializable, IDataset{
     
 
     /**
-     * Similar to {@link org.opentox.ontology.rdf.Dataset#getInstaces(java.lang.String, boolean)
+     * Similar to {@link org.opentox.ontology.rdf.Dataset#getInstaces(java.lang.String, boolean) }
      * but the generated Instances is constructed with respect to a certain model.
      * @param model_id
      * @return Instances for prediction using a given model.
@@ -509,8 +509,8 @@ public class Dataset extends RDFHandler implements Serializable, IDataset{
 
     /**
      *
-     * @param predictedData
-     * @return
+     * @param predictedData Instances containing just the predictions.
+     * @return Populated Dataset.
      */
     public synchronized Dataset populateDataset(Instances predictedData) {
         OntModel datasetModel = null;

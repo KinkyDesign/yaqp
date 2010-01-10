@@ -41,7 +41,7 @@ public class MlrPredictor extends ErrorSource implements IPredictor {
     }
 
     /**
-     * An implementation of the corresponding method in {@link Predictor } for
+     * An implementation of the corresponding method in {@link org.opentox.interfaces.IPredictor } for
      * MLR models.
      * @param form The posted parameters as an instance of {@link org.restlet.data.Form }
      * @param model_id The id of the model to be used for the prediction.

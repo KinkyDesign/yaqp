@@ -116,7 +116,7 @@ public class AlgorithmReporter extends ErrorSource implements  IAlgorithmReporte
             MlrMetaInf.setAbout(OTResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.title = ("mlr");
             MlrMetaInf.subject = ("MLR, Multiple Linear Regression");
-            MlrMetaInf.algorithmType = AlgorithmTypes.Class.RegressionEagerSingleTarget;
+            MlrMetaInf.algorithmType = AlgorithmTypes.RegressionEagerSingleTarget;
             MlrMetaInf.description = ("Multiple Linear Regression Training Algorithm");
             MlrMetaInf.identifier = (OTResource.URIs.mlrAlgorithmURI);
             MlrMetaInf.setParameters(Parameters(AlgorithmEnum.mlr));
@@ -128,7 +128,7 @@ public class AlgorithmReporter extends ErrorSource implements  IAlgorithmReporte
             SvmMetaInf.setAbout(OTResource.URIs.svmAlgorithmURI);
             SvmMetaInf.title = ("svm");
             SvmMetaInf.subject = ("SVM Regression");
-            SvmMetaInf.algorithmType = AlgorithmTypes.Class.RegressionEagerSingleTarget;
+            SvmMetaInf.algorithmType = AlgorithmTypes.RegressionEagerSingleTarget;
             SvmMetaInf.description = ("Training Algorithm for Support Vector"
                     + "Machine Regression Models");
             SvmMetaInf.setParameters(Parameters(AlgorithmEnum.svm));
@@ -141,7 +141,7 @@ public class AlgorithmReporter extends ErrorSource implements  IAlgorithmReporte
             SvcMetaInf.setAbout(OTResource.URIs.svcAlgorithmURI);
             SvcMetaInf.title = ("svc");
             SvcMetaInf.subject = ("SVC Classification");
-            SvcMetaInf.algorithmType = AlgorithmTypes.Class.ClassificationEagerSingleTarget;
+            SvcMetaInf.algorithmType = AlgorithmTypes.ClassificationEagerSingleTarget;
             SvcMetaInf.description = ("Training Algorithm for Support Vector"
                     + "Machine Classification Models");
             SvcMetaInf.setParameters(Parameters(AlgorithmEnum.svc));

@@ -35,7 +35,7 @@ public interface IOntClass {
 
     /**
      * Returns the Resource of this class
-     * ( {@link org.opentox.namespaces.Namespace.Class } ).
+     * ( {@link org.opentox.interfaces.IOntClass } ).
      * @return the corresponding jena resource.
      */
     Resource getResource();

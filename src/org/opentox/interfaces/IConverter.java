@@ -5,7 +5,8 @@ import java.io.InputStream;
 import weka.core.Instances;
 
 /**
- *
+ * An abstract converter between different representations of dataset such as Instances
+ * (instance of {@link weka.core.Instances } or an ARFF file) and DSD files.
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry

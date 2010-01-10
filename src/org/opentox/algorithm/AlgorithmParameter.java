@@ -10,7 +10,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class AlgorithmParameter<E> {
+public class AlgorithmParameter<E extends Object> {
 
     /**
      * The parameter's name.

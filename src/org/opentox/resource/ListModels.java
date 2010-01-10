@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import org.opentox.database.ModelsTable;
 import org.opentox.interfaces.IProvidesHttpAccess;
+import org.opentox.interfaces.Jterator;
 import org.opentox.media.OpenToxMediaType;
 import org.opentox.ontology.namespaces.OTClass;
 import org.opentox.ontology.namespaces.OTProperties;
@@ -31,7 +32,7 @@ import org.restlet.resource.ResourceException;
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class ListModels extends OTResource
-        implements IProvidesHttpAccess{
+        implements IProvidesHttpAccess {
 
     private static final long serialVersionUID = 203859831723987321L;
     /**
@@ -40,10 +41,12 @@ public class ListModels extends OTResource
      * is not case sensitive, so svm will give the same results with SVM ro Svm.
      */
     private static final String ALGORITHM_TYPE_QUERY = "algorithm";
+    private static final String MAX_RESULTS_QUERY = "max";
     /**
      * Database Query
      */
     private String searchAlgorithm = "";
+    private int max = Integer.MAX_VALUE;
 
     /**
      * Initializes the resource.
@@ -62,6 +65,10 @@ public class ListModels extends OTResource
         variants.add(new Variant(OpenToxMediaType.TEXT_N3));
         Form queryForm = getReference().getQueryAsForm();
         searchAlgorithm = queryForm.getFirstValue(ALGORITHM_TYPE_QUERY);
+        try {
+            max = Integer.parseInt(queryForm.getFirstValue(MAX_RESULTS_QUERY));
+        } catch (NumberFormatException nfe) {
+        }
     }
 
     /**
@@ -76,11 +83,25 @@ public class ListModels extends OTResource
         MediaType mediatype = variant.getMediaType();
         Representation rep = null;
         ReferenceList list = new ReferenceList();
+
+
+//      ------- Create the list ----------
+        Jterator<String> jt;
         if (!(searchAlgorithm == null)) {
-            list = ModelsTable.INSTANCE.getReferenceListFromAlgId(searchAlgorithm);
+            jt = ModelsTable.INSTANCE.search(ModelsTable.COL_MODEL_URI,
+                    ModelsTable.COL_ALGORITHM_ID, searchAlgorithm);
         } else {
-            list = ModelsTable.INSTANCE.getModelsAsReferenceList();
+            jt = ModelsTable.INSTANCE.iterator(ModelsTable.COL_MODEL_URI);
         }
+
+        int model_counter = 0;
+        while (jt.hasNext() && model_counter<max) {
+            list.add(jt.next());
+            model_counter++;
+        }
+        jt.close();
+//      -----------------------------------
+
 
 
         if ((MediaType.TEXT_URI_LIST).equals(mediatype)) {

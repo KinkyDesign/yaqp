@@ -113,7 +113,7 @@ import weka.core.Instances;
                 if (model.getErrorRep().getErrorLevel() == 0) {
 
                     representation = new StringRepresentation(OTResource.URIs.modelURI + "/"
-                            + ModelsTable.INSTANCE.registerNewModel(
+                            + ModelsTable.INSTANCE.register(
                             OTResource.URIs.mlrAlgorithmURI) + "\n");
 
                 }
@@ -150,7 +150,6 @@ import weka.core.Instances;
     @Override
     public synchronized ErrorRepresentation checkParameters() {
         final Status clientPostedWrongParametersStatus = Status.CLIENT_ERROR_BAD_REQUEST;
-
 
         /**
          * Check the dataset_uri parameter.........

@@ -3,9 +3,9 @@ package org.opentox.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentox.OpenToxApplication;
 import org.opentox.Server;
 import org.opentox.interfaces.IAcceptsRepresentation;
+import org.opentox.interfaces.IProvidesHttpAccess;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -19,7 +19,8 @@ import org.restlet.resource.ResourceException;
  *
  * @author chung
  */
-public class ShutDownResource extends OTResource implements IAcceptsRepresentation {
+public class ShutDownResource extends OTResource 
+        implements IAcceptsRepresentation, IProvidesHttpAccess {
 
     private static boolean sentShutDownRequest = false;
     private static long timeOfShutDownRequest = 0;
@@ -95,7 +96,7 @@ public class ShutDownResource extends OTResource implements IAcceptsRepresentati
     }
 
     @Override
-    protected Representation get(Variant variant) throws ResourceException {
+    public Representation get(Variant variant) throws ResourceException {
         return new StringRepresentation("ShutDown service...\n" +
                 "[ Only Administrators can shutdown the server! ]\n");
     }

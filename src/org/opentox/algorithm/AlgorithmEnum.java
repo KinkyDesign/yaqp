@@ -70,9 +70,9 @@ public enum AlgorithmEnum implements Iterable<String> {
 
     private class IteratorImpl implements Iterator<String> {
 
-        int count = -1;
+        private int count = -1;
         private AlgorithmEnum[] values = AlgorithmEnum.values();
-        private final int SIZE = values.length;
+        private final int SIZE = values.length - 1;
 
         public boolean hasNext() {
             return count < SIZE - 1;
@@ -93,7 +93,7 @@ public enum AlgorithmEnum implements Iterable<String> {
 
     /**
      * Iterator over all algorithm names.
-     * @return
+     * @return Iterator.
      */
     public Iterator<String> iterator() {
         return new IteratorImpl();

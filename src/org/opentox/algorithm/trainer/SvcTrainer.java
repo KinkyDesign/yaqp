@@ -201,7 +201,7 @@ public class SvcTrainer extends AbstractTrainer {
                         // if status is OK(200), register the new model in the database and
                         // return the URI to the client.
                         rep = new StringRepresentation(URIs.modelURI + "/"
-                                + ModelsTable.INSTANCE.registerNewModel(URIs.svcAlgorithmURI) + "\n");
+                                + ModelsTable.INSTANCE.register(URIs.svcAlgorithmURI) + "\n");
                     } else {
                         //rep = new StringRepresentation(internalStatus.toString());
                     }

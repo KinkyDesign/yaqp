@@ -29,16 +29,15 @@ public class AlgorithmYamlFormatter extends AbstractAlgorithmFormatter{
         builder.append("---\nAlgorithm:\n");
         builder.append("    name : " + metainf.title + "\n");
         builder.append("    id : " + metainf.identifier + "\n");
-        builder.append("    AlgorithmType : " + metainf.algorithmType + "\n");
+        builder.append("    AlgorithmType : " + metainf.algorithmType.getURI() + "\n");
         builder.append("    Parameters:\n");
         
             for (int i = 0; i < metainf.Parameters.size(); i++) {
                 builder.append("        -" + metainf.Parameters.get(i).paramName + ":\n");
-                builder.append("            type:" + metainf.Parameters.get(i).dataType.toString()+"\n");
+                builder.append("            type:" + metainf.Parameters.get(i).dataType.getURI()+"\n");
                 builder.append("            defaultValue:" + metainf.Parameters.get(i).paramValue.toString()+"\n");
             }
-        
-        builder.append("    statisticsSupported:\n");
+                
         
         return new StringRepresentation(builder.toString(), mime);
     }

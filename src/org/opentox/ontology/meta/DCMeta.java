@@ -1,11 +1,12 @@
 package org.opentox.ontology.meta;
 
+
 /**
  *
  * @author Sopasakis Pantelis
  */
 public class DCMeta {
-
+    
     public String
             title,
             description,

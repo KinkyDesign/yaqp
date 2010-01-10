@@ -13,11 +13,14 @@ import java.util.Map;
 import org.opentox.interfaces.IOntClass;
 
 /**
- * Superclass for all Namespaces introduced in opentox such as {@link org.opentox.namespaces.AlgorithmTypes }
- * and {@link org.opentox.namespaces.OT }
+ * Superclass for all Namespaces introduced in opentox such as 
+ * {@link org.opentox.ontology.namespaces.AlgorithmTypes },
+ * {@link org.opentox.ontology.namespaces.OTProperties }
+ * and {@link org.opentox.ontology.namespaces.OTClass }
  * @author OpenTox - http://www.opentox.org
  * @author Sopasakis Pantelis
  * @author Sarimveis Harry
+ * @see org.opentox.interfaces.IOntClass
  */
 public abstract class AbsOntClass implements IOntClass {
 
@@ -77,7 +80,7 @@ public abstract class AbsOntClass implements IOntClass {
 
     /**
      * Returns the Resource of this class
-     * ( {@link org.opentox.namespaces.AbsOntClass.Class } ).
+     * ( {@link org.opentox.ontology.namespaces.AbsOntClass.Class } ).
      * @return the corresponding jena resource.
      */
     public Resource getResource() {
@@ -157,7 +160,7 @@ public abstract class AbsOntClass implements IOntClass {
 
         /**
          * Returns the Resource of this class
-         * ( {@link org.opentox.namespaces.AbsOntClass.Class } ).
+         * ( {@link org.opentox.ontology.namespaces.AbsOntClass.Class } ).
          * @return the corresponding jena resource.
          */
         public Resource getResource(){

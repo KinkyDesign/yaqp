@@ -1,5 +1,6 @@
 package org.opentox.interfaces;
 
+import org.opentox.error.ErrorRepresentation;
 import org.restlet.representation.Representation;
 
 /**
@@ -22,5 +23,12 @@ public interface ITrainer extends IProne2Error {
      * @return Representation of the model URI.
      */
     public abstract Representation train();
+
+    /**
+     * Check the consistency of the posted parameters.
+     * @return A null Representation if the posted parameters are consistent,
+     * or an Error Message otherwise.
+     */
+    public abstract ErrorRepresentation checkParameters();
 
 }

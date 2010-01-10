@@ -25,7 +25,7 @@ public class TaskResource extends OTResource {
     /**
      * TODO: Return a representation of the task - use org.opentox.rdf.Task.
      * @param variant
-     * @return
+     * @return Representation of the given variant.
      * @throws ResourceException
      */
     @Override

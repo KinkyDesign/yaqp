@@ -32,10 +32,7 @@ public interface IModel extends IProne2Error{
      * of the dataset used to train it, its target feature, the Data and a List of
      * tuning parameters for the training algorithm. The RDF document is built according
      * to the specification of OpenTox API (v 1.1).
-     * @param model_id The id of the model (Integer).
-     * @param dataseturi The URI of the dataset used to train the model.
-     * @param data The Instances object containing the training data.
-     * @param algorithmParameters A List of the tuning parameters of the algorithm.
+     * @param meta Meta-information about the model.
      * @param out The output stream used to store the model.
      */
     void createModel(ModelMeta meta, OutputStream out);

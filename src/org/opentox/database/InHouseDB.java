@@ -12,7 +12,8 @@ import org.opentox.OpenToxApplication;
  * article</a> for details ). Only one object of this class can be created! The access point
  * pf this class is {@link InHouseDB#INSTANCE } and is the only object that can be created.
  * The contructor of InHouseDB is private and cannot be accessed from other classes and
- * what is more, InHouseDB cannot be subclassed. The interface {@link  DataBaseAccess } provides
+ * what is more, InHouseDB cannot be subclassed. The interface 
+ * {@link  org.opentox.interfaces.IDataBaseAccess } provides
  * an API for classes used to access certain tables of the database such as the Models' and
  * the Users' ones.
  *
@@ -104,44 +105,32 @@ public final class InHouseDB implements IDataBaseAccess {
         ResultSet rs = null;
         Statement stmt = null;
         Boolean exists1 = false,
-                exists2 = false,
-                exists3 = false;
+                exists2 = false;
 
         try {
             md = connection.getMetaData();
 
             rs = md.getTables(null, null, "%", null);
 
-            while (rs.next() && !(exists1 && exists2 && exists3)) {
-                if (rs.getString(3).equals(ModelsTable.MODELS_STACK_TABLE)) {
+            while (rs.next() && !(exists1 && exists2) ) {
+               
+                if (rs.getString(3).equals(ModelsTable.MODEL_INFO_TABLE)) {
                     exists1 = true;
                 }
-                if (rs.getString(3).equals(ModelsTable.MODEL_INFO_TABLE)) {
-                    exists2 = true;
-                }
                 if (rs.getString(3).equals(UsersTable.USER_ACCOUNTS_TABLE)) {
-                    exists3 = true;
+                    exists2 = true;
                 }
             }
 
 
-            if ((!exists1)||(!exists2)) {
+            if (!exists1) {
                 ModelsTable.INSTANCE.create();
             }
             
-            if (!exists3) {
+            if (!exists2) {
                 UsersTable.INSTANCE.create();
             }
-
-            /**
-             * When loading the tables,
-             * update the entry of MODELS_STACK_TABLE...
-             */
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM " + ModelsTable.MODELS_STACK_TABLE);
-            while (rs.next()) {
-                ModelsTable.modelsStack = rs.getInt("STACK");
-            }
+            
 
         } catch (SQLException ex) {
             OpenToxApplication.opentoxLogger.log(Level.SEVERE, null, ex);

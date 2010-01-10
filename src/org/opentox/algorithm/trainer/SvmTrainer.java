@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.opentox.algorithm.SvmParameters;
 import org.opentox.resource.OTResource.Directories;
 import org.opentox.resource.OTResource.URIs;
 import org.opentox.algorithm.dataprocessing.DataCleanUp;
@@ -169,7 +170,7 @@ import weka.core.converters.ArffSaver;
                         // if status is OK(200), register the new model in the database and
                         // return the URI to the client.
                         representation = new StringRepresentation(URIs.modelURI + "/"
-                                + ModelsTable.INSTANCE.registerNewModel(URIs.svmAlgorithmURI) + "\n");
+                                + ModelsTable.INSTANCE.register(URIs.svmAlgorithmURI) + "\n");
                     }
                 }
             } catch (AssertionError ex) {

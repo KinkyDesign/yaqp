@@ -1,13 +1,16 @@
 package org.opentox.database;
 
+import java.util.Iterator;
 import org.opentox.interfaces.ITable;
 import org.opentox.interfaces.IDataBaseAccess;
 import org.opentox.auth.Priviledges;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import org.opentox.OpenToxApplication;
+import org.opentox.interfaces.Jterator;
 import static org.opentox.auth.DigestGenerator.*;
 
 /**
@@ -184,6 +187,7 @@ public class UsersTable implements IDataBaseAccess, ITable {
     }
 
 
+    // TODO: Improve the format of the returned string by this method!
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -223,10 +227,15 @@ public class UsersTable implements IDataBaseAccess, ITable {
     }
 
     public static void main(String[] args) {
-        UsersTable udb = UsersTable.INSTANCE;
-        
-        udb.addUser("chung", "abfhs8y", Priviledges.ADMIN);
-        udb.addUser("hampos", "13@.6fa/'5tr#ew", Priviledges.ADMIN);
-        System.out.println(udb);
+        UsersTable udb = UsersTable.INSTANCE;                
+        System.out.printf(Locale.UK, "%s t", udb);
+    }
+
+    public Jterator<String> iterator(String ColumnName) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Jterator<String> search(String IterableCoumn, String SearchColumn, String keyword) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -22,7 +22,7 @@ public class ConstantParameters {
     public static final AlgorithmParameter<Integer> CACHESIZE = CACHESIZE((int)250007);
 
     public static final AlgorithmParameter<String> TARGET(String value) {
-        return new AlgorithmParameter<String>("target",
+        return new AlgorithmParameter<String>("prediction_feature",
                 XSDDatatype.XSDanyURI, value, "mandatory");
     }
 

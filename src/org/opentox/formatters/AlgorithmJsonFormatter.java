@@ -28,12 +28,12 @@ public class AlgorithmJsonFormatter extends AbstractAlgorithmFormatter {
         builder.append("\"Algorithm\": \n{\n");
         builder.append("\"name\" : \""+metainf.title+"\",\n");
         builder.append("\"id\" : \""+metainf.identifier+"\",\n");
-        builder.append("\"AlgorithmType\" : \""+metainf.algorithmType+"\",\n");
+        builder.append("\"AlgorithmType\" : \""+metainf.algorithmType.getURI()+"\",\n");
         builder.append("\"Parameters\" : {\n");
         for (int i=0;i<metainf.Parameters.size();i++){
             builder.append("\""+metainf.Parameters.get(i).paramName+"\" : { \"type\" : \""+
-                    metainf.Parameters.get(i).dataType.toString()+
-                    "\" , \"defaultValue\"  :\""+metainf.Parameters.get(i).paramValue.toString()+"\"\n");
+                    metainf.Parameters.get(i).dataType.getURI()+
+                    "\" , \"defaultValue\"  :\""+metainf.Parameters.get(i).paramValue.toString()+" \" } \n");
         }
         builder.append("}\n");
         

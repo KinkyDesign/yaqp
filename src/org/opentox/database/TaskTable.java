@@ -1,7 +1,9 @@
 package org.opentox.database;
 
+import java.util.Iterator;
 import org.opentox.interfaces.ITable;
 import org.opentox.interfaces.IDataBaseAccess;
+import org.opentox.interfaces.Jterator;
 
 /**
  *
@@ -25,6 +27,14 @@ public final class TaskTable implements IDataBaseAccess, ITable {
     }
 
     public void create() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Jterator<String> iterator(String ColumnName) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Jterator<String> search(String IterableCoumn, String SearchColumn, String keyword) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

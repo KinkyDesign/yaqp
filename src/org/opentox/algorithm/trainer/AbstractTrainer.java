@@ -2,9 +2,7 @@ package org.opentox.algorithm.trainer;
 
 import org.opentox.interfaces.ITrainer;
 import java.net.URI;
-import org.opentox.error.ErrorRepresentation;
 import org.opentox.error.ErrorSource;
-import org.opentox.interfaces.IProne2Error;
 import org.restlet.data.Form;
 import org.restlet.resource.ServerResource;
 
@@ -16,7 +14,8 @@ import org.restlet.resource.ServerResource;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public abstract class AbstractTrainer extends ErrorSource implements ITrainer{
+public abstract class AbstractTrainer extends ErrorSource
+        implements ITrainer{
     
 
     protected URI targeturi;
@@ -39,14 +38,7 @@ public abstract class AbstractTrainer extends ErrorSource implements ITrainer{
         this.resource = resource;
     }
 
-    
-
-    /**
-     * Check the consistency of the posted parameters.
-     * @return A null Representation if the posted parameters are consistent,
-     * or an Error Message otherwise.
-     */
-    public abstract ErrorRepresentation checkParameters();
+       
 
     protected @interface Regression{ String name() default "";  };
 

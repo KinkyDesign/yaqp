@@ -1,9 +1,7 @@
-package org.opentox.algorithm.trainer;
+package org.opentox.algorithm;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentox.algorithm.AlgorithmParameter;
-import org.opentox.algorithm.ConstantParameters;
 
 /**
  * TODO: Move this class.
@@ -19,40 +17,40 @@ public class SvmParameters {
      * The kernel used in the SVM model.
      * This can be rbf, linear, sigmoid or polynomial.
      */
-    protected String kernel = null;
+    public String kernel = null;
     /**
      * The name of the target attribute which normally is the
      * URI of a feature definition.
      */
-    protected  String targetAttribute = null;
+    public  String targetAttribute = null;
     /**
      * The degree of the polynomial kernel (when used).
      */
-    protected String degree = null;
+    public String degree = null;
     /**
      * The cahed memory used in model training.
      */
-    protected String cacheSize = null;
+    public String cacheSize = null;
     /**
      * The Cost coefficient.
      */
-    protected String cost = null;
+    public String cost = null;
     /**
      * The parameter epsilon used in SVM models.
      */
-    protected String epsilon = null;
+    public String epsilon = null;
     /**
      * The kernel parameter gamma used in various kernel functions.
      */
-    protected String gamma = null;
+    public String gamma = null;
     /**
      * The bias of the support vector model.
      */
-    protected String coeff0 = null;
+    public String coeff0 = null;
     /**
      * The tolerance used in model training.
      */
-    protected String tolerance = null;
+    public String tolerance = null;
 
     /**
      * Returns the SVM parameters as a list of {@link AlgorithmParameter } objects.

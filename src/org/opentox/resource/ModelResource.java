@@ -19,6 +19,8 @@ import org.opentox.error.ErrorRepresentation;
 import org.opentox.error.ErrorSource;
 import org.opentox.formatters.ModelFormatter;
 import org.opentox.interfaces.IAcceptsRepresentation;
+import org.opentox.interfaces.IProvidesHttpAccess;
+import org.opentox.interfaces.IRemovableResource;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -38,7 +40,8 @@ import org.restlet.resource.ResourceException;
  * @author Sarimveis Harry
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
-public class ModelResource extends OTResource implements IAcceptsRepresentation {
+public class ModelResource extends OTResource 
+        implements IAcceptsRepresentation, IProvidesHttpAccess, IRemovableResource {
 
     private static final long serialVersionUID = 26047187263491246L;
     private String model_id;
@@ -73,7 +76,7 @@ public class ModelResource extends OTResource implements IAcceptsRepresentation 
      * @return StringRepresentation
      */
     @Override
-    protected Representation get(Variant variant) {        
+    public Representation get(Variant variant) {
         ErrorRepresentation errorRepr = new ErrorRepresentation();
         ModelFormatter modelFormatter = null;
         try {
@@ -129,12 +132,12 @@ public class ModelResource extends OTResource implements IAcceptsRepresentation 
 
 
     @Override
-    protected Representation delete() {
+    public Representation delete() {
         String responseText = null;
         try {
             if (opentoxClient.INSTANCE.IsMimeAvailable(new URI("http://localhost:"+Server.__PORT_+"/model/" + model_id),
                     MediaType.TEXT_XML, false)) {
-                ModelsTable.INSTANCE.removeModel(model_id);
+                ModelsTable.INSTANCE.remove(model_id);
                 File modelFile = new File(Directories.modelRdfDir + "/" + model_id);
                 responseText = "The resource was detected and removed from OT database successfully!";
                 if (modelFile.exists()) {

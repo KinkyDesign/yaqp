@@ -1,6 +1,5 @@
 package org.opentox.ontology.namespaces;
 
-import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  *
@@ -9,14 +8,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @author Sarimveis Harry
  */
 public class AlgorithmTypes extends AbsOntClass{
-
-    private static final long serialVersionUID = -6959757110626828334L;
-
-    public static class Class extends AbsOntClass.Class{
-
-        public Class(Resource resource){
-            super(resource);
-        }
 
         public static final Class ClassificationEagerMultipleTargets =
                 new Class(m_model.createResource(String.format(_NS, "ClassificationEagerMultipleTargets")));
@@ -40,6 +31,6 @@ public class AlgorithmTypes extends AbsOntClass{
                 new Class(m_model.createResource(String.format(_NS, "MultipleTargets")));
         public static final Class MSDMTox =
                 new Class(m_model.createResource(String.format(_NS, "MSDMTox")));
-    };
+    
 }
 

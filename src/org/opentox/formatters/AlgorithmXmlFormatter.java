@@ -25,7 +25,7 @@ public class AlgorithmXmlFormatter extends AbstractAlgorithmFormatter{
         StringBuilder builder = new StringBuilder();
         builder.append(OTResource.xmlIntro);
         builder.append("<algorithm name=\"" + metainf.title + "\" id=\"" + metainf.identifier + "\">\n");
-        builder.append("<algorithmType>" + metainf.algorithmType + "</algorithmType>\n");
+        builder.append("<algorithmType>" + metainf.algorithmType.getURI() + "</algorithmType>\n");
 
         builder.append("<Parameters>\n");
    

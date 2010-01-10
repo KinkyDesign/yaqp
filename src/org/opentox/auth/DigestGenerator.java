@@ -51,9 +51,15 @@ public class DigestGenerator {
 
     /**
      * Gives the SHA or MD5 digest for a given string message. See
-     * <a href="http://snippets.dzone.com/posts/show/3686">this snippet</a>
-     * @param message Initial Message
+     * <a href="http://snippets.dzone.com/posts/show/3686">this snippet</a>.
+     * Given the digest of the message there is no way to retrieve the initial
+     * message.
+     * @param message Initial Message such as a password or some other sensitive
+     * message.
+     * @param DigestAlgorithm The Digest Algorithm to be used - Choose one from
+     * the static class {@link DigestAlgorithm }.
      * @return The SHA or MD5 digest that correspongs to the given message.
+     * @see DigestAlgorithm
      */
     public static String generateDigest(String message, String DigestAlgorithm) {
         try {

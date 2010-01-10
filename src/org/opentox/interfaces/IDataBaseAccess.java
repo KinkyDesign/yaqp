@@ -15,10 +15,17 @@ public interface IDataBaseAccess {
     
     
 
+    /**
+     * Methods which are used to created a new table in the database.
+     */
     @Inherited public @interface CreateTable{
         String[] value() default {};
     }
 
+    /**
+     * Methods which are used to add new entried in a table of the database are
+     * annotated using this annotation interface.
+     */
     @Inherited public @interface Registration{
 
     }

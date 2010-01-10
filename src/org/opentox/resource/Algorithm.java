@@ -1,6 +1,5 @@
 package org.opentox.resource;
 
-import org.opentox.algorithm.trainer.AbstractTrainer;
 import org.opentox.algorithm.trainer.SvcTrainer;
 import org.opentox.algorithm.trainer.SvmTrainer;
 import org.opentox.algorithm.trainer.MlrTrainer;
@@ -13,6 +12,7 @@ import org.opentox.algorithm.reporting.AlgorithmReporter;
 
 import org.opentox.algorithm.reporting.AlgorithmReporter.*;
 import org.opentox.interfaces.IAcceptsRepresentation;
+import org.opentox.interfaces.IAlgorithmReporter;
 import org.opentox.interfaces.IProvidesHttpAccess;
 import org.opentox.interfaces.ITrainer;
 import org.restlet.data.Form;
@@ -34,7 +34,7 @@ import org.restlet.resource.ResourceException;
  * @version 1.3.3 (Last update: Dec 20, 2009)
  */
 public class Algorithm extends OTResource
-        implements IAcceptsRepresentation, IProvidesHttpAccess{
+        implements IAcceptsRepresentation, IProvidesHttpAccess {
 
     private static final long serialVersionUID = 8992374761250990L;
     /**
@@ -86,7 +86,7 @@ public class Algorithm extends OTResource
         /** The algorithm id can be one of {svm, mlr, svc} **/
         String alg = Reference.decode(getRequest().getAttributes().get("id").toString());
         algorithm = AlgorithmEnum.getAlgorithmEnum(alg);
-        
+
     }
 
     /**
@@ -97,12 +97,12 @@ public class Algorithm extends OTResource
      */
     @Override
     public Representation get(Variant variant) {
-               
+
 
         Representation representation = null;
+        MediaType mediatype = variant.getMediaType();
 
-
-        if (variant.getMediaType().equals(MediaType.TEXT_URI_LIST)) {
+        if (mediatype.equals(MediaType.TEXT_URI_LIST)) {
             ReferenceList list = new ReferenceList();
             list.add(getReference());
             representation = list.getTextRepresentation();
@@ -111,8 +111,8 @@ public class Algorithm extends OTResource
                 case svm:
                 case mlr:
                 case svc:
-                    representation = new AlgorithmReporter().formatedRepresntation(
-                            variant.getMediaType(), algorithm);
+                    IAlgorithmReporter algorithm_reporter = new AlgorithmReporter();
+                    representation = algorithm_reporter.formatedRepresntation(mediatype, algorithm);
                     break;
                 default:
                     getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
@@ -133,12 +133,11 @@ public class Algorithm extends OTResource
     public Representation post(Representation entity)
             throws ResourceException {
 
-        
+
         Representation representation = null;
         Status status = Status.SUCCESS_ACCEPTED;
 
         ITrainer trainer = null;
-        
 
 
         switch (algorithm) {
@@ -163,7 +162,9 @@ public class Algorithm extends OTResource
         }
 
 
-        getResponse().setStatus(trainer.getErrorRep().getStatus().getCode()==202 ? Status.SUCCESS_OK : trainer.getErrorRep().getStatus());
+        getResponse().
+                setStatus(trainer.getErrorRep().getStatus().getCode() == 202
+                ? Status.SUCCESS_OK : trainer.getErrorRep().getStatus());
         return representation;
     }
 }

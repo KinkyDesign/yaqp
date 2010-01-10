@@ -39,7 +39,8 @@ public class CredentialsVerifier extends SecretVerifier {
 
     /**
      * Verify if a given pair of username and password are valid performing
-     * a database query.
+     * a database query. The given password is compared to a digest in the
+     * database.
      * @param identifier the username.
      * @param inputSecret Character Array of the password/
      * @return true if the user is authenticated and false if not.
