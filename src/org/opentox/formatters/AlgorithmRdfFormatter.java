@@ -95,9 +95,6 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             algorithm.addProperty(jenaModel.createAnnotationProperty(RDF.type.getURI()),
                     jenaModel.createOntResource(metainf.algorithmType.getURI()));
 
-            // owl:sameAs
-            // This line is wrong:
-//            algorithm.setSameAs(jenaModel.createResource(metainf.algorithmType.getURI(), OTClass.Algorithm.getResource()));
 
 
             Individual iparam;
