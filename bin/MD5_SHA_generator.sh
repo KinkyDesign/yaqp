@@ -33,6 +33,7 @@ SHA=sha512sum;
 MD5=md5sum;
 MD5FILE=md5sums;
 SHAFILE=sha512sums;
+BASE=..
 
 if [ -e $MD5FILE ]
 then
@@ -46,12 +47,13 @@ echo "Removing the old file: $SHAFILE"
 rm $SHAFILE;
 fi
 
-for file in  `find . -type f`
+for file in  `find $BASE -type f`
  do
    if [ ! -d $file ]
    then
     
-    $SHA $file >> $SHAFILE
+    $SHA $file >> $SHAFILE;
+    $MD5 $file >> $MD5FILE;
    fi
  done
 

@@ -26,6 +26,7 @@ public class OTProperties extends AbsOntClass {
             m_model.createProperty(String.format(_NS, "hasSource"));
     public static final Property conformer =
             m_model.createProperty(String.format(_NS, "conformer"));
+    @Deprecated
     public static final Property isA =
             m_model.createProperty(String.format(_NS, "isA"));
     public static final Property model =

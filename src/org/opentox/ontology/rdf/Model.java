@@ -139,8 +139,9 @@ public class Model extends RDFHandler  implements Serializable, IModel{
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.title.getURI()), "Model " + meta.model_id);
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.identifier.getURI()), URIs.modelURI + "/" + meta.model_id);
             ot_model.addProperty(jenaModel.createAnnotationProperty(DC.creator.getURI()), URIs.baseURI);
-            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.date.getURI()), java.util.GregorianCalendar.getInstance().getTime().toString());
-            ot_model.addProperty(jenaModel.createAnnotationProperty(OTProperties.isA.getURI()), OTClass.Model.getResource());
+            ot_model.addProperty(jenaModel.createAnnotationProperty(DC.date.getURI()), java.util.GregorianCalendar.getInstance().getTime().toString());            
+
+            
 
             //the algorithm
             Individual algorithm = jenaModel.createIndividual(

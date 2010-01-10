@@ -6,6 +6,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +53,7 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
 
             OTClass.Parameter.createOntClass(jenaModel);
             OTClass.Algorithm.createOntClass(jenaModel);
+            metainf.algorithmType.createOntClass(jenaModel);
 
 
 
@@ -89,12 +91,13 @@ public class AlgorithmRdfFormatter extends AbstractAlgorithmFormatter {
             // dc:identifier
             algorithm.addLiteral(jenaModel.createAnnotationProperty(DC.identifier.getURI()),
                     jenaModel.createTypedLiteral(metainf.identifier, XSDDatatype.XSDanyURI));
-            // ot:isA
-            algorithm.addProperty(jenaModel.createAnnotationProperty(OTProperties.isA.getURI()),
+            // ot:type
+            algorithm.addProperty(jenaModel.createAnnotationProperty(RDF.type.getURI()),
                     jenaModel.createOntResource(metainf.algorithmType.getURI()));
 
             // owl:sameAs
-            algorithm.setSameAs(jenaModel.createResource(metainf.algorithmType.getURI(), OTClass.Algorithm.getResource()));
+            // This line is wrong:
+//            algorithm.setSameAs(jenaModel.createResource(metainf.algorithmType.getURI(), OTClass.Algorithm.getResource()));
 
 
             Individual iparam;
